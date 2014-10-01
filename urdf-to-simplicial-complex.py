@@ -123,7 +123,7 @@ for i in range(0,N):
 C0=[]
 C1=[]
 for i in range(0,N):
-        C0.append(i)
+        C0.append([i])
         for j in range(i+1,N):
                 if M[i,j]==1:
                         C1.append([i,j])
@@ -144,3 +144,7 @@ for p in range(0,len(C2candidates)):
 print C0
 print C1
 print C2
+
+np.save("C0.simcomplex",C0)
+np.save("C1.simcomplex",C1)
+np.save("C2.simcomplex",C2)
