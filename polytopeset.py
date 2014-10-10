@@ -6,6 +6,7 @@ import re
 import math
 from copy import copy 
 from cvxpy import *
+from pyhull.halfspace import Halfspace, HalfspaceIntersection
 
 class PolytopeSet:
         """Set of polytopes, specified by A,b and optional centroid xyz"""
@@ -20,21 +21,75 @@ class PolytopeSet:
                 self.D=[]
                 self.M=[]
                 self.WD=[]
-                self.W=[]
+                self.W=[] ##walkable surface
                 
+        def projectPointOntoHyperplane(self, v, a, b):
+                a=a[0]
+                return v - (v[0]*a[0]+v[1]*a[1]+v[2]*a[2] - b)*a
+
+        def distancePolytopePolytope(self, Ai, bi, Aj, bj):
+                xob = Variable(3)
+                yob = Variable(3)
+                objective = Minimize(sum_squares(xob  - yob ))
+                constraints = [Ai*xob <= bi,Aj*yob <= bj]
+                prob = Problem(objective, constraints)
+                return sqrt(abs(prob.solve())).value
+
+        def distanceWalkableSurfacePolytope(self, Wi, Ai, bi):
+                xob = Variable(3)
+                yob = Variable(3)
+                objective = Minimize(sum_squares(xob  - yob ))
+
+                AsurfaceX = Wi[0]
+                bsurfaceX = Wi[1]
+                ApolyX =    Wi[2]
+                bpolyX =    Wi[3]
+
+                constraints = []
+
+                constraints.append(ApolyX*xob <= bpolyX)
+                constraints.append(AsurfaceX*xob == bsurfaceX)
+
+                constraints.append(Ai*yob <= bi)
+
+                prob = Problem(objective, constraints)
+                return sqrt(abs(prob.solve())).value
+
+        def distanceWalkableSurfaceWalkableSurface(self, Wi, Wj):
+
+                xob = Variable(3)
+                yob = Variable(3)
+                objective = Minimize(sum_squares(xob  - yob ))
+
+                AsurfaceX = Wi[0]
+                bsurfaceX = Wi[1]
+                ApolyX =    Wi[2]
+                bpolyX =    Wi[3]
+
+                AsurfaceY = Wj[0]
+                bsurfaceY = Wj[1]
+                ApolyY =    Wj[2]
+                bpolyY =    Wj[3]
+
+                constraints = []
+
+                constraints.append(ApolyX*xob <= bpolyX)
+                constraints.append(AsurfaceX*xob == bsurfaceX)
+
+                constraints.append(ApolyY*yob <= bpolyY)
+                constraints.append(AsurfaceY*yob == bsurfaceY)
+
+                prob = Problem(objective, constraints)
+                return sqrt(abs(prob.solve())).value
+
+
         def computeDistanceMatrix(self):
                 N = self.N
                 self.M=np.zeros((N,N))
                 self.D=np.zeros((N,N))
                 for i in range(0,N):
                         for j in range(i+1,N):
-                                xob = Variable(3)
-                                yob = Variable(3)
-                                objective = Minimize(sum_squares(xob  - yob ))
-                                constraints = [self.A[i]*xob <= self.b[i],self.A[j]*yob <= self.b[j]]
-                                prob = Problem(objective, constraints)
-
-                                self.D[i,j] = sqrt(abs(prob.solve())).value
+                                self.D[i,j] = self.distancePolytopePolytope(self.A[i],self.b[i],self.A[j],self.b[j])
                                 self.D[j,i] = self.D[i,j]
                                 if self.D[i,j] < self.ROBOT_SPHERE_RADIUS:
                                         self.M[i,j] = 1
@@ -58,29 +113,9 @@ class PolytopeSet:
                 for i in range(0,N):
                         self.WM[i,i]=1
                         for j in range(i+1,N):
-                                xob = Variable(3)
-                                yob = Variable(3)
-                                objective = Minimize(sum_squares(xob  - yob ))
 
-                                AsurfaceX = self.W[i][0]
-                                bsurfaceX = self.W[i][1]
-                                ApolyX = self.W[i][2]
-                                bpolyX = self.W[i][3]
-                                AsurfaceY = self.W[j][0]
-                                bsurfaceY = self.W[j][1]
-                                ApolyY = self.W[j][2]
-                                bpolyY = self.W[j][3]
-
-                                constraints = []
-                                constraints.append(AsurfaceX*xob <= bsurfaceX)
-                                constraints.append(ApolyX*xob <= bpolyX)
-                                constraints.append(AsurfaceX*yob <= bsurfaceY)
-                                constraints.append(ApolyY*yob <= bpolyY)
-
-                                prob = Problem(objective, constraints)
-                                prob.solve()
-                                self.WD[i,j]=self.WD[j,i]=prob.value
-                                if prob.value < self.ROBOT_FOOT_RADIUS:
+                                self.WD[i,j]=self.WD[j,i]=self.distanceWalkableSurfaceWalkableSurface(self.W[i],self.W[j])
+                                if self.WD[i,j] < self.ROBOT_FOOT_RADIUS:
                                         self.WM[i,j]=self.WM[j,i]=1
 
                 self.WD=np.around(self.WD,3)
@@ -128,6 +163,24 @@ class PolytopeSet:
                 np.save("WC1.simcomplex",C1)
                 np.save("WC2.simcomplex",C2)
 
+        def computeProjectableObjectCandidates(self, surfaceElement):
+                if surfaceElement >= len(self.W):
+                        print "exceeds number of walkable surfaces!"
+                        exit
+                W = self.W[surfaceElement]
+                Wobj = np.zeros((self.N))
+                for i in range(0,self.N):
+                        Wobj[i] = self.distanceWalkableSurfacePolytope(W, self.A[i], self.b[i])
+
+                H = []
+                for i in range(0,len(W[2])):
+                        h = Halfspace(W[2][i], W[3][i])
+                        H.append(h)
+                hi = HalfspaceIntersection(H, self.projectPointOntoHyperplane(W[4], W[0],W[1]) )
+                print hi.vertices
+                print np.around(Wobj,3)
+
+
         def getWalkableSurfaces(self):
                 self.W = []
                 ## iterate over all objects and extract information if it is a
@@ -171,7 +224,7 @@ class PolytopeSet:
                                         print R.value, radius
                                         if radius >= self.ROBOT_FOOT_RADIUS:
                                                 ##surface is walkable
-                                                self.W.append([a,b[j],self.A[i],self.b[i]])
+                                                self.W.append([np.array(a),b[j],self.A[i],self.b[i],self.xyz[i]])
                                                 ctrW = ctrW + 1
 
 
@@ -217,23 +270,6 @@ class PolytopeSet:
                                 C2.append([i,j,k])
                         print "2-cells ",p,"/",len(C2candidates)
 
-                C3=[]
-                for p in range(0,len(C3candidates)):
-                        #[i,j,k,l]=C3candidates[p]
-                        #iob = Variable(3)
-                        #job = Variable(3)
-                        #kob = Variable(3)
-                        #lob = Variable(3)
-                        #objective = Minimize(sum_squares(iob-job)+sum_squares(iob-kob)+sum_squares(iob-lob)+sum_squares(job-kob) + sum_squares(job-lob) +sum_squares(kob-lob))
-                        #constraints = [A[i]*iob <= b[i],A[j]*job <= b[j],A[k]*kob <= b[k],A[l]*lob <= b[l]]
-                        #prob = Problem(objective, constraints)
-
-                        #dist = sqrt(abs(prob.solve())).value
-                        #if dist < ROBOT_SPHERE_RADIUS:
-                        #        C3.append([i,j,k,l])
-                        C3.append([i,j,k,l])
-                        print "3-cells ",p,"/",len(C3candidates)
-
                 ###############################################################################
                 ## delete subgraphs of size 4, which are fully connected, 
                 ## and add two 2-cells instead
@@ -242,12 +278,10 @@ class PolytopeSet:
                 print C0
                 print C1
                 print C2
-                print C3
 
                 np.save("C0.simcomplex",C0)
                 np.save("C1.simcomplex",C1)
                 np.save("C2.simcomplex",C2)
-                np.save("C3.simcomplex",C3)
 
         def fromURDF(self,urdf_fname):
                 DEBUG = 1
