@@ -1,9 +1,10 @@
 from BeautifulSoup import BeautifulSoup
+import numpy as np
 import os
 import re
 import sys
 
-DEBUG = 1
+DEBUG = 0
 
 ###############################################################################
 ## Parse URDF, extract box informations for each link
@@ -42,6 +43,9 @@ for i in range(0,len(links)):
         if DEBUG:
                 if sx+sy > 0.5:
                         K.append([sx,sy,sz,x,y,z,ro,po,yo])
+        else:
+                K.append([sx,sy,sz,x,y,z,ro,po,yo])
+
 
 N = len(K)
 print "complexity ",N," over 2 for distance computation"
@@ -53,6 +57,7 @@ print "complexity ",N," over 2 for distance computation"
 from scipy.spatial import ConvexHull
 A=[]
 b=[]
+xyz=[]
 for i in range(0,N):
         if abs(K[i][6])+abs(K[i][7])+abs(K[i][8]) > 0.001:
                 print "please do not rotate any boxes in URDF -- not handled atm"
@@ -73,13 +78,13 @@ for i in range(0,N):
         bh = -E[0:,3]
         A.append(Ah)
         b.append(bh)
+        xyz.append([x,y,z])
 
+np.save("xyz.simcomplex",xyz)
 ###############################################################################
 ## Use convex optimization to compute distances between objects
 ###############################################################################
-from cvxopt.base import *
 from cvxpy import *
-import numpy as np
 
 M=np.zeros((N,N))
 D=np.zeros((N,N))
@@ -99,52 +104,83 @@ for i in range(0,N):
                 else:
                         M[i,j] = 0
                         M[j,i] = 0
+        print i,"/",N
 
 D=np.around(D,3)
+DIST_MATRIX=D
 print D
 ###############################################################################
 ## Use convex optimization to compute possible 2-cell candidates
 ###############################################################################
-C2candidates=[]
-for i in range(0,N):
-        for j in range(i+1,N):
-                if M[i,j]==1:
-                        for k in range(j+1,N):
-                                if M[i,k]+M[j,k]==2:
-                                        #connection between 3 cells
-                                        C2candidates.append([i,j,k])
-
-
-
-###############################################################################
-## Create simplicial complex from distance matrices
-###############################################################################
-
-C0=[]
-C1=[]
-for i in range(0,N):
-        C0.append([i])
-        for j in range(i+1,N):
-                if M[i,j]==1:
-                        C1.append([i,j])
-C2=[]
-for p in range(0,len(C2candidates)):
-        [i,j,k]=C2candidates[p]
-        xob = Variable(3)
-        yob = Variable(3)
-        zob = Variable(3)
-        objective = Minimize(sum_squares(xob-yob)+sum_squares(xob-yob)+sum_squares(yob-zob))
-        constraints = [A[i]*xob <= b[i],A[j]*yob <= b[j],A[k]*zob <= b[k]]
-        prob = Problem(objective, constraints)
-
-        dist = sqrt(abs(prob.solve())).value
-        if dist < ROBOT_SPHERE_RADIUS:
-                C2.append([i,j,k])
-
-print C0
-print C1
-print C2
-
-np.save("C0.simcomplex",C0)
-np.save("C1.simcomplex",C1)
-np.save("C2.simcomplex",C2)
+#C2candidates=[]
+#C3candidates=[]
+#for i in range(0,N):
+#        for j in range(i+1,N):
+#                if M[i,j]==1:
+#                        for k in range(j+1,N):
+#                                if M[i,k]+M[j,k]==2:
+#                                        foundFour=0
+#                                        for l in range(k+1,N):
+#                                                if M[i,l]+M[j,l]+M[k,l]==3:
+#                                                        C3candidates.append([i,j,k,l])
+#                                                        foundFour=1
+#                                        if foundFour==0:
+#                                                #connection between 3 cells
+#                                                C2candidates.append([i,j,k])
+#
+################################################################################
+### Create simplicial complex from distance matrices
+################################################################################
+#
+#C0=[]
+#C1=[]
+#for i in range(0,N):
+#        C0.append([i])
+#        for j in range(i+1,N):
+#                if M[i,j]==1:
+#                        C1.append([i,j])
+#C2=[]
+#for p in range(0,len(C2candidates)):
+#        [i,j,k]=C2candidates[p]
+#        xob = Variable(3)
+#        yob = Variable(3)
+#        zob = Variable(3)
+#        objective = Minimize(sum_squares(xob-yob)+sum_squares(xob-yob)+sum_squares(yob-zob))
+#        constraints = [A[i]*xob <= b[i],A[j]*yob <= b[j],A[k]*zob <= b[k]]
+#        prob = Problem(objective, constraints)
+#        dist = sqrt(abs(prob.solve())).value
+#        if dist < ROBOT_SPHERE_RADIUS:
+#                C2.append([i,j,k])
+#        print "2-cells ",p,"/",len(C2candidates)
+#
+#C3=[]
+#for p in range(0,len(C3candidates)):
+#        #[i,j,k,l]=C3candidates[p]
+#        #iob = Variable(3)
+#        #job = Variable(3)
+#        #kob = Variable(3)
+#        #lob = Variable(3)
+#        #objective = Minimize(sum_squares(iob-job)+sum_squares(iob-kob)+sum_squares(iob-lob)+sum_squares(job-kob) + sum_squares(job-lob) +sum_squares(kob-lob))
+#        #constraints = [A[i]*iob <= b[i],A[j]*job <= b[j],A[k]*kob <= b[k],A[l]*lob <= b[l]]
+#        #prob = Problem(objective, constraints)
+#
+#        #dist = sqrt(abs(prob.solve())).value
+#        #if dist < ROBOT_SPHERE_RADIUS:
+#        #        C3.append([i,j,k,l])
+#        C3.append([i,j,k,l])
+#        print "3-cells ",p,"/",len(C3candidates)
+#
+################################################################################
+### delete subgraphs of size 4, which are fully connected, 
+### and add two 2-cells instead
+################################################################################
+#
+#print C0
+#print C1
+#print C2
+#print C3
+#
+#np.save("C0.simcomplex",C0)
+#np.save("C1.simcomplex",C1)
+#np.save("C2.simcomplex",C2)
+#np.save("C3.simcomplex",C3)
