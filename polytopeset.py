@@ -82,6 +82,25 @@ class PolytopeSet:
                 prob = Problem(objective, constraints)
                 return sqrt(abs(prob.solve())).value
 
+        def distanceWalkableSurfaceHyperplane(self, Wi, ai, bi):
+                xob = Variable(3)
+                yob = Variable(3)
+                objective = Minimize(sum_squares(xob  - yob ))
+
+                AsurfaceX = Wi[0]
+                bsurfaceX = Wi[1]
+                ApolyX =    Wi[2]
+                bpolyX =    Wi[3]
+
+                constraints = []
+
+                constraints.append(ApolyX*xob <= bpolyX)
+                constraints.append(AsurfaceX*xob == bsurfaceX)
+
+                constraints.append(ai[0]*yob[0]+ai[1]*yob[1]+ai[2]*yob[2]== bi)
+
+                prob = Problem(objective, constraints)
+                return [sqrt(abs(prob.solve())).value,np.array(xob.value)]
 
         def computeDistanceMatrix(self):
                 N = self.N
@@ -179,6 +198,61 @@ class PolytopeSet:
                 hi = HalfspaceIntersection(H, self.projectPointOntoHyperplane(W[4], W[0],W[1]) )
                 print hi.vertices
                 print np.around(Wobj,3)
+
+        def fromWalkableSurfaceComputeBoxElement(self, surfaceElement):
+                RobotFootHeight = 0.1
+                if surfaceElement >= len(self.W):
+                        print "exceeds number of walkable surfaces!"
+                        exit
+                W = self.W[surfaceElement]
+                Wobj = np.zeros((self.N))
+                ap = W[0][0]
+                bp = W[1]
+                Bip = []
+                A = []
+                b =[]
+                ##surface hyperplane, but opposite direction
+                Bip.append(Halfspace(-W[0][0],-W[1])) 
+                A.append(-W[0][0])
+                b.append(-W[1])
+                ##distance from surface hyperplane, pointing inside
+                Bip.append(Halfspace(W[0][0],W[1]+RobotFootHeight)) 
+                A.append(W[0][0])
+                b.append(W[1]+RobotFootHeight)
+
+                ##introduce some offset to remove the objects which are adjacent
+                hoffset = 0.0
+                for j in range(0,len(W[2])):
+                        aj = W[2][j]
+                        bj = W[3][j]
+                        if np.dot(aj,ap) >0.99: 
+                                ##hard alignment, either
+                                ##parallel or equal => discard
+                                continue
+                        [value, x0] = self.distanceWalkableSurfaceHyperplane(W,aj,bj)
+                        if value < 0.0001:
+                                #project hyperplane
+                                ajp = aj - (aj.T*ap - bp)*ap
+
+                                bjp = x0[0]*ajp[0]+x0[1]*ajp[1]+x0[2]*ajp[2] - hoffset
+                                Bip.append(Halfspace(ajp,bjp))
+                                A.append(ajp)
+                                b.append(bjp)
+                self.AWA=A
+                self.AWb=b
+
+                #############################################################
+                ## compute distance between box and objects in the scene
+                #############################################################
+                N = len(self.A)
+                WD = []
+                for i in range(0,N):
+                        d=self.distancePolytopePolytope(self.A[i],self.b[i],np.array(A),np.array(b))
+                        if d < 0.0001:
+                                WD.append(d)
+
+                print "Number of objects which have to be projected: ",len(WD)
+                print np.around(WD,3)
 
 
         def getWalkableSurfaces(self):
@@ -284,7 +358,7 @@ class PolytopeSet:
                 np.save("C2.simcomplex",C2)
 
         def fromURDF(self,urdf_fname):
-                DEBUG = 1
+                DEBUG = 0
                 soup = BeautifulSoup(open(urdf_fname))
                 links = soup.robot.findAll("collision")
                 K=[]
