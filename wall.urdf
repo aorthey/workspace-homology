@@ -9,6 +9,28 @@
     <origin rpy="0 0 0" xyz="0 0 0"/>
     </visual>
   </link>
+  <link name="object">
+    <visual>
+      <geometry>
+        <box size="1.0 1.0 1.0"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="1.0 1.0 0.0"/>
+    <material name="wall_colored">
+      <color rgba="1.000000 0.188235 0.003922 1.000000"/>
+    </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="1.0 1.0 1.0"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="1.0 1.0 0.0"/>
+    </collision>
+  </link>
+
+  <joint name="base_to_object" type="fixed">
+    <parent link="base_link"/>
+    <child link="object"/>
+  </joint>
   <!--  ######################################################## -->
   <!--  ######################################################## -->
   <!--  ######################################################## -->

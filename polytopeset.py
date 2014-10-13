@@ -1,12 +1,20 @@
 from BeautifulSoup import BeautifulSoup
 from scipy.spatial import ConvexHull
 import numpy as np
+from numpy import dot
+## vertex enumeration
+from sympy import *
+from itertools import combinations
+###
 import os
 import re
 import math
 from copy import copy 
 from cvxpy import *
 from pyhull.halfspace import Halfspace, HalfspaceIntersection
+from plotter import Plotter
+
+DEBUG = 1
 
 class PolytopeSet:
         """Set of polytopes, specified by A,b and optional centroid xyz"""
@@ -22,16 +30,51 @@ class PolytopeSet:
                 self.M=[]
                 self.WD=[]
                 self.W=[] ##walkable surface
-                
+
+        ## Vertex enumeration problem:
+        ## brute forcing algorithm: check the solutions to all 3x3 submatrices S of A: Sx=b. 
+        ## If x is feasible, then it is a vertex of Ax <= b
+
+        def getVertices(self, A, b):
+                A = Matrix(A)
+                b = Matrix(b+0.01) 
+                M = A.rows
+                N = A.cols
+
+                vertices = []
+                for rowlist in combinations(range(M), N):
+                        Ap = A.extract(rowlist, range(N))
+                        bp = b.extract(rowlist, [0])
+                        if Ap.det() != 0:
+                                xp = np.linalg.solve(Ap,bp)
+                                P = np.less_equal(A*xp,b)
+                                if P.all():
+                                        vertices.append(xp)
+
+                V = np.zeros((len(vertices),3))
+                for i in range(0,len(vertices)):
+                        V[i,0]=vertices[i][0]
+                        V[i,1]=vertices[i][1]
+                        V[i,2]=vertices[i][2]
+                return V
+
         def projectPointOntoHyperplane(self, v, a, b):
                 a=a[0]
-                return v - (v[0]*a[0]+v[1]*a[1]+v[2]*a[2] - b)*a
+                return v - (dot(v,a) - b)*a
+
+        def projectPointOntoPolytope(self, v, Ai, bi):
+                xob = Variable(3)
+                objective = Minimize(sum_squares(xob  - v))
+                constraints = [np.matrix(Ai)*xob <= bi]
+                prob = Problem(objective, constraints)
+                prob.solve()
+                return xob.value
 
         def distancePolytopePolytope(self, Ai, bi, Aj, bj):
                 xob = Variable(3)
                 yob = Variable(3)
                 objective = Minimize(sum_squares(xob  - yob ))
-                constraints = [Ai*xob <= bi,Aj*yob <= bj]
+                constraints = [np.matrix(Ai)*xob <= bi,np.matrix(Aj)*yob <= bj]
                 prob = Problem(objective, constraints)
                 return sqrt(abs(prob.solve())).value
 
@@ -47,10 +90,10 @@ class PolytopeSet:
 
                 constraints = []
 
-                constraints.append(ApolyX*xob <= bpolyX)
-                constraints.append(AsurfaceX*xob == bsurfaceX)
+                constraints.append(np.matrix(ApolyX)*xob <= bpolyX)
+                constraints.append(np.matrix(AsurfaceX)*xob == bsurfaceX)
 
-                constraints.append(Ai*yob <= bi)
+                constraints.append(np.matrix(Ai)*yob <= bi)
 
                 prob = Problem(objective, constraints)
                 return sqrt(abs(prob.solve())).value
@@ -73,11 +116,11 @@ class PolytopeSet:
 
                 constraints = []
 
-                constraints.append(ApolyX*xob <= bpolyX)
-                constraints.append(AsurfaceX*xob == bsurfaceX)
+                constraints.append(np.matrix(ApolyX)*xob <= bpolyX)
+                constraints.append(np.matrix(AsurfaceX)*xob == bsurfaceX)
 
-                constraints.append(ApolyY*yob <= bpolyY)
-                constraints.append(AsurfaceY*yob == bsurfaceY)
+                constraints.append(np.matrix(ApolyY)*yob <= bpolyY)
+                constraints.append(np.matrix(AsurfaceY)*yob == bsurfaceY)
 
                 prob = Problem(objective, constraints)
                 return sqrt(abs(prob.solve())).value
@@ -94,13 +137,22 @@ class PolytopeSet:
 
                 constraints = []
 
-                constraints.append(ApolyX*xob <= bpolyX)
-                constraints.append(AsurfaceX*xob == bsurfaceX)
+                constraints.append(np.matrix(ApolyX)*xob <= bpolyX)
+                constraints.append(np.matrix(AsurfaceX)*xob == bsurfaceX)
 
-                constraints.append(ai[0]*yob[0]+ai[1]*yob[1]+ai[2]*yob[2]== bi)
+                #constraints.append(ai[0]*yob[0]+ai[1]*yob[1]+ai[2]*yob[2]== bi)
+                constraints.append(np.matrix(ai)*yob == bi)
 
                 prob = Problem(objective, constraints)
-                return [sqrt(abs(prob.solve())).value,np.array(xob.value)]
+                d = sqrt(abs(prob.solve())).value
+                xx = None
+                if xob is not None:
+                        xx = np.zeros((3,1))
+                        x=xob.value
+                        xx[0]=x[0]
+                        xx[1]=x[1]
+                        xx[2]=x[2]
+                return [d,xx]
 
         def computeDistanceMatrix(self):
                 N = self.N
@@ -140,7 +192,6 @@ class PolytopeSet:
                 self.WD=np.around(self.WD,3)
                 print self.WD
                 print self.WM
-
 
         def createWalkableSimplicialComplex(self):
                 C2candidates=[]
@@ -201,31 +252,29 @@ class PolytopeSet:
 
         def fromWalkableSurfaceComputeBoxElement(self, surfaceElement):
                 RobotFootHeight = 0.1
+                ##introduce some offset to remove the objects which are adjacent
+                hoffset = 0.0
+
                 if surfaceElement >= len(self.W):
                         print "exceeds number of walkable surfaces!"
                         exit
                 W = self.W[surfaceElement]
-                Wobj = np.zeros((self.N))
-                ap = W[0][0]
+                ap = W[0]
                 bp = W[1]
-                Bip = []
-                A = []
-                b =[]
+                A_box =[]
+                b_box =[]
                 ##surface hyperplane, but opposite direction
-                Bip.append(Halfspace(-W[0][0],-W[1])) 
-                A.append(-W[0][0])
-                b.append(-W[1])
-                ##distance from surface hyperplane, pointing inside
-                Bip.append(Halfspace(W[0][0],W[1]+RobotFootHeight)) 
-                A.append(W[0][0])
-                b.append(W[1]+RobotFootHeight)
+                A_box.append(-ap)
+                b_box.append(-bp)
+                ##distance from surface hyperplane, pointing outside
+                A_box.append(ap)
+                b_box.append(bp+RobotFootHeight)
+                print "ROBOTFOOTHEIGHT", bp+RobotFootHeight, " <<<"
 
-                ##introduce some offset to remove the objects which are adjacent
-                hoffset = 0.0
                 for j in range(0,len(W[2])):
                         aj = W[2][j]
                         bj = W[3][j]
-                        if np.dot(aj,ap) >0.99: 
+                        if np.dot(ap,aj) >0.99: 
                                 ##hard alignment, either
                                 ##parallel or equal => discard
                                 continue
@@ -234,23 +283,70 @@ class PolytopeSet:
                                 #project hyperplane
                                 ajp = aj - (aj.T*ap - bp)*ap
 
-                                bjp = x0[0]*ajp[0]+x0[1]*ajp[1]+x0[2]*ajp[2] - hoffset
-                                Bip.append(Halfspace(ajp,bjp))
-                                A.append(ajp)
-                                b.append(bjp)
-                self.AWA=A
-                self.AWb=b
+                                bjp = dot(x0.T,np.array(ajp).T)
+                                A_box.append(ajp)
+                                b_box.append(bjp)
+
+                A_clean = np.zeros((len(A_box),3))
+                b_clean = np.zeros((len(b_box),1))
+                for j in range(0,len(A_box)):
+                        A_clean[j,0] = A_box[j][0][0]
+                        A_clean[j,1] = A_box[j][0][1]
+                        A_clean[j,2] = A_box[j][0][2]
+                        print b_box[j]
+                        b_clean[j] = b_box[j]
+
+                A_box = A_clean
+                b_box = b_clean
 
                 #############################################################
                 ## compute distance between box and objects in the scene
                 #############################################################
                 N = len(self.A)
                 WD = []
+                print "-----------------------------------------------"
+                print "Distance between Box over walkable surface and"
+                print "object in the environment"
+                print "-----------------------------------------------"
+
+                plot = Plotter()
                 for i in range(0,N):
-                        d=self.distancePolytopePolytope(self.A[i],self.b[i],np.array(A),np.array(b))
+                        A_obj = self.A[i]
+                        b_obj = self.b[i]
+                        ##clean b_obj
+                        b_clean = np.zeros((len(b_obj),1))
+                        for j in range(0,len(b_obj)):
+                                b_clean[j] = b_obj[j]
+                        b_obj = b_clean
+
+                        d=self.distancePolytopePolytope(A_obj,b_obj,A_box,b_box)
                         if d < 0.0001:
                                 WD.append(d)
+                                N_obj=len(A_obj)
+                                N_box=len(A_box)
+                                ##A intersection object box A_iob
+                                A_iob = np.zeros((N_obj+N_box,3))
+                                b_iob = np.zeros((N_obj+N_box,1))
 
+                                for j in range(0,N_obj):
+                                        A_iob[j,:]=A_obj[j]
+                                        b_iob[j]=b_obj[j]
+
+                                for j in range(0,N_box):
+                                        A_iob[j+N_obj,:]=A_box[j]
+                                        b_iob[j+N_obj] = b_box[j]
+
+                                print "Object ",i," distance ",d
+
+                                v_obj = self.getVertices(A_obj,b_obj)
+                                plot.points(v_obj)
+                                v_iob = self.getVertices(A_iob,b_iob)
+                                plot.points(v_iob)
+
+                v_box = self.getVertices(A_box,b_box)
+                plot.points(v_box)
+                plot.show()
+                print "-----------------------------------------------"
                 print "Number of objects which have to be projected: ",len(WD)
                 print np.around(WD,3)
 
@@ -264,6 +360,9 @@ class PolytopeSet:
                 vg = np.array((0,0,1))
                 coneD = float(np.sqrt((2-2*math.cos(self.ROBOT_MAX_SLOPE*math.pi/180.0))))
                 ctrW = 0
+                print "-----------------------------------------------"
+                print "Walkable surfaces"
+                print "-----------------------------------------------"
                 for i in range(0,self.N):
                         ##iterate over all polytopes
                         for j in range(0,len(self.A[i])):
@@ -295,11 +394,12 @@ class PolytopeSet:
                                         self.prob = Problem(objective, constraints)
                                         solver_output = self.prob.solve(solver=ECOS)
                                         radius = self.prob.value
-                                        print R.value, radius
                                         if radius >= self.ROBOT_FOOT_RADIUS:
+                                                print ctrW,": radius on surface: ",radius
                                                 ##surface is walkable
                                                 self.W.append([np.array(a),b[j],self.A[i],self.b[i],self.xyz[i]])
                                                 ctrW = ctrW + 1
+                print "-----------------------------------------------"
 
 
         def computeSimplex(self):
@@ -358,7 +458,6 @@ class PolytopeSet:
                 np.save("C2.simcomplex",C2)
 
         def fromURDF(self,urdf_fname):
-                DEBUG = 0
                 soup = BeautifulSoup(open(urdf_fname))
                 links = soup.robot.findAll("collision")
                 K=[]
@@ -410,8 +509,8 @@ class PolytopeSet:
                         p8 = [x-sx/2, y-sy/2, z-sz/2]
                         hull = ConvexHull([p1,p2,p3,p4,p5,p6,p7,p8])
                         E=hull.equations[0::2]
-                        Ah = E[0:,0:3]
-                        bh = -E[0:,3]
+                        Ah = np.array(E[0:,0:3])
+                        bh = np.array(-E[0:,3])
                         ###normalize
                         for at in range(0,len(Ah)):
                                 normA = np.linalg.norm(Ah[at])
@@ -422,4 +521,18 @@ class PolytopeSet:
                         self.xyz.append([x,y,z])
 
                 np.save("xyz.simcomplex",self.xyz)
+
+if __name__ == "__main__":
+        p = PolytopeSet()
+        p.fromURDF("wall.urdf")
+
+        #p.computeDistanceMatrix()
+        p.getWalkableSurfaces()
+
+
+        p.distanceWalkableSurfaceMatrix()
+        #p.createWalkableSimplicialComplex()
+        #p.computeProjectableObjectCandidates(1)
+        #p.computeProjectableObjectCandidates(2)
+        p.fromWalkableSurfaceComputeBoxElement(1)
 
