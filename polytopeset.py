@@ -52,15 +52,78 @@ class PolytopeSet:
                                         vertices.append(xp)
 
                 V = np.zeros((len(vertices),3))
+                theta = np.zeros((len(vertices),1))
+
+                mean = np.zeros((2,1))
+                for i in range(0,len(vertices)):
+                        mean[0] = mean[0]+vertices[i][0]
+                        mean[1] = mean[1]+vertices[i][1]
+                mean[0]=mean[0]/len(vertices)
+                mean[1]=mean[1]/len(vertices)
+
                 for i in range(0,len(vertices)):
                         V[i,0]=vertices[i][0]
                         V[i,1]=vertices[i][1]
                         V[i,2]=vertices[i][2]
-                return V
+                        theta[i] = atan2(V[i,1]-mean[1],V[i,0]-mean[0])
+
+                ## sort vertices clockwise order:
+                Iv = np.argsort(theta.T)
+
+                #print theta
+                #print Iv
+                #print V[Iv]
+                ##return V[Iv][0][::-1]
+                #exit(0)
+                return V[Iv][0]
+
+        def getRotationMatrixAligningHyperplaneAndXYPlane(self, ap, bp):
+                z=np.zeros((3,1))
+                z[2]=1
+                y=np.zeros((3,1))
+                y[1]=1
+                x=np.zeros((3,1))
+                x[0]=1
+                axy = ap - (dot(ap.T,z))*z
+                axy = axy/np.linalg.norm(axy)
+                azy = ap - (dot(ap.T,x))*x
+                azy = azy/np.linalg.norm(azy)
+                #########################
+                dya = dot(y.T,axy)
+                if dya > 0.01:
+                        txy = acos(dya)
+                else:
+                        txy = 0
+                dza = dot(z.T,azy)
+                if dza > 0.01:
+                        tzy = acos(dza)
+                else:
+                        tzy = 0
+                #########################
+                RX = np.zeros((3,3))
+                RX[0,0]=1
+                RX[1,1]=cos(txy)
+                RX[1,2]=-sin(txy)
+                RX[2,1]=sin(txy)
+                RX[2,2]=cos(txy)
+
+                RZ = np.zeros((3,3))
+                RZ[2,2]=1
+                RZ[0,0]=cos(tzy)
+                RZ[0,1]=-sin(tzy)
+                RZ[1,0]=sin(tzy)
+                RZ[1,1]=cos(tzy)
+                R = dot(RX,RZ)
+                return R
 
         def projectPointOntoHyperplane(self, v, a, b):
                 a=a[0]
                 return v - (dot(v,a) - b)*a
+
+        def distancePointHyperplane(self, v, a, b):
+                a=a[0]
+                vprime = v - (dot(v,a) - b)*a
+                return np.linalg.norm(vprime-v)
 
         def projectPointOntoPolytope(self, v, Ai, bi):
                 xob = Variable(3)
@@ -260,7 +323,15 @@ class PolytopeSet:
                         exit
                 W = self.W[surfaceElement]
                 ap = W[0]
+                apclean = np.zeros((3,1))
+                apclean[0]=ap[0][0]
+                apclean[1]=ap[0][1]
+                apclean[2]=ap[0][2]
                 bp = W[1]
+                Rxy = self.getRotationMatrixAligningHyperplaneAndXYPlane(apclean,bp)
+                print Rxy
+                ######################################################
+
                 A_box =[]
                 b_box =[]
                 ##surface hyperplane, but opposite direction
@@ -281,7 +352,7 @@ class PolytopeSet:
                         [value, x0] = self.distanceWalkableSurfaceHyperplane(W,aj,bj)
                         if value < 0.0001:
                                 #project hyperplane
-                                ajp = aj - (aj.T*ap - bp)*ap
+                                ajp = aj - (np.dot(ap,aj) - bp)*ap
 
                                 bjp = dot(x0.T,np.array(ajp).T)
                                 A_box.append(ajp)
@@ -310,6 +381,8 @@ class PolytopeSet:
                 print "-----------------------------------------------"
 
                 plot = Plotter()
+
+                proj_objects=[]
                 for i in range(0,N):
                         A_obj = self.A[i]
                         b_obj = self.b[i]
@@ -336,19 +409,97 @@ class PolytopeSet:
                                         A_iob[j+N_obj,:]=A_box[j]
                                         b_iob[j+N_obj] = b_box[j]
 
+                                print "------------------------------------"
                                 print "Object ",i," distance ",d
 
                                 v_obj = self.getVertices(A_obj,b_obj)
-                                plot.points(v_obj)
+                                plot.polytopeFromVertices(v_obj)
                                 v_iob = self.getVertices(A_iob,b_iob)
-                                plot.points(v_iob)
+                                plot.polytopeFromVertices(v_iob)
+                                v_iob_prime = np.zeros((len(v_iob),3))
 
-                v_box = self.getVertices(A_box,b_box)
-                plot.points(v_box)
-                plot.show()
+                                for j in range(0,len(v_iob)):
+                                        v_prime = self.projectPointOntoHyperplane(v_iob[j], ap, bp)
+                                        v_iob_prime[j] = np.dot(Rxy,v_prime)
+                                        print v_iob_prime[j][0],v_iob_prime[j][1],v_iob_prime[j][2]
+                                proj_objects.append(v_iob_prime)
+
                 print "-----------------------------------------------"
                 print "Number of objects which have to be projected: ",len(WD)
+                print "-----------------------------------------------"
                 print np.around(WD,3)
+                #######################################################
+                ## write to file for convex decomposition
+                #######################################################
+                fh = open('walkable-projection.poly', 'w')
+                fh.write(str(len(proj_objects)+1)+"\n")
+
+                v_box = self.getVertices(A_box,b_box)
+                v_on_surface = np.zeros((len(v_box),1))
+
+                for j in range(0,len(v_box)):
+                        d = self.distancePointHyperplane(v_box[j],ap,bp)
+                        v_on_surface[j] = False
+                        if d <= 0.02:
+                                v_on_surface[j] = True
+
+                v_box = self.getVertices(A_box,b_box+0.15)
+                v_box_prime = []
+                for j in range(0,len(v_box)):
+                        if v_on_surface[j]:
+                                v_box_prime.append(v_box[j])
+
+                fh.write(str(len(v_box_prime))+" out\n")
+                for j in range(0,len(v_box_prime)):
+                        ## use only x,y component, since we will do polygonal
+                        ## decomposition
+                        x = str(np.around(v_box_prime[j][0],2))
+                        y = str(np.around(v_box_prime[j][1],2))
+                        fh.write(x+" "+y+"\n")
+                for j in range(0,len(v_box_prime)):
+                        fh.write(str(j+1)+" ")
+                fh.write("\n")
+
+                #write objects
+                for j in range(0,len(proj_objects)):
+                        vp = proj_objects[j]
+                        nonDoubleCtr=0
+                        nonDouble = np.zeros((len(vp),1))
+                        for k in range(0,len(vp)):
+                                xk = np.around(vp[k][0],2)
+                                yk = np.around(vp[k][1],2)
+                                doubleV=False
+                                for l in range(0,k)[::-1]:
+                                        xl = np.around(vp[l][0],2)
+                                        yl = np.around(vp[l][1],2)
+                                        dlk = sqrt((xk-xl)**2+(yk-yl)**2).value
+                                        if dlk <= 0.012:
+                                                doubleV=True
+                                nonDouble[k]=False
+                                if not doubleV:
+                                        nonDoubleCtr=nonDoubleCtr+1
+                                        nonDouble[k]=True
+
+                        fh.write(str(nonDoubleCtr)+" in\n")
+
+                        for k in range(0,len(vp)):
+                                if nonDouble[k]:
+                                        xk = np.around(vp[k][0],2)
+                                        yk = np.around(vp[k][1],2)
+                                        fh.write(str(xk)+" "+str(yk)+"\n")
+
+
+                        for k in range(0,nonDoubleCtr):
+                                fh.write(str(k+1)+" ")
+                        fh.write("\n")
+
+
+                fh.close()
+                #######################################################
+                #######################################################
+
+                plot.polytopeFromVertices(v_box)
+                plot.show()
 
 
         def getWalkableSurfaces(self):

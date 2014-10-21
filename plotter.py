@@ -12,14 +12,14 @@ class Plotter:
         def polytope(self,A,b):
                 #NIY
                 return
-        def points(self,V):
+        def polytopeFromVertices(self,V):
                 self.hull = ConvexHull(V)
                 faces = []
                 for ia, ib, ic in self.hull.simplices:
                      faces.append(V[[ia, ib, ic]])
                 items = Poly3DCollection(faces, facecolors=[(0, 0, 0, 0.1)])
                 self.ax.add_collection(items)
-                self.ax.scatter(V[:,0], V[:,1], V[:,2], 'o')
+                self.ax.scatter(V[:,0], V[:,1], V[:,2], 'r*')
 
         def show(self):
                 show()
