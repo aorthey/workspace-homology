@@ -5,7 +5,6 @@ p.fromURDF("wall.urdf")
 #p.computeDistanceMatrix()
 p.getWalkableSurfaces()
 
-
 p.distanceWalkableSurfaceMatrix()
 #p.createWalkableSimplicialComplex()
 #p.computeProjectableObjectCandidates(1)

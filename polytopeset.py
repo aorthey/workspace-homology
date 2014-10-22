@@ -9,10 +9,14 @@ from itertools import combinations
 import os
 import re
 import math
+import scipy
 from copy import copy 
 from cvxpy import *
 from pyhull.halfspace import Halfspace, HalfspaceIntersection
 from plotter import Plotter
+#from src.polytope import ObjectPolytope
+#from src.walkable import WalkableSurface, WalkableSurfaceBox
+import Polygon, Polygon.IO
 
 DEBUG = 1
 
@@ -30,6 +34,7 @@ class PolytopeSet:
                 self.M=[]
                 self.WD=[]
                 self.W=[] ##walkable surface
+                self.plot = Plotter()
 
         ## Vertex enumeration problem:
         ## brute forcing algorithm: check the solutions to all 3x3 submatrices S of A: Sx=b. 
@@ -341,9 +346,10 @@ class PolytopeSet:
                 bp = W[1]
                 Rxy = self.getRotationMatrixAligningHyperplaneAndXYPlane(apclean,bp)
                 print Rxy
-                ######################################################
-                ######################################################
 
+                ######################################################
+                ## create box above S_i^p
+                ######################################################
                 A_box =[]
                 b_box =[]
                 ##surface hyperplane, but opposite direction
@@ -392,8 +398,6 @@ class PolytopeSet:
                 print "object in the environment"
                 print "-----------------------------------------------"
 
-                plot = Plotter()
-
                 proj_objects=[]
                 for i in range(0,N):
                         if i==objectBelongingToWalkableSurface:
@@ -427,9 +431,9 @@ class PolytopeSet:
                                 print "Object ",i," distance ",d
 
                                 v_obj = self.getVertices(A_obj,b_obj)
-                                plot.polytopeFromVertices(v_obj)
+                                self.plot.polytopeFromVertices(v_obj)
                                 v_iob = self.getVertices(A_iob,b_iob-0.001)
-                                plot.polytopeFromVertices(v_iob)
+                                self.plot.polytopeFromVertices(v_iob)
                                 v_iob_prime = np.zeros((len(v_iob),3))
 
                                 for j in range(0,len(v_iob)):
@@ -531,7 +535,6 @@ class PolytopeSet:
                 #######################################################
                 ## Create Polygons
                 #######################################################
-                import Polygon, Polygon.IO
 
                 pbox = Polygon.Polygon( polygonBoxV )
                 qbox = pbox
@@ -541,46 +544,19 @@ class PolytopeSet:
                         pobj = Polygon.Polygon( polygonObjArray[j] )
                         qbox = qbox - pobj
                         p.append(pobj)
+
                 print qbox
                 qdecomp = qbox.triStrip()
                 print qdecomp
                 for j in range(0,len(qdecomp)):
                         qdecomp[j]=self.sortVertices(qdecomp[j])
-                        plot.polytopeFromPolygonVertices(qdecomp[j])
+                        self.plot.polytopeFromPolygonVertices(qdecomp[j])
+
                 Polygon.IO.writeSVG("poly.img", qdecomp)
 
+                self.plot.polytopeFromVertices(v_box)
+
                 #######################################################
-                ## Write vertices to file
-                #######################################################
-                fh = open('walkable-projection.poly', 'w')
-
-                fh.write(str(len(verticesToWrite))+" 2 0 0\n")
-
-                for j in range(0,len(verticesToWrite)):
-                        n = verticesToWrite[j][0]
-                        x = verticesToWrite[j][1]
-                        y = verticesToWrite[j][2]
-                        fh.write(str(n)+" "+str(x)+" "+str(y)+"\n")
-
-                fh.write(str(len(segmentsToWrite))+" 0\n")
-                for j in range(0,len(segmentsToWrite)):
-                        n = segmentsToWrite[j][0]
-                        d = segmentsToWrite[j][1]
-                        dd = segmentsToWrite[j][2]
-                        fh.write(str(n)+" "+str(d)+" "+str(dd)+"\n")
-
-
-                fh.write(str(len(meanProjObjects))+"\n")
-                for j in range(0,len(meanProjObjects)):
-                        fh.write(str(j)+" "+str(meanProjObjects[j][0])+" "+str(meanProjObjects[j][1])+"\n")
-
-                fh.close()
-                #######################################################
-                #######################################################
-
-                plot.polytopeFromVertices(v_box)
-                plot.show()
-
 
         def getWalkableSurfaces(self):
                 self.W = []
@@ -633,61 +609,6 @@ class PolytopeSet:
                 print "-----------------------------------------------"
 
 
-        def computeSimplex(self):
-                C2candidates=[]
-                C3candidates=[]
-                for i in range(0,N):
-                        for j in range(i+1,N):
-                                if M[i,j]==1:
-                                        for k in range(j+1,N):
-                                                if M[i,k]+M[j,k]==2:
-                                                        foundFour=0
-                                                        for l in range(k+1,N):
-                                                                if M[i,l]+M[j,l]+M[k,l]==3:
-                                                                        C3candidates.append([i,j,k,l])
-                                                                        foundFour=1
-                                                        if foundFour==0:
-                                                                #connection between 3 cells
-                                                                C2candidates.append([i,j,k])
-
-                ###############################################################################
-                ## Create simplicial complex from distance matrices
-                ###############################################################################
-
-                C0=[]
-                C1=[]
-                for i in range(0,N):
-                        C0.append([i])
-                        for j in range(i+1,N):
-                                if M[i,j]==1:
-                                        C1.append([i,j])
-                C2=[]
-                for p in range(0,len(C2candidates)):
-                        [i,j,k]=C2candidates[p]
-                        xob = Variable(3)
-                        yob = Variable(3)
-                        zob = Variable(3)
-                        objective = Minimize(sum_squares(xob-yob)+sum_squares(xob-yob)+sum_squares(yob-zob))
-                        constraints = [A[i]*xob <= b[i],A[j]*yob <= b[j],A[k]*zob <= b[k]]
-                        prob = Problem(objective, constraints)
-                        dist = sqrt(abs(prob.solve())).value
-                        if dist < ROBOT_SPHERE_RADIUS:
-                                C2.append([i,j,k])
-                        print "2-cells ",p,"/",len(C2candidates)
-
-                ###############################################################################
-                ## delete subgraphs of size 4, which are fully connected, 
-                ## and add two 2-cells instead
-                ###############################################################################
-
-                print C0
-                print C1
-                print C2
-
-                np.save("C0.simcomplex",C0)
-                np.save("C1.simcomplex",C1)
-                np.save("C2.simcomplex",C2)
-
         def fromURDF(self,urdf_fname):
                 soup = BeautifulSoup(open(urdf_fname))
                 links = soup.robot.findAll("collision")
@@ -723,11 +644,12 @@ class PolytopeSet:
                 self.A=[]
                 self.b=[]
                 self.xyz=[]
+
                 for i in range(0,self.N):
                         v=np.abs(K[i][6])+np.abs(K[i][7])+np.abs(K[i][8])
                         if v>0.001:
-                                print "please do not rotate any boxes in URDF -- not handled atm"
-                                exit
+                                print "please do not rotate any boxes in URDF -- not handled atm" 
+                                exit 
                         [sx,sy,sz,x,y,z] = K[i][0:6]
 
                         p1 = [x+sx/2, y+sy/2, z+sz/2]
@@ -756,14 +678,8 @@ class PolytopeSet:
 if __name__ == "__main__":
         p = PolytopeSet()
         p.fromURDF("wall.urdf")
-
-        #p.computeDistanceMatrix()
         p.getWalkableSurfaces()
-
-
-        p.distanceWalkableSurfaceMatrix()
-        #p.createWalkableSimplicialComplex()
-        #p.computeProjectableObjectCandidates(1)
-        #p.computeProjectableObjectCandidates(2)
         p.fromWalkableSurfaceComputeBoxElement(1)
+        p.fromWalkableSurfaceComputeBoxElement(2)
+        p.plot.show()
 
