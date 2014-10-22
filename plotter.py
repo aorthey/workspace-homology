@@ -9,9 +9,24 @@ class Plotter:
         def __init__(self):
                 self.fig=figure()
                 self.ax = self.fig.gca(projection='3d')
-        def polytope(self,A,b):
-                #NIY
-                return
+        def polytopeFromPolygonVertices(self,Vin,thickness=0.1):
+                print Vin
+
+                print Vin.shape
+                Vz = np.zeros((len(Vin),1))
+                Vz.fill(thickness/2)
+                Vup = column_stack((Vin,Vz))
+                Vdown = column_stack((Vin,-Vz))
+                V = np.vstack((Vdown, Vup))
+
+                self.hull = ConvexHull(V)
+                faces = []
+                for ia, ib, ic in self.hull.simplices:
+                     faces.append(V[[ia, ib, ic]])
+                items = Poly3DCollection(faces, facecolors=[(1, 0, 0, 0.5)])
+                self.ax.add_collection(items)
+                self.ax.scatter(V[:,0], V[:,1], V[:,2], 'r*')
+
         def polytopeFromVertices(self,V):
                 self.hull = ConvexHull(V)
                 faces = []
@@ -23,5 +38,4 @@ class Plotter:
 
         def show(self):
                 show()
-
 

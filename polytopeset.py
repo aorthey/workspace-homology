@@ -69,12 +69,24 @@ class PolytopeSet:
 
                 ## sort vertices clockwise order:
                 Iv = np.argsort(theta.T)
+                return V[Iv][0]
 
-                #print theta
-                #print Iv
-                #print V[Iv]
-                ##return V[Iv][0][::-1]
-                #exit(0)
+        def sortVertices(self,vertices):
+                mean = np.zeros((2,1))
+                V = np.zeros((len(vertices),2))
+                theta = np.zeros((len(vertices),1))
+                for i in range(0,len(vertices)):
+                        mean[0] = mean[0]+vertices[i][0]
+                        mean[1] = mean[1]+vertices[i][1]
+                mean[0]=mean[0]/len(vertices)
+                mean[1]=mean[1]/len(vertices)
+
+                for i in range(0,len(vertices)):
+                        V[i,0]=vertices[i][0]
+                        V[i,1]=vertices[i][1]
+                        theta[i] = atan2(V[i,1]-mean[1],V[i,0]-mean[0])
+                ## sort vertices clockwise order:
+                Iv = np.argsort(theta.T)
                 return V[Iv][0]
 
         def getRotationMatrixAligningHyperplaneAndXYPlane(self, ap, bp):
@@ -316,13 +328,12 @@ class PolytopeSet:
         def fromWalkableSurfaceComputeBoxElement(self, surfaceElement):
                 RobotFootHeight = 0.1
                 ##introduce some offset to remove the objects which are adjacent
-                hoffset = 0.0
-
                 if surfaceElement >= len(self.W):
                         print "exceeds number of walkable surfaces!"
                         exit
                 W = self.W[surfaceElement]
                 ap = W[0]
+                objectBelongingToWalkableSurface=W[5]
                 apclean = np.zeros((3,1))
                 apclean[0]=ap[0][0]
                 apclean[1]=ap[0][1]
@@ -330,6 +341,7 @@ class PolytopeSet:
                 bp = W[1]
                 Rxy = self.getRotationMatrixAligningHyperplaneAndXYPlane(apclean,bp)
                 print Rxy
+                ######################################################
                 ######################################################
 
                 A_box =[]
@@ -384,6 +396,8 @@ class PolytopeSet:
 
                 proj_objects=[]
                 for i in range(0,N):
+                        if i==objectBelongingToWalkableSurface:
+                                continue
                         A_obj = self.A[i]
                         b_obj = self.b[i]
                         ##clean b_obj
@@ -414,7 +428,7 @@ class PolytopeSet:
 
                                 v_obj = self.getVertices(A_obj,b_obj)
                                 plot.polytopeFromVertices(v_obj)
-                                v_iob = self.getVertices(A_iob,b_iob)
+                                v_iob = self.getVertices(A_iob,b_iob-0.001)
                                 plot.polytopeFromVertices(v_iob)
                                 v_iob_prime = np.zeros((len(v_iob),3))
 
@@ -431,43 +445,59 @@ class PolytopeSet:
                 #######################################################
                 ## write to file for convex decomposition
                 #######################################################
-                fh = open('walkable-projection.poly', 'w')
-                fh.write(str(len(proj_objects)+1)+"\n")
 
                 v_box = self.getVertices(A_box,b_box)
                 v_on_surface = np.zeros((len(v_box),1))
+                segmentCtr=0
+                verticesCtr=0
+                verticesToWrite=[]
+                segmentsToWrite=[]
 
+                ## get box vertices
                 for j in range(0,len(v_box)):
                         d = self.distancePointHyperplane(v_box[j],ap,bp)
                         v_on_surface[j] = False
                         if d <= 0.02:
                                 v_on_surface[j] = True
 
-                v_box = self.getVertices(A_box,b_box+0.15)
+                v_box = self.getVertices(A_box,b_box)
                 v_box_prime = []
                 for j in range(0,len(v_box)):
                         if v_on_surface[j]:
                                 v_box_prime.append(v_box[j])
 
-                fh.write(str(len(v_box_prime))+" out\n")
+                firstVertex = verticesCtr
+                polygonBoxV = []
                 for j in range(0,len(v_box_prime)):
                         ## use only x,y component, since we will do polygonal
                         ## decomposition
-                        x = str(np.around(v_box_prime[j][0],2))
-                        y = str(np.around(v_box_prime[j][1],2))
-                        fh.write(x+" "+y+"\n")
-                for j in range(0,len(v_box_prime)):
-                        fh.write(str(j+1)+" ")
-                fh.write("\n")
+                        x = np.around(v_box_prime[j][0],2)
+                        y = np.around(v_box_prime[j][1],2)
+                        verticesToWrite.append([verticesCtr,x,y])
 
-                #write objects
+                        if j==len(v_box_prime)-1:
+                                segmentsToWrite.append([segmentCtr,verticesCtr,firstVertex])
+                        else:
+                                segmentsToWrite.append([segmentCtr,verticesCtr,verticesCtr+1])
+                        segmentCtr=segmentCtr+1
+                        verticesCtr=verticesCtr+1
+                        polygonBoxV.append((x,y))
+
+                # get vertices of objects
+                objectSegments=[]
+                objectSegmentsNumber=0
+                polygonObjArray = []
+                meanProjObjects=np.zeros((len(proj_objects),2))
                 for j in range(0,len(proj_objects)):
                         vp = proj_objects[j]
                         nonDoubleCtr=0
+                        lastNonDouble=0
                         nonDouble = np.zeros((len(vp),1))
                         for k in range(0,len(vp)):
                                 xk = np.around(vp[k][0],2)
                                 yk = np.around(vp[k][1],2)
+                                meanProjObjects[j][0]=meanProjObjects[j][0]+xk/len(vp)
+                                meanProjObjects[j][1]=meanProjObjects[j][1]+yk/len(vp)
                                 doubleV=False
                                 for l in range(0,k)[::-1]:
                                         xl = np.around(vp[l][0],2)
@@ -479,20 +509,70 @@ class PolytopeSet:
                                 if not doubleV:
                                         nonDoubleCtr=nonDoubleCtr+1
                                         nonDouble[k]=True
+                                        lastNonDouble=k
 
-                        fh.write(str(nonDoubleCtr)+" in\n")
-
+                        firstVertex=verticesCtr
+                        polygonObjV=[]
                         for k in range(0,len(vp)):
                                 if nonDouble[k]:
                                         xk = np.around(vp[k][0],2)
                                         yk = np.around(vp[k][1],2)
-                                        fh.write(str(xk)+" "+str(yk)+"\n")
+                                        polygonObjV.append((xk,yk))
+                                        verticesToWrite.append([verticesCtr,xk,yk])
+                                        if k==lastNonDouble:
+                                                segmentsToWrite.append([segmentCtr,verticesCtr,firstVertex])
+                                        else:
+                                                segmentsToWrite.append([segmentCtr,verticesCtr,verticesCtr+1])
+                                        verticesCtr=verticesCtr+1
+                                        segmentCtr=segmentCtr+1
+
+                        polygonObjArray.append(polygonObjV)
+
+                #######################################################
+                ## Create Polygons
+                #######################################################
+                import Polygon, Polygon.IO
+
+                pbox = Polygon.Polygon( polygonBoxV )
+                qbox = pbox
+                p = []
+
+                for j in range(0,len(polygonObjArray)):
+                        pobj = Polygon.Polygon( polygonObjArray[j] )
+                        qbox = qbox - pobj
+                        p.append(pobj)
+                print qbox
+                qdecomp = qbox.triStrip()
+                print qdecomp
+                for j in range(0,len(qdecomp)):
+                        qdecomp[j]=self.sortVertices(qdecomp[j])
+                        plot.polytopeFromPolygonVertices(qdecomp[j])
+                Polygon.IO.writeSVG("poly.img", qdecomp)
+
+                #######################################################
+                ## Write vertices to file
+                #######################################################
+                fh = open('walkable-projection.poly', 'w')
+
+                fh.write(str(len(verticesToWrite))+" 2 0 0\n")
+
+                for j in range(0,len(verticesToWrite)):
+                        n = verticesToWrite[j][0]
+                        x = verticesToWrite[j][1]
+                        y = verticesToWrite[j][2]
+                        fh.write(str(n)+" "+str(x)+" "+str(y)+"\n")
+
+                fh.write(str(len(segmentsToWrite))+" 0\n")
+                for j in range(0,len(segmentsToWrite)):
+                        n = segmentsToWrite[j][0]
+                        d = segmentsToWrite[j][1]
+                        dd = segmentsToWrite[j][2]
+                        fh.write(str(n)+" "+str(d)+" "+str(dd)+"\n")
 
 
-                        for k in range(0,nonDoubleCtr):
-                                fh.write(str(k+1)+" ")
-                        fh.write("\n")
-
+                fh.write(str(len(meanProjObjects))+"\n")
+                for j in range(0,len(meanProjObjects)):
+                        fh.write(str(j)+" "+str(meanProjObjects[j][0])+" "+str(meanProjObjects[j][1])+"\n")
 
                 fh.close()
                 #######################################################
@@ -548,7 +628,7 @@ class PolytopeSet:
                                         if radius >= self.ROBOT_FOOT_RADIUS:
                                                 print ctrW,": radius on surface: ",radius
                                                 ##surface is walkable
-                                                self.W.append([np.array(a),b[j],self.A[i],self.b[i],self.xyz[i]])
+                                                self.W.append([np.array(a),b[j],self.A[i],self.b[i],self.xyz[i],i])
                                                 ctrW = ctrW + 1
                 print "-----------------------------------------------"
 
