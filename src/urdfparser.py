@@ -4,7 +4,7 @@ import re
 import numpy as np
 from src.polytope import Polytope
 
-DEBUG = 1
+DEBUG = 0
 def URDFtoPolytopes(urdf_fname):
         soup = BeautifulSoup(open(urdf_fname))
         links = soup.robot.findAll("collision")

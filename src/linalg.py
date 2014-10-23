@@ -156,15 +156,15 @@ def distanceWalkableSurfaceWalkableSurface(Wi, Wj):
         yob = Variable(3)
         objective = Minimize(sum_squares(xob  - yob ))
 
-        AsurfaceX = Wi[0]
-        bsurfaceX = Wi[1]
-        ApolyX =    Wi[2]
-        bpolyX =    Wi[3]
+        AsurfaceX = Wi.ap
+        bsurfaceX = Wi.bp
+        ApolyX =    Wi.A
+        bpolyX =    Wi.b
 
-        AsurfaceY = Wj[0]
-        bsurfaceY = Wj[1]
-        ApolyY =    Wj[2]
-        bpolyY =    Wj[3]
+        AsurfaceY = Wj.ap
+        bsurfaceY = Wj.bp
+        ApolyY =    Wj.A
+        bpolyY =    Wj.b
 
         constraints = []
 
