@@ -1,5 +1,6 @@
 import numpy as np
 from numpy import dot
+from scipy.spatial import ConvexHull
 import math
 from copy import copy 
 from cvxpy import *
@@ -9,6 +10,9 @@ from src.linalg import distanceWalkableSurfaceHyperplane, distancePolytopePolyto
 from src.linalg import projectPointOntoHyperplane
 from src.linalg import distancePointHyperplane
 from src.linalg import sortVertices2D
+from src.linalg import getMeanFromVerticesNumpy
+from itertools import combinations
+from math import acos,cos,sin,atan2
 import Polygon, Polygon.IO
 
 class WalkableSurface(Polytope):
@@ -20,6 +24,35 @@ class WalkableSurface(Polytope):
                 self.b = b
                 self.iObject = iObject
                 self.slope = np.linalg.norm(ap-np.array((0,0,1)))
+
+        @classmethod
+        def fromVertices(cls, ap, bp, V, iObject):
+                ## assume vertices are in the plane
+                zvalue = V[0,2]
+                ap = ap
+                bp = bp
+                iObject = iObject
+                A = np.zeros((len(V),3))
+                b = np.zeros((len(V),1))
+
+                vm = getMeanFromVerticesNumpy(V)
+                vm = vm.flatten()
+                for i in range(0,len(V)):
+                        if i==len(V)-1:
+                                vi = V[i,:]
+                                vii = V[0,:]
+                        else:
+                                vi = V[i,:]
+                                vii = V[i+1,:]
+
+                        vvi = (vii-vi)/(np.linalg.norm(vii-vi))
+
+                        av = (vi+dot(vm-vi,vvi)*(vvi))-vm
+                        av = av/np.linalg.norm(av)
+                        bv = dot(av,vi)
+                        A[i,:]=av
+                        b[i]=bv
+                return cls(ap, bp, A, b, iObject)
 
         def __str__(self):
                 out = ""
@@ -33,6 +66,42 @@ class WalkableSurface(Polytope):
                 out += "slope  : "+str(self.slope)+"\n"
                 out += "------------------------------\n"
                 return out
+
+        def getVertexRepresentation(self):
+                An = np.vstack([self.A, self.ap])
+                bn = np.vstack([self.b, self.bp])
+                M = An.shape[0]
+                N = An.shape[1]
+
+                vertices = []
+                for rowlist in combinations(range(M), N):
+                        Ap = An[np.ix_(rowlist,range(0,N))]
+                        bp = bn[np.ix_(rowlist)]
+                        if np.linalg.det(Ap) != 0:
+                                xp = np.linalg.solve(Ap,bp)
+                                P = np.less_equal(dot(An,xp),bn)
+                                if P.all():
+                                        vertices.append(xp)
+                if len(vertices)==0:
+                        #print "[WARNING] number of vertices for object is NULL"
+                        return []
+
+                V = np.zeros((len(vertices),3))
+                theta = np.zeros((len(vertices),1))
+
+                from src.linalg import getMeanFromVerticesList
+                mean = getMeanFromVerticesList(vertices)
+
+                for i in range(0,len(vertices)):
+                        V[i,0]=vertices[i][0]
+                        V[i,1]=vertices[i][1]
+                        V[i,2]=vertices[i][2]
+                        theta[i] = atan2(V[i,1]-mean[1],V[i,0]-mean[0])
+
+                ## sort vertices clockwise order:
+                Iv = np.argsort(theta.T)
+                self.V = V[Iv][0]
+                return self.V
 
         def createBox(self, DeltaL, DeltaU):
                 A_box =[]
@@ -139,7 +208,6 @@ def ProjectPolytopesDownInsideBox(polytopes, surface, box):
         apt[1]=ap[1]
         apt[2]=ap[2]
         Rxy = getRotationMatrixAligningHyperplaneAndXYPlane(apt,bp)
-        print Rxy
 
         #############################################################
         ## compute distance between box and objects in the scene
@@ -174,15 +242,10 @@ def ProjectPolytopesDownInsideBox(polytopes, surface, box):
                         p_iob = Polytope(A_iob,b_iob)
                         v_obj = p_obj.getVertexRepresentation()
                         v_iob = p_iob.getVertexRepresentation()
-
-                        #self.plot.polytopeFromVertices(v_obj)
-                        #self.plot.polytopeFromVertices(v_iob)
                         v_iob_prime = np.zeros((len(v_iob),3))
-
                         for j in range(0,len(v_iob)):
                                 v_prime = projectPointOntoHyperplane(v_iob[j], ap, bp)
                                 v_iob_prime[j] = dot(Rxy,v_prime)
-                                print v_iob_prime[j][0],v_iob_prime[j][1],v_iob_prime[j][2]
                         proj_objects.append(v_iob_prime)
 
         print "Found ",len(proj_objects)," objects to project down"
@@ -194,36 +257,24 @@ def ProjectPolytopesDownInsideBox(polytopes, surface, box):
         p_box = Polytope(A_box,b_box)
         v_box = p_box.getVertexRepresentation()
 
-        v_on_surface = np.zeros((len(v_box),1))
-        segmentCtr=0
-        verticesCtr=0
-        verticesToWrite=[]
-        segmentsToWrite=[]
-
-        ## use only those vertices, which are on the surface
-        for j in range(0,len(v_box)):
-                d = distancePointHyperplane(v_box[j],ap,bp)
-                v_on_surface[j] = False
-                if d <= 0.01:
-                        v_on_surface[j] = True
-
-        v_box_prime = []
-        for j in range(0,len(v_box)):
-                if v_on_surface[j]:
-                        v_box_prime.append(v_box[j])
-
         ## get the xy positions of the box vertices
         polygonBoxV = []
-        for j in range(0,len(v_box_prime)):
-                x = np.around(v_box_prime[j][0],4)
-                y = np.around(v_box_prime[j][1],4)
-                z = np.around(v_box_prime[j][2],4)
-                #print dot(Rxy,(x,y,z))
-                polygonBoxV.append((x,y))
+        for j in range(0,len(v_box)):
+                x = np.around(v_box[j][0],4)
+                y = np.around(v_box[j][1],4)
+                z = np.around(v_box[j][2],4)
+                vv = np.array((x,y,z))
+                d = distancePointHyperplane(vv,ap,bp)
+                vvp = dot(Rxy,(vv-(bp+d)*ap))
+                if not vvp[2] == 0:
+                        print "[WARNING] z component has to be zero after rotation"
+                        print vvp,vv,bp,ap
+                        print Rxy
+
+                polygonBoxV.append((vvp[0],vvp[1]))
 
         # get vertices of objects
         polygonObjArray = []
-
         for j in range(0,len(proj_objects)):
                 vp = proj_objects[j]
                 polygonObjV=[]
@@ -231,7 +282,17 @@ def ProjectPolytopesDownInsideBox(polytopes, surface, box):
                         xk = np.around(vp[k][0],2)
                         yk = np.around(vp[k][1],2)
                         zk = np.around(vp[k][2],2)
-                        polygonObjV.append((xk,yk))
+
+                        vv = np.array((xk,yk,zk))
+                        d = distancePointHyperplane(vv,ap,bp)
+                        vvp = dot(Rxy,(vv-(bp+d)*ap))
+
+                        if not vvp[2] == 0:
+                                print "[WARNING] z component has to be zero after rotation"
+                                print vvp,vv,bp,ap
+                                print Rxy
+
+                        polygonObjV.append((vvp[0],vvp[1]))
 
                 polygonObjArray.append(polygonObjV)
 
@@ -252,8 +313,14 @@ def ProjectPolytopesDownInsideBox(polytopes, surface, box):
         decompPolygons = []
         for j in range(0,len(qdecomp)):
                 qdecomp[j]=sortVertices2D(qdecomp[j])
-                decompPolygons.append( qdecomp[j] )
+                projV = np.zeros((qdecomp[j].shape[0],qdecomp[j].shape[1]+1)); 
+                projV[:,:-1] = qdecomp[j]
 
+                for k in range(0,len(qdecomp[j])):
+                        vvp = np.array((qdecomp[j][k][0],qdecomp[j][k][1],0))
+                        vv = dot(np.linalg.inv(Rxy),vvp)+bp*ap
+                        projV[k,:]=vv
+                decompPolygons.append( projV )
 
         return decompPolygons
         #Polygon.IO.writeSVG("poly.img", qdecomp)

@@ -10,11 +10,29 @@ class Plotter:
                 self.fig=figure()
                 self.ax = self.fig.gca(projection='3d')
 
-        def polytopeFromPolygonVertices(self,Vin,thickness=0.1, fcolor=(0,0,0,0.1), ecolor=(1,1,1,0.4)):
+        def polytopeFromPolygonVertices3D(self,Vin,thickness=0.1, fcolor=(0,0,0,0.1), ecolor=(1,1,1,0.4)):
                 Vz = np.zeros((len(Vin),1))
                 Vz.fill(thickness/2)
-                Vup = column_stack((Vin,Vz))
-                Vdown = column_stack((Vin,-Vz))
+                Vup = column_stack((Vin[:,0:2],thickness/2+Vin[:,2]))
+                Vdown = column_stack((Vin[:,0:2],-thickness/2+Vin[:,2]))
+                V = np.vstack((Vdown, Vup))
+
+                self.polytopeFromVertices(V, fcolor, ecolor)
+
+#        def polytopeFromPolygonVertices(self,Vin,thickness=0.1, fcolor=(0,0,0,0.1), ecolor=(1,1,1,0.4)):
+#                Vz = np.zeros((len(Vin),1))
+#                Vz.fill(thickness/2)
+#                Vup = column_stack((Vin,Vz))
+#                Vdown = column_stack((Vin,-Vz))
+#                V = np.vstack((Vdown, Vup))
+#
+#                self.polytopeFromVertices(V, fcolor, ecolor)
+
+        def polytopeFromVertices2D(self,Vin,thickness=0.1, fcolor=(0,0,0,0.1), ecolor=(1,1,1,0.4)):
+                Vz = np.zeros((len(Vin),1))
+                Vz.fill(thickness/2)
+                Vup = column_stack((Vin[:,0:2],Vz))
+                Vdown = column_stack((Vin[:,0:2],-Vz))
                 V = np.vstack((Vdown, Vup))
 
                 self.polytopeFromVertices(V, fcolor, ecolor)

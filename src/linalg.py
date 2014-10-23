@@ -19,8 +19,6 @@ def intersection(p1, p2):
                 A_iob[j+N1,:]=p2.A[j]
                 b_iob[j+N1] = p2.b[j]
 
-        print "------------------------------------"
-
         return Polytope(A_iob, b_iob)
 
 def sortVertices2D(vertices):
@@ -42,27 +40,34 @@ def sortVertices2D(vertices):
         return V[Iv][0]
 
 def getRotationMatrixAligningHyperplaneAndXYPlane(ap, bp):
-        print ap[0],bp
         z=np.zeros((3,1))
         z[2]=1
         y=np.zeros((3,1))
         y[1]=1
         x=np.zeros((3,1))
         x[0]=1
-        axy = ap - (dot(ap.T,z))*z
-        axy = axy/np.linalg.norm(axy)
-        azy = ap - (dot(ap.T,x))*x
-        azy = azy/np.linalg.norm(azy)
-        print axy,ap
         #########################
-        dya = dot(y.T,axy)
-        if dya > 0.01:
-                txy = acos(dya)
+        axy = ap - (dot(ap.T,z))*z
+        axynorm = np.linalg.norm(axy)
+        if axynorm > 0:
+                axy = axy/axynorm
+                dya = dot(y.T,axy)
+                if dya > 0.01:
+                        txy = acos(dya)
+                else:
+                        txy = 0
         else:
                 txy = 0
-        dza = dot(z.T,azy)
-        if dza > 0.01:
-                tzy = acos(dza)
+        #########################
+        azy = ap - (dot(ap.T,x))*x
+        azynorm = np.linalg.norm(azy)
+        if azynorm > 0:
+                azy = azy/azynorm
+                dza = dot(z.T,azy)
+                if dza > 0.01:
+                        tzy = acos(dza)
+                else:
+                        tzy = 0
         else:
                 tzy = 0
         #########################
@@ -82,12 +87,30 @@ def getRotationMatrixAligningHyperplaneAndXYPlane(ap, bp):
         R = dot(RX,RZ)
         return R
 
+def getMeanFromVerticesList(V):
+        M = len(V[0])
+        N = len(V)
+        mean = np.zeros((M,1))
+        for i in range(0,N):
+                for j in range(0,M):
+                        mean[j] += V[i][j]
+        mean /= N
+        return mean
+
+def getMeanFromVerticesNumpy(V):
+        mean = np.zeros((V.shape[1],1))
+        for i in range(0,V.shape[0]):
+                for j in range(0,V.shape[1]):
+                        mean[j] += V[i,j]
+
+        mean /= V.shape[0]
+        return mean
+
 def projectPointOntoHyperplane(v, a, b):
         a=a[0]
         return v - (dot(v,a) - b)*a
 
 def distancePointHyperplane(v, a, b):
-        a=a[0]
         vprime = v - (dot(v,a) - b)*a
         return np.linalg.norm(vprime-v)
 

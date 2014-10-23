@@ -50,32 +50,20 @@ class Polytope:
                                 if P.all():
                                         vertices.append(xp)
                 if len(vertices)==0:
-                        #print "number of vertices for object"
-                        #print self
-                        #print np.around(self.A,3)
-                        #print np.around(self.b,3)
-                        #print "is NULL"
+                        #print "[WARNING] number of vertices for object is NULL"
                         return []
 
                 V = np.zeros((len(vertices),3))
                 theta = np.zeros((len(vertices),1))
-                mean = np.zeros((3,1))
-                for i in range(0,len(vertices)):
-                        mean[0] = mean[0]+vertices[i][0]
-                        mean[1] = mean[1]+vertices[i][1]
-                        mean[2] = mean[2]+vertices[i][2]
 
-                mean[0]=mean[0]/len(vertices)
-                mean[1]=mean[1]/len(vertices)
-                mean[2]=mean[2]/len(vertices)
-
-                self.mean = mean
+                from src.linalg import getMeanFromVerticesList
+                self.mean = getMeanFromVerticesList(vertices)
 
                 for i in range(0,len(vertices)):
                         V[i,0]=vertices[i][0]
                         V[i,1]=vertices[i][1]
                         V[i,2]=vertices[i][2]
-                        theta[i] = atan2(V[i,1]-mean[1],V[i,0]-mean[0])
+                        theta[i] = atan2(V[i,1]-self.mean[1],V[i,0]-self.mean[0])
 
                 ## sort vertices clockwise order:
                 Iv = np.argsort(theta.T)
