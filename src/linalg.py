@@ -114,6 +114,23 @@ def distancePointHyperplane(v, a, b):
         vprime = v - (dot(v,a) - b)*a
         return np.linalg.norm(vprime-v)
 
+def distancePointWalkableSurface(v, W):
+        xob = Variable(3)
+        objective = Minimize(sum_squares(xob  - v ))
+
+        AsurfaceX = W.ap
+        bsurfaceX = W.bp
+        ApolyX =    W.A
+        bpolyX =    W.b
+
+        constraints = []
+
+        constraints.append(np.matrix(ApolyX)*xob <= bpolyX)
+        constraints.append(np.matrix(AsurfaceX)*xob == bsurfaceX)
+
+        prob = Problem(objective, constraints)
+        return sqrt(abs(prob.solve())).value
+
 def projectPointOntoPolytope(v, Ai, bi):
         xob = Variable(3)
         objective = Minimize(sum_squares(xob  - v))
@@ -121,6 +138,31 @@ def projectPointOntoPolytope(v, Ai, bi):
         prob = Problem(objective, constraints)
         prob.solve()
         return xob.value
+
+def projectPointOntoWalkableSurface(v, W):
+        xob = Variable(3)
+        objective = Minimize(sum_squares(xob  - v ))
+
+        AsurfaceX = W.ap
+        bsurfaceX = W.bp
+        ApolyX =    W.A
+        bpolyX =    W.b
+
+        constraints = []
+
+        constraints.append(np.matrix(ApolyX)*xob <= bpolyX)
+        constraints.append(np.matrix(AsurfaceX)*xob == bsurfaceX)
+
+        prob = Problem(objective, constraints)
+        prob.solve()
+        return xob.value
+
+def distancePointPolytope(v, A, b):
+        xob = Variable(3)
+        objective = Minimize(sum_squares(xob  - v ))
+        constraints = [np.matrix(A)*xob <= b]
+        prob = Problem(objective, constraints)
+        return sqrt(abs(prob.solve())).value
 
 def distancePolytopePolytope(Ai, bi, Aj, bj):
         xob = Variable(3)
@@ -130,22 +172,22 @@ def distancePolytopePolytope(Ai, bi, Aj, bj):
         prob = Problem(objective, constraints)
         return sqrt(abs(prob.solve())).value
 
-def distanceWalkableSurfacePolytope(Wi, Ai, bi):
+def distanceWalkableSurfacePolytope(W, A, b):
         xob = Variable(3)
         yob = Variable(3)
         objective = Minimize(sum_squares(xob  - yob ))
 
-        AsurfaceX = Wi[0]
-        bsurfaceX = Wi[1]
-        ApolyX =    Wi[2]
-        bpolyX =    Wi[3]
+        AsurfaceX = W.ap
+        bsurfaceX = W.bp
+        ApolyX =    W.A
+        bpolyX =    W.b
 
         constraints = []
 
         constraints.append(np.matrix(ApolyX)*xob <= bpolyX)
         constraints.append(np.matrix(AsurfaceX)*xob == bsurfaceX)
 
-        constraints.append(np.matrix(Ai)*yob <= bi)
+        constraints.append(np.matrix(A)*yob <= b)
 
         prob = Problem(objective, constraints)
         return sqrt(abs(prob.solve())).value

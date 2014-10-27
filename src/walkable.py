@@ -11,6 +11,8 @@ from src.linalg import projectPointOntoHyperplane
 from src.linalg import distancePointHyperplane
 from src.linalg import sortVertices2D
 from src.linalg import getMeanFromVerticesNumpy
+from src.linalg import distancePointWalkableSurface
+from src.linalg import projectPointOntoWalkableSurface
 from itertools import combinations
 from math import acos,cos,sin,atan2
 import Polygon, Polygon.IO
@@ -103,7 +105,7 @@ class WalkableSurface(Polytope):
                 self.V = V[Iv][0]
                 return self.V
 
-        def createBox(self, DeltaL, DeltaU):
+        def createBox(self, DeltaL, DeltaU, DeltaSide=0.0):
                 A_box =[]
                 b_box =[]
                 ##surface hyperplane, but opposite direction
@@ -126,7 +128,8 @@ class WalkableSurface(Polytope):
                                 ajp = aj - (dot(self.ap,aj))*self.ap
                                 bjp = dot(x0.T,np.array(ajp).T)
                                 A_box.append(ajp)
-                                b_box.append(bjp)
+                                b_box.append(bjp+DeltaSide)
+
 
                 A_clean = np.zeros((len(A_box),3))
                 b_clean = np.zeros((len(b_box),1))
@@ -138,6 +141,33 @@ class WalkableSurface(Polytope):
                 b_box = b_clean
 
                 return Polytope(A_box, b_box)
+
+
+def getStartGoalWalkableSurfaces(wsurfaces, xstart, xgoal):
+        N = len(wsurfaces)
+
+        minStartI = 0
+        minStartV = float("inf")
+        for i in range(0,N):
+                d = distancePointWalkableSurface(xstart, wsurfaces[i])
+                if d < minStartV:
+                        minStartV = d
+                        minStartI = i
+        minGoalI = 0
+        minGoalV = float("inf")
+        for i in range(0,N):
+                d = distancePointWalkableSurface(xgoal, wsurfaces[i])
+                if d < minGoalV:
+                        minGoalV = d
+                        minGoalI = i
+        if minStartV > 0.5:
+                print "[WARNING]: Distance of start contact to walkable surface seems too big"
+        if minGoalV > 0.5:
+                print "[WARNING]: Distance of goal contact to walkable surface seems too big"
+        xstartProj = projectPointOntoWalkableSurface(xstart, wsurfaces[minStartI])
+        xgoalProj = projectPointOntoWalkableSurface(xgoal, wsurfaces[minGoalI])
+
+        return [minStartI, xstartProj, minGoalI, xgoalProj]
 
 
 def WalkableSurfacesFromPolytopes(polytopes):
@@ -190,11 +220,13 @@ def WalkableSurfacesFromPolytopes(polytopes):
                                 solver_output = prob.solve(solver=ECOS)
                                 radius = prob.value
                                 if radius >= ROBOT_FOOT_HEIGHT:
-                                        print ctrW,": radius on surface: ",radius
+                                        #print ctrW,": radius on surface: ",radius
                                         ##surface is walkable
                                         ctrW = ctrW + 1
                                         W.append(WalkableSurface(a,b[j],p.A,p.b,i))
 
+        print "Found ",len(W)," walkable surfaces in environment"
+        print "-----------------------------------------------"
         return W
 
 def ProjectPolytopesDownInsideBox(polytopes, surface, box):
@@ -248,7 +280,7 @@ def ProjectPolytopesDownInsideBox(polytopes, surface, box):
                                 v_iob_prime[j] = dot(Rxy,v_prime)
                         proj_objects.append(v_iob_prime)
 
-        print "Found ",len(proj_objects)," objects to project down"
+        #print "Found ",len(proj_objects)," objects to project down"
 
         #######################################################
         ## write to file for convex decomposition
@@ -265,11 +297,20 @@ def ProjectPolytopesDownInsideBox(polytopes, surface, box):
                 z = np.around(v_box[j][2],4)
                 vv = np.array((x,y,z))
                 d = distancePointHyperplane(vv,ap,bp)
-                vvp = dot(Rxy,(vv-(bp+d)*ap))
-                if not vvp[2] == 0:
-                        print "[WARNING] z component has to be zero after rotation"
-                        print vvp,vv,bp,ap
-                        print Rxy
+                if dot(ap,vv) <= bp:
+                        vvp = dot(Rxy,(vv-(bp-d)*ap))
+                else:
+                        vvp = dot(Rxy,(vv-(bp+d)*ap))
+
+                if np.absolute(vvp[2])>=0.001:
+                        print "[WARNING1] z component has to be zero after rotation"
+                        print " but is ",vvp[2]
+                        print "vvp: ",vvp
+                        print "vv: ",vv
+                        print "ap,bp: ",ap,bp
+                        print "d : ",d
+                        print "Rxy: ",Rxy
+                        raise "warning"
 
                 polygonBoxV.append((vvp[0],vvp[1]))
 
@@ -285,12 +326,22 @@ def ProjectPolytopesDownInsideBox(polytopes, surface, box):
 
                         vv = np.array((xk,yk,zk))
                         d = distancePointHyperplane(vv,ap,bp)
-                        vvp = dot(Rxy,(vv-(bp+d)*ap))
+                        #vvp = dot(Rxy,(vv-(bp+d)*ap))
 
-                        if not vvp[2] == 0:
-                                print "[WARNING] z component has to be zero after rotation"
-                                print vvp,vv,bp,ap
-                                print Rxy
+                        if dot(ap,vv) <= bp:
+                                vvp = dot(Rxy,(vv-(bp-d)*ap))
+                        else:
+                                vvp = dot(Rxy,(vv-(bp+d)*ap))
+
+                        if np.absolute(vvp[2])>=0.001:
+                                print "[WARNING2] z component has to be zero after rotation"
+                                print " but is ",vvp[2]
+                                print "vvp: ",vvp
+                                print "vv: ",vv
+                                print "ap,bp: ",ap,bp
+                                print "d : ",d
+                                print "Rxy: ",Rxy
+                                raise "warning"
 
                         polygonObjV.append((vvp[0],vvp[1]))
 
