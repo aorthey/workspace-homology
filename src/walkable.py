@@ -225,7 +225,7 @@ def WalkableSurfacesFromPolytopes(polytopes):
                                         ctrW = ctrW + 1
                                         W.append(WalkableSurface(a,b[j],p.A,p.b,i))
 
-        print "Found ",len(W)," walkable surfaces in environment"
+        print "Found",len(W),"initial walkable surfaces in environment"
         print "-----------------------------------------------"
         return W
 
