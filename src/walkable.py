@@ -81,8 +81,10 @@ class WalkableSurface(Polytope):
                         bp = bn[np.ix_(rowlist)]
                         if np.linalg.det(Ap) != 0:
                                 xp = np.linalg.solve(Ap,bp)
+                                print xp
                                 P = np.less_equal(dot(An,xp),bn)
-                                if P.all():
+                                d = distancePointHyperplane(xp,self.ap,self.bp)
+                                if P.all() & d <= 0.001:
                                         vertices.append(xp)
                 if len(vertices)==0:
                         #print "[WARNING] number of vertices for object is NULL"

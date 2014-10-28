@@ -107,10 +107,13 @@ def getMeanFromVerticesNumpy(V):
         return mean
 
 def projectPointOntoHyperplane(v, a, b):
-        a=a[0]
+        #a=a[0]
+        assert len(a)==3
         return v - (dot(v,a) - b)*a
 
 def distancePointHyperplane(v, a, b):
+        assert len(a)==3
+        print v,a,b
         vprime = v - (dot(v,a) - b)*a
         return np.linalg.norm(vprime-v)
 

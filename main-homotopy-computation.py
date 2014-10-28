@@ -11,6 +11,8 @@ from src.linalg import intersection
 from src.linalg import distanceWalkableSurfaceWalkableSurface
 from src.linalg import distancePointPolytope
 from src.linalg import distanceWalkableSurfacePolytope
+from src.linalg import projectPointOntoHyperplane
+from scipy.spatial import ConvexHull
 from src.robotspecifications import ROBOT_FOOT_RADIUS 
 from src.robotspecifications import ROBOT_MAX_SLOPE
 from src.robotspecifications import ROBOT_SPHERE_RADIUS
@@ -199,5 +201,35 @@ for i in range(0,len(head_surfaces)):
 # Analyse body box to obtain the body homotopy classes
 ###############################################################################
 
-#optimizePath(xstartProj, xgoalProj, path, Wsurfaces_decomposed)
+## get body box by projecting head surface down onto walkable surface, then
+## taking the convex hull, and building up a new box on top of this convex hull
+
+for i in range(0,len(head_surfaces)):
+        W = Wsurfaces_decomposed[i]
+        ap = W.ap
+        bp = W.bp
+        Vw = W.getVertexRepresentation()
+
+        for j in range(0,len(head_surfaces[i])):
+                V = head_surfaces[i][j].getVertexRepresentation()
+                Vp = []
+                for k in range(0,len(V)):
+                        vproj = projectPointOntoHyperplane(V[k],ap,bp)
+                        Vp.append(vproj)
+
+                Vunion_all=np.vstack((Vw,Vp))
+                #plot.walkableSurface(Vunion_all,\
+                                #thickness=0.2,fcolor=(1,1,0,0.8))
+                hull = ConvexHull(Vunion_all[:,0:2])
+                Vunion=Vunion_all[hull.vertices,:]
+                w_union = WalkableSurface.fromVertices(ap,bp,Vunion,W.iObject)
+                plot.walkableSurface(w_union.getVertexRepresentation(),\
+                                thickness=0.2,fcolor=(1,1,0,0.8))
+
+###############################################################################
+# Optimization of paths in each homotopy class
+###############################################################################
+for k in range(0,len(paths)):
+        optimizePath(xstartProj, xgoalProj, paths[k], Wsurfaces_decomposed)
+
 plot.showEnvironment()
