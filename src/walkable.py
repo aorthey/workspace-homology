@@ -81,10 +81,9 @@ class WalkableSurface(Polytope):
                         bp = bn[np.ix_(rowlist)]
                         if np.linalg.det(Ap) != 0:
                                 xp = np.linalg.solve(Ap,bp)
-                                print xp
                                 P = np.less_equal(dot(An,xp),bn)
-                                d = distancePointHyperplane(xp,self.ap,self.bp)
-                                if P.all() & d <= 0.001:
+                                d = distancePointHyperplane(xp.T,self.ap,self.bp)
+                                if P.all() and d <= 0.001:
                                         vertices.append(xp)
                 if len(vertices)==0:
                         #print "[WARNING] number of vertices for object is NULL"
@@ -256,7 +255,8 @@ def ProjectPolytopesDownInsideBox(polytopes, surface, box):
                 A_obj = p.A
                 b_obj = p.b
 
-                d=distancePolytopePolytope(A_obj,b_obj,A_box,b_box)
+                #d=distancePolytopePolytope(A_obj,b_obj,A_box,b_box)
+                d=distancePolytopePolytope(p, box)
                 if d < 0.001:
                         N_obj=len(A_obj)
                         N_box=len(A_box)

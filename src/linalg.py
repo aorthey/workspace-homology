@@ -113,7 +113,6 @@ def projectPointOntoHyperplane(v, a, b):
 
 def distancePointHyperplane(v, a, b):
         assert len(a)==3
-        print v,a,b
         vprime = v - (dot(v,a) - b)*a
         return np.linalg.norm(vprime-v)
 
@@ -167,11 +166,17 @@ def distancePointPolytope(v, A, b):
         prob = Problem(objective, constraints)
         return sqrt(abs(prob.solve())).value
 
-def distancePolytopePolytope(Ai, bi, Aj, bj):
+#def distancePolytopePolytope(Ai, bi, Aj, bj):
+def distancePolytopePolytope(Pi, Pj):
+        Ai = Pi.A
+        bi = Pi.b
+        Aj = Pj.A
+        bj = Pj.b
         xob = Variable(3)
         yob = Variable(3)
         objective = Minimize(sum_squares(xob  - yob ))
-        constraints = [np.matrix(Ai)*xob <= bi,np.matrix(Aj)*yob <= bj]
+        #constraints = [np.dot(Ai,xob)<= bi,np.dot(Aj,yob) <= bj]
+        constraints = [np.matrix(Ai)*xob<= bi,np.matrix(Aj)*yob <= bj]
         prob = Problem(objective, constraints)
         return sqrt(abs(prob.solve())).value
 

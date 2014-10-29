@@ -61,7 +61,11 @@ def URDFtoPolytopes(urdf_fname):
                 hull = ConvexHull([p1,p2,p3,p4,p5,p6,p7,p8])
                 E=hull.equations[0::2]
                 Ah = np.array(E[0:,0:3])
-                bh = np.array(-E[0:,3])
+                bh = np.zeros((len(Ah),1))
+                #bh = np.array((-E[0:,3]))
+                for k in range(0,len(Ah)):
+                        bh[k] = -E[k,3]
+                #bh = -E[0:,3]
                 ###normalize
                 for at in range(0,len(Ah)):
                         normA = np.linalg.norm(Ah[at])
