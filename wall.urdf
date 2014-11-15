@@ -280,7 +280,7 @@
   <link name="box3">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.881096 0.001900 1.031809"/>
     <material name="wall_colored">
@@ -289,7 +289,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.881096 0.001900 1.031809"/>
     </collision>
@@ -303,7 +303,7 @@
   <link name="box4">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.839493 0.001900 0.917724"/>
     <material name="wall_colored">
@@ -312,7 +312,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.839493 0.001900 0.917724"/>
     </collision>
@@ -326,7 +326,7 @@
   <link name="box5">
     <visual>
       <geometry>
-        <box size="0.150000 0.105000 0.050500"/>
+        <box size="0.150000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.668039 0.001900 1.032588"/>
     <material name="wall_colored">
@@ -335,7 +335,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.150000 0.105000 0.050500"/>
+        <box size="0.150000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.668039 0.001900 1.032588"/>
     </collision>
@@ -349,7 +349,7 @@
   <link name="box6">
     <visual>
       <geometry>
-        <box size="0.120000 0.105000 0.050500"/>
+        <box size="0.120000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.337760 0.001900 1.010439"/>
     <material name="wall_colored">
@@ -358,7 +358,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.120000 0.105000 0.050500"/>
+        <box size="0.120000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.337760 0.001900 1.010439"/>
     </collision>
@@ -372,7 +372,7 @@
   <link name="box7">
     <visual>
       <geometry>
-        <box size="0.120000 0.105000 0.050500"/>
+        <box size="0.120000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.196181 0.001900 1.131102"/>
     <material name="wall_colored">
@@ -381,7 +381,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.120000 0.105000 0.050500"/>
+        <box size="0.120000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.196181 0.001900 1.131102"/>
     </collision>
@@ -395,7 +395,7 @@
   <link name="box8">
     <visual>
       <geometry>
-        <box size="0.150000 0.105000 0.050500"/>
+        <box size="0.150000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.841478 0.001900 0.858704"/>
     <material name="wall_colored">
@@ -404,7 +404,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.150000 0.105000 0.050500"/>
+        <box size="0.150000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.841478 0.001900 0.858704"/>
     </collision>
@@ -418,7 +418,7 @@
   <link name="box9">
     <visual>
       <geometry>
-        <box size="0.130000 0.105000 0.050500"/>
+        <box size="0.130000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.350722 0.001900 0.798006"/>
     <material name="wall_colored">
@@ -427,7 +427,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.130000 0.105000 0.050500"/>
+        <box size="0.130000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.350722 0.001900 0.798006"/>
     </collision>
@@ -441,7 +441,7 @@
   <link name="box10">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.289887 0.001900 0.623176"/>
     <material name="wall_colored">
@@ -450,7 +450,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.289887 0.001900 0.623176"/>
     </collision>
@@ -464,7 +464,7 @@
   <link name="box11">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.279463 0.001900 0.444432"/>
     <material name="wall_colored">
@@ -473,7 +473,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.279463 0.001900 0.444432"/>
     </collision>
@@ -487,7 +487,7 @@
   <link name="box12">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.712452 0.001900 0.444432"/>
     <material name="wall_colored">
@@ -496,7 +496,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.712452 0.001900 0.444432"/>
     </collision>
@@ -510,7 +510,7 @@
   <link name="box13">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.293353 0.001900 1.090411"/>
     <material name="wall_colored">
@@ -519,7 +519,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.293353 0.001900 1.090411"/>
     </collision>
@@ -533,7 +533,7 @@
   <link name="box14">
     <visual>
       <geometry>
-        <box size="0.200000 0.105000 0.050500"/>
+        <box size="0.200000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.757292 0.001900 0.797778"/>
     <material name="wall_colored">
@@ -542,7 +542,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.200000 0.105000 0.050500"/>
+        <box size="0.200000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.757292 0.001900 0.797778"/>
     </collision>
@@ -556,7 +556,7 @@
   <link name="box15">
     <visual>
       <geometry>
-        <box size="0.200000 0.105000 0.050500"/>
+        <box size="0.200000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.969851 0.001900 0.797778"/>
     <material name="wall_colored">
@@ -565,7 +565,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.200000 0.105000 0.050500"/>
+        <box size="0.200000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.969851 0.001900 0.797778"/>
     </collision>
@@ -579,7 +579,7 @@
   <link name="box16">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.746165 0.001900 0.623176"/>
     <material name="wall_colored">
@@ -588,7 +588,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.746165 0.001900 0.623176"/>
     </collision>
@@ -602,7 +602,7 @@
   <link name="box17">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.493117 0.001900 0.444432"/>
     <material name="wall_colored">
@@ -611,7 +611,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.493117 0.001900 0.444432"/>
     </collision>
@@ -625,7 +625,7 @@
   <link name="box18">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.474637 0.001900 0.444432"/>
     <material name="wall_colored">
@@ -634,7 +634,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.474637 0.001900 0.444432"/>
     </collision>
@@ -648,7 +648,7 @@
   <link name="box19">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.497251 0.001900 1.090411"/>
     <material name="wall_colored">
@@ -657,7 +657,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.497251 0.001900 1.090411"/>
     </collision>
@@ -671,7 +671,7 @@
   <link name="box20">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.765040 0.001900 0.622229"/>
     <material name="wall_colored">
@@ -680,7 +680,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.765040 0.001900 0.622229"/>
     </collision>
@@ -694,7 +694,7 @@
   <link name="box21">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.976122 0.001900 0.446851"/>
     <material name="wall_colored">
@@ -703,7 +703,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.976122 0.001900 0.446851"/>
     </collision>
@@ -717,7 +717,7 @@
   <link name="box22">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.993155 0.001900 0.620963"/>
     <material name="wall_colored">
@@ -726,7 +726,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.993155 0.001900 0.620963"/>
     </collision>
@@ -740,7 +740,7 @@
   <link name="box23">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.734359 0.001900 0.444432"/>
     <material name="wall_colored">
@@ -749,7 +749,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.734359 0.001900 0.444432"/>
     </collision>
@@ -763,7 +763,7 @@
   <link name="box24">
     <visual>
       <geometry>
-        <box size="0.150000 0.105000 0.050500"/>
+        <box size="0.150000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.282977 0.001900 0.444432"/>
     <material name="wall_colored">
@@ -772,7 +772,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.150000 0.105000 0.050500"/>
+        <box size="0.150000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.282977 0.001900 0.444432"/>
     </collision>
@@ -786,7 +786,7 @@
   <link name="box25">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.801618 0.001900 0.681605"/>
     <material name="wall_colored">
@@ -795,7 +795,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.801618 0.001900 0.681605"/>
     </collision>
@@ -809,7 +809,7 @@
   <link name="box26">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.552560 0.001900 0.204567"/>
     <material name="wall_colored">
@@ -818,7 +818,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.552560 0.001900 0.204567"/>
     </collision>
@@ -832,7 +832,7 @@
   <link name="box27">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.540365 0.001900 0.204567"/>
     <material name="wall_colored">
@@ -841,7 +841,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.540365 0.001900 0.204567"/>
     </collision>
@@ -855,7 +855,7 @@
   <link name="box28">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.766214 0.001900 0.204567"/>
     <material name="wall_colored">
@@ -864,7 +864,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.766214 0.001900 0.204567"/>
     </collision>
@@ -878,7 +878,7 @@
   <link name="box29">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.302551 0.001900 0.204567"/>
     <material name="wall_colored">
@@ -887,7 +887,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.302551 0.001900 0.204567"/>
     </collision>
@@ -901,7 +901,7 @@
   <link name="box30">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="1.007456 0.001900 0.204567"/>
     <material name="wall_colored">
@@ -910,7 +910,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="1.007456 0.001900 0.204567"/>
     </collision>
@@ -924,7 +924,7 @@
   <link name="box31">
     <visual>
       <geometry>
-        <box size="0.150000 0.105000 0.050500"/>
+        <box size="0.150000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.109887 0.001900 0.204567"/>
     <material name="wall_colored">
@@ -933,7 +933,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.150000 0.105000 0.050500"/>
+        <box size="0.150000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.109887 0.001900 0.204567"/>
     </collision>
@@ -947,7 +947,7 @@
   <link name="box32">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.870461 0.001900 1.032878"/>
     <material name="wall_colored">
@@ -956,7 +956,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.870461 0.001900 1.032878"/>
     </collision>
@@ -970,7 +970,7 @@
   <link name="box33">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.779190 0.001900 0.801157"/>
     <material name="wall_colored">
@@ -979,7 +979,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.779190 0.001900 0.801157"/>
     </collision>
@@ -993,7 +993,7 @@
   <link name="box34">
     <visual>
       <geometry>
-        <box size="0.150000 0.105000 0.050500"/>
+        <box size="0.150000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.386149 0.001900 0.808573"/>
     <material name="wall_colored">
@@ -1002,7 +1002,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.150000 0.105000 0.050500"/>
+        <box size="0.150000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.386149 0.001900 0.808573"/>
     </collision>
@@ -1016,7 +1016,7 @@
   <link name="box35">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.494825 0.001900 0.324118"/>
     <material name="wall_colored">
@@ -1025,7 +1025,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.494825 0.001900 0.324118"/>
     </collision>
@@ -1039,7 +1039,7 @@
   <link name="box36">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.704989 0.001900 0.324118"/>
     <material name="wall_colored">
@@ -1048,7 +1048,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.704989 0.001900 0.324118"/>
     </collision>
@@ -1062,7 +1062,7 @@
   <link name="box37">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.710321 0.001900 0.324118"/>
     <material name="wall_colored">
@@ -1071,7 +1071,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.710321 0.001900 0.324118"/>
     </collision>
@@ -1085,7 +1085,7 @@
   <link name="box38">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.465333 0.001900 0.324118"/>
     <material name="wall_colored">
@@ -1094,7 +1094,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.465333 0.001900 0.324118"/>
     </collision>
@@ -1108,7 +1108,7 @@
   <link name="box39">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.948136 0.001900 0.324118"/>
     <material name="wall_colored">
@@ -1117,7 +1117,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.948136 0.001900 0.324118"/>
     </collision>
@@ -1131,7 +1131,7 @@
   <link name="box40">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.227519 0.001900 0.324118"/>
     <material name="wall_colored">
@@ -1140,7 +1140,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.227519 0.001900 0.324118"/>
     </collision>
@@ -1154,7 +1154,7 @@
   <link name="box41">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.367186 0.001900 0.682390"/>
     <material name="wall_colored">
@@ -1163,7 +1163,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.367186 0.001900 0.682390"/>
     </collision>
@@ -1177,7 +1177,7 @@
   <link name="box42">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.654482 0.001900 0.971514"/>
     <material name="wall_colored">
@@ -1186,7 +1186,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.654482 0.001900 0.971514"/>
     </collision>
@@ -1200,7 +1200,7 @@
   <link name="box43">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.632180 0.001900 0.918695"/>
     <material name="wall_colored">
@@ -1209,7 +1209,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.632180 0.001900 0.918695"/>
     </collision>
@@ -1223,7 +1223,7 @@
   <link name="box44">
     <visual>
       <geometry>
-        <box size="0.180000 0.105000 0.050500"/>
+        <box size="0.180000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.338705 0.001900 0.740034"/>
     <material name="wall_colored">
@@ -1232,7 +1232,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.180000 0.105000 0.050500"/>
+        <box size="0.180000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.338705 0.001900 0.740034"/>
     </collision>
@@ -1246,7 +1246,7 @@
   <link name="box45">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.299132 0.001900 0.561291"/>
     <material name="wall_colored">
@@ -1255,7 +1255,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.299132 0.001900 0.561291"/>
     </collision>
@@ -1269,7 +1269,7 @@
   <link name="box46">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.779111 0.001900 0.561291"/>
     <material name="wall_colored">
@@ -1278,7 +1278,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.779111 0.001900 0.561291"/>
     </collision>
@@ -1292,7 +1292,7 @@
   <link name="box47">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.071018 0.001900 1.298161"/>
     <material name="wall_colored">
@@ -1301,7 +1301,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.071018 0.001900 1.298161"/>
     </collision>
@@ -1315,7 +1315,7 @@
   <link name="box48">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.730836 0.001900 1.207270"/>
     <material name="wall_colored">
@@ -1324,7 +1324,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.730836 0.001900 1.207270"/>
     </collision>
@@ -1338,7 +1338,7 @@
   <link name="box49">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.406791 0.001900 1.270767"/>
     <material name="wall_colored">
@@ -1347,7 +1347,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.406791 0.001900 1.270767"/>
     </collision>
@@ -1361,7 +1361,7 @@
   <link name="box50">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.411585 0.001900 1.331667"/>
     <material name="wall_colored">
@@ -1370,7 +1370,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.411585 0.001900 1.331667"/>
     </collision>
@@ -1384,7 +1384,7 @@
   <link name="box51">
     <visual>
       <geometry>
-        <box size="0.190000 0.105000 0.050500"/>
+        <box size="0.190000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.698998 0.001900 0.914637"/>
     <material name="wall_colored">
@@ -1393,7 +1393,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.190000 0.105000 0.050500"/>
+        <box size="0.190000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.698998 0.001900 0.914637"/>
     </collision>
@@ -1407,7 +1407,7 @@
   <link name="box52">
     <visual>
       <geometry>
-        <box size="0.190000 0.105000 0.030000"/>
+        <box size="0.190000 0.405009 0.030000"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.423380 0.001900 1.036865"/>
     <material name="wall_colored">
@@ -1416,7 +1416,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.190000 0.105000 0.030000"/>
+        <box size="0.190000 0.405009 0.030000"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.423380 0.001900 1.036865"/>
     </collision>
@@ -1430,7 +1430,7 @@
   <link name="box53">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.732904 0.001900 0.740034"/>
     <material name="wall_colored">
@@ -1439,7 +1439,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.732904 0.001900 0.740034"/>
     </collision>
@@ -1453,7 +1453,7 @@
   <link name="box54">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.711681 0.001900 0.561291"/>
     <material name="wall_colored">
@@ -1462,7 +1462,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.711681 0.001900 0.561291"/>
     </collision>
@@ -1476,7 +1476,7 @@
   <link name="box55">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.541297 0.001900 0.561291"/>
     <material name="wall_colored">
@@ -1485,7 +1485,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.541297 0.001900 0.561291"/>
     </collision>
@@ -1499,7 +1499,7 @@
   <link name="box56">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.739973 0.001900 1.087937"/>
     <material name="wall_colored">
@@ -1508,7 +1508,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.739973 0.001900 1.087937"/>
     </collision>
@@ -1522,7 +1522,7 @@
   <link name="box57">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.170224 0.001900 1.310616"/>
     <material name="wall_colored">
@@ -1531,7 +1531,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.170224 0.001900 1.310616"/>
     </collision>
@@ -1545,7 +1545,7 @@
   <link name="box58">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.275824 0.001900 1.187165"/>
     <material name="wall_colored">
@@ -1554,7 +1554,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.275824 0.001900 1.187165"/>
     </collision>
@@ -1568,7 +1568,7 @@
   <link name="box59">
     <visual>
       <geometry>
-        <box size="0.130000 0.105000 0.040000"/>
+        <box size="0.130000 0.405009 0.040000"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.221300 0.001900 1.258849"/>
     <material name="wall_colored">
@@ -1577,7 +1577,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.130000 0.105000 0.040000"/>
+        <box size="0.130000 0.405009 0.040000"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.221300 0.001900 1.258849"/>
     </collision>
@@ -1591,7 +1591,7 @@
   <link name="box60">
     <visual>
       <geometry>
-        <box size="0.190000 0.105000 0.050500"/>
+        <box size="0.190000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.272879 0.001900 1.207270"/>
     <material name="wall_colored">
@@ -1600,7 +1600,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.190000 0.105000 0.050500"/>
+        <box size="0.190000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.272879 0.001900 1.207270"/>
     </collision>
@@ -1614,7 +1614,7 @@
   <link name="box61">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.917195 0.001900 0.914637"/>
     <material name="wall_colored">
@@ -1623,7 +1623,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.917195 0.001900 0.914637"/>
     </collision>
@@ -1637,7 +1637,7 @@
   <link name="box62">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.644115 0.001900 1.032667"/>
     <material name="wall_colored">
@@ -1646,7 +1646,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.644115 0.001900 1.032667"/>
     </collision>
@@ -1660,7 +1660,7 @@
   <link name="box63">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.951576 0.001900 0.563709"/>
     <material name="wall_colored">
@@ -1669,7 +1669,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.951576 0.001900 0.563709"/>
     </collision>
@@ -1683,7 +1683,7 @@
   <link name="box64">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.968609 0.001900 0.737822"/>
     <material name="wall_colored">
@@ -1692,7 +1692,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.968609 0.001900 0.737822"/>
     </collision>
@@ -1706,7 +1706,7 @@
   <link name="box65">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.334596 0.001900 0.561291"/>
     <material name="wall_colored">
@@ -1715,7 +1715,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.334596 0.001900 0.561291"/>
     </collision>
@@ -1729,7 +1729,7 @@
   <link name="box66">
     <visual>
       <geometry>
-        <box size="0.160000 0.105000 0.050500"/>
+        <box size="0.160000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.399448 0.001900 0.084253"/>
     <material name="wall_colored">
@@ -1738,7 +1738,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.160000 0.105000 0.050500"/>
+        <box size="0.160000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.399448 0.001900 0.084253"/>
     </collision>
@@ -1752,7 +1752,7 @@
   <link name="box67">
     <visual>
       <geometry>
-        <box size="0.160000 0.105000 0.050500"/>
+        <box size="0.160000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.451465 0.001900 1.210264"/>
     <material name="wall_colored">
@@ -1761,7 +1761,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.160000 0.105000 0.050500"/>
+        <box size="0.160000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.451465 0.001900 1.210264"/>
     </collision>
@@ -1775,7 +1775,7 @@
   <link name="box68">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.639801 0.001900 0.084253"/>
     <material name="wall_colored">
@@ -1784,7 +1784,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.639801 0.001900 0.084253"/>
     </collision>
@@ -1798,7 +1798,7 @@
   <link name="box69">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.679579 0.001900 1.329597"/>
     <material name="wall_colored">
@@ -1807,7 +1807,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.679579 0.001900 1.329597"/>
     </collision>
@@ -1821,7 +1821,7 @@
   <link name="box70">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.602360 0.001900 0.084253"/>
     <material name="wall_colored">
@@ -1830,7 +1830,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.602360 0.001900 0.084253"/>
     </collision>
@@ -1844,7 +1844,7 @@
   <link name="box71">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.654377 0.001900 1.210264"/>
     <material name="wall_colored">
@@ -1853,7 +1853,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.654377 0.001900 1.210264"/>
     </collision>
@@ -1867,7 +1867,7 @@
   <link name="box72">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.401987 0.001900 0.084253"/>
     <material name="wall_colored">
@@ -1876,7 +1876,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.401987 0.001900 0.084253"/>
     </collision>
@@ -1890,7 +1890,7 @@
   <link name="box73">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.334671 0.001900 1.369374"/>
     <material name="wall_colored">
@@ -1899,7 +1899,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.334671 0.001900 1.369374"/>
     </collision>
@@ -1913,7 +1913,7 @@
   <link name="box74">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.843602 0.001900 0.084253"/>
     <material name="wall_colored">
@@ -1922,7 +1922,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.843602 0.001900 0.084253"/>
     </collision>
@@ -1936,7 +1936,7 @@
   <link name="box75">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.895618 0.001900 1.210264"/>
     <material name="wall_colored">
@@ -1945,7 +1945,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.895618 0.001900 1.210264"/>
     </collision>
@@ -1959,7 +1959,7 @@
   <link name="box76">
     <visual>
       <geometry>
-        <box size="0.190000 0.105000 0.050500"/>
+        <box size="0.190000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.188664 0.001900 0.084253"/>
     <material name="wall_colored">
@@ -1968,7 +1968,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.190000 0.105000 0.050500"/>
+        <box size="0.190000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.188664 0.001900 0.084253"/>
     </collision>
@@ -1982,7 +1982,7 @@
   <link name="box77">
     <visual>
       <geometry>
-        <box size="0.190000 0.105000 0.050500"/>
+        <box size="0.190000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.138737 0.001900 1.372434"/>
     <material name="wall_colored">
@@ -1991,7 +1991,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.190000 0.105000 0.050500"/>
+        <box size="0.190000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.138737 0.001900 1.372434"/>
     </collision>
@@ -2005,7 +2005,7 @@
   <link name="box78">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.894758 0.001900 1.094263"/>
     <material name="wall_colored">
@@ -2014,7 +2014,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.894758 0.001900 1.094263"/>
     </collision>
@@ -2028,7 +2028,7 @@
   <link name="box79">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.639737 0.001900 0.862542"/>
     <material name="wall_colored">
@@ -2037,7 +2037,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.639737 0.001900 0.862542"/>
     </collision>
@@ -2051,7 +2051,7 @@
   <link name="box80">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.559906 0.001900 0.805610"/>
     <material name="wall_colored">
@@ -2060,7 +2060,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.559906 0.001900 0.805610"/>
     </collision>
@@ -2074,7 +2074,7 @@
   <link name="box81">
     <visual>
       <geometry>
-        <box size="0.130000 0.105000 0.050500"/>
+        <box size="0.130000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.449203 0.001900 0.385503"/>
     <material name="wall_colored">
@@ -2083,7 +2083,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.130000 0.105000 0.050500"/>
+        <box size="0.130000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.449203 0.001900 0.385503"/>
     </collision>
@@ -2097,7 +2097,7 @@
   <link name="box82">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.752081 0.001900 0.385503"/>
     <material name="wall_colored">
@@ -2106,7 +2106,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.752081 0.001900 0.385503"/>
     </collision>
@@ -2120,7 +2120,7 @@
   <link name="box83">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.633803 0.001900 0.385503"/>
     <material name="wall_colored">
@@ -2129,7 +2129,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.633803 0.001900 0.385503"/>
     </collision>
@@ -2143,7 +2143,7 @@
   <link name="box84">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.512425 0.001900 0.385503"/>
     <material name="wall_colored">
@@ -2152,7 +2152,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.512425 0.001900 0.385503"/>
     </collision>
@@ -2166,7 +2166,7 @@
   <link name="box85">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.871617 0.001900 0.385503"/>
     <material name="wall_colored">
@@ -2175,7 +2175,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.871617 0.001900 0.385503"/>
     </collision>
@@ -2189,7 +2189,7 @@
   <link name="box86">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.274611 0.001900 0.385503"/>
     <material name="wall_colored">
@@ -2198,7 +2198,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.274611 0.001900 0.385503"/>
     </collision>
@@ -2212,7 +2212,7 @@
   <link name="box87">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.520616 0.001900 0.145638"/>
     <material name="wall_colored">
@@ -2221,7 +2221,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.520616 0.001900 0.145638"/>
     </collision>
@@ -2235,7 +2235,7 @@
   <link name="box88">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.520616 0.001900 1.390982"/>
     <material name="wall_colored">
@@ -2244,7 +2244,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.520616 0.001900 1.390982"/>
     </collision>
@@ -2258,7 +2258,7 @@
   <link name="box89">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.625619 0.001900 0.145638"/>
     <material name="wall_colored">
@@ -2267,7 +2267,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.625619 0.001900 0.145638"/>
     </collision>
@@ -2281,7 +2281,7 @@
   <link name="box90">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.573602 0.001900 1.390982"/>
     <material name="wall_colored">
@@ -2290,7 +2290,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.573602 0.001900 1.390982"/>
     </collision>
@@ -2304,7 +2304,7 @@
   <link name="box91">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.734271 0.001900 0.145638"/>
     <material name="wall_colored">
@@ -2313,7 +2313,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.734271 0.001900 0.145638"/>
     </collision>
@@ -2327,7 +2327,7 @@
   <link name="box92">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.654715 0.001900 1.268589"/>
     <material name="wall_colored">
@@ -2336,7 +2336,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.654715 0.001900 1.268589"/>
     </collision>
@@ -2350,7 +2350,7 @@
   <link name="box93">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.387805 0.001900 0.145638"/>
     <material name="wall_colored">
@@ -2359,7 +2359,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.387805 0.001900 0.145638"/>
     </collision>
@@ -2373,7 +2373,7 @@
   <link name="box94">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.087943 0.001900 1.366503"/>
     <material name="wall_colored">
@@ -2382,7 +2382,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.087943 0.001900 1.366503"/>
     </collision>
@@ -2396,7 +2396,7 @@
   <link name="box95">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.975512 0.001900 0.145638"/>
     <material name="wall_colored">
@@ -2405,7 +2405,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.975512 0.001900 0.145638"/>
     </collision>
@@ -2419,7 +2419,7 @@
   <link name="box96">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.902077 0.001900 1.271649"/>
     <material name="wall_colored">
@@ -2428,7 +2428,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.902077 0.001900 1.271649"/>
     </collision>
@@ -2442,7 +2442,7 @@
   <link name="box97">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.170726 0.001900 0.145638"/>
     <material name="wall_colored">
@@ -2451,7 +2451,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.170726 0.001900 0.145638"/>
     </collision>
@@ -2465,7 +2465,7 @@
   <link name="box98">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.881850 0.001900 1.345084"/>
     <material name="wall_colored">
@@ -2474,7 +2474,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.881850 0.001900 1.345084"/>
     </collision>
@@ -2488,7 +2488,7 @@
   <link name="box99">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.863905 0.001900 0.973949"/>
     <material name="wall_colored">
@@ -2497,7 +2497,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.863905 0.001900 0.973949"/>
     </collision>
@@ -2511,7 +2511,7 @@
   <link name="box100">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.694746 0.001900 0.742228"/>
     <material name="wall_colored">
@@ -2520,7 +2520,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.694746 0.001900 0.742228"/>
     </collision>
@@ -2534,7 +2534,7 @@
   <link name="box101">
     <visual>
       <geometry>
-        <box size="0.150000 0.105000 0.050500"/>
+        <box size="0.150000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.526620 0.001900 0.265189"/>
     <material name="wall_colored">
@@ -2543,7 +2543,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.150000 0.105000 0.050500"/>
+        <box size="0.150000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.526620 0.001900 0.265189"/>
     </collision>
@@ -2557,7 +2557,7 @@
   <link name="box102">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.593476 0.001900 0.265189"/>
     <material name="wall_colored">
@@ -2566,7 +2566,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.593476 0.001900 0.265189"/>
     </collision>
@@ -2580,7 +2580,7 @@
   <link name="box103">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.722779 0.001900 0.265189"/>
     <material name="wall_colored">
@@ -2589,7 +2589,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.722779 0.001900 0.265189"/>
     </collision>
@@ -2603,7 +2603,7 @@
   <link name="box104">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.353820 0.001900 0.265189"/>
     <material name="wall_colored">
@@ -2612,7 +2612,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.353820 0.001900 0.265189"/>
     </collision>
@@ -2626,7 +2626,7 @@
   <link name="box105">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.960593 0.001900 0.265189"/>
     <material name="wall_colored">
@@ -2635,7 +2635,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.960593 0.001900 0.265189"/>
     </collision>
@@ -2649,7 +2649,7 @@
   <link name="box106">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.116006 0.001900 0.265189"/>
     <material name="wall_colored">
@@ -2658,7 +2658,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.116006 0.001900 0.265189"/>
     </collision>
@@ -2672,7 +2672,7 @@
   <link name="box107">
     <visual>
       <geometry>
-        <box size="0.130000 0.105000 0.050500"/>
+        <box size="0.130000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.491072 0.001900 0.747145"/>
     <material name="wall_colored">
@@ -2681,7 +2681,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.130000 0.105000 0.050500"/>
+        <box size="0.130000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.491072 0.001900 0.747145"/>
     </collision>
@@ -2695,7 +2695,7 @@
   <link name="box108">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.310139 0.001900 0.681105"/>
     <material name="wall_colored">
@@ -2704,7 +2704,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.310139 0.001900 0.681105"/>
     </collision>
@@ -2718,7 +2718,7 @@
   <link name="box109">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.275734 0.001900 0.502362"/>
     <material name="wall_colored">
@@ -2727,7 +2727,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.275734 0.001900 0.502362"/>
     </collision>
@@ -2741,7 +2741,7 @@
   <link name="box110">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.771035 0.001900 0.502362"/>
     <material name="wall_colored">
@@ -2750,7 +2750,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.771035 0.001900 0.502362"/>
     </collision>
@@ -2764,7 +2764,7 @@
   <link name="box111">
     <visual>
       <geometry>
-        <box size="0.150000 0.105000 0.050500"/>
+        <box size="0.150000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.696599 0.001900 1.094323"/>
     <material name="wall_colored">
@@ -2773,7 +2773,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.150000 0.105000 0.050500"/>
+        <box size="0.150000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.696599 0.001900 1.094323"/>
     </collision>
@@ -2787,7 +2787,7 @@
   <link name="box112">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.742872 0.001900 1.148341"/>
     <material name="wall_colored">
@@ -2796,7 +2796,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.742872 0.001900 1.148341"/>
     </collision>
@@ -2810,7 +2810,7 @@
   <link name="box113">
     <visual>
       <geometry>
-        <box size="0.150000 0.105000 0.050500"/>
+        <box size="0.150000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.341404 0.001900 1.075893"/>
     <material name="wall_colored">
@@ -2819,7 +2819,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.150000 0.105000 0.050500"/>
+        <box size="0.150000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.341404 0.001900 1.075893"/>
     </collision>
@@ -2833,7 +2833,7 @@
   <link name="box114">
     <visual>
       <geometry>
-        <box size="0.130000 0.105000 0.050500"/>
+        <box size="0.130000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.194999 0.001900 1.069458"/>
     <material name="wall_colored">
@@ -2842,7 +2842,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.130000 0.105000 0.050500"/>
+        <box size="0.130000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.194999 0.001900 1.069458"/>
     </collision>
@@ -2856,7 +2856,7 @@
   <link name="box115">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.262173 0.001900 1.148341"/>
     <material name="wall_colored">
@@ -2865,7 +2865,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.262173 0.001900 1.148341"/>
     </collision>
@@ -2879,7 +2879,7 @@
   <link name="box116">
     <visual>
       <geometry>
-        <box size="0.200000 0.105000 0.050500"/>
+        <box size="0.200000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.534834 0.001900 0.620818"/>
     <material name="wall_colored">
@@ -2888,7 +2888,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.200000 0.105000 0.050500"/>
+        <box size="0.200000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.534834 0.001900 0.620818"/>
     </collision>
@@ -2902,7 +2902,7 @@
   <link name="box117">
     <visual>
       <geometry>
-        <box size="0.190000 0.105000 0.050500"/>
+        <box size="0.190000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.694705 0.001900 0.973738"/>
     <material name="wall_colored">
@@ -2911,7 +2911,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.190000 0.105000 0.050500"/>
+        <box size="0.190000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.694705 0.001900 0.973738"/>
     </collision>
@@ -2925,7 +2925,7 @@
   <link name="box118">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.742436 0.001900 0.681105"/>
     <material name="wall_colored">
@@ -2934,7 +2934,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.742436 0.001900 0.681105"/>
     </collision>
@@ -2948,7 +2948,7 @@
   <link name="box119">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.533221 0.001900 0.502362"/>
     <material name="wall_colored">
@@ -2957,7 +2957,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.533221 0.001900 0.502362"/>
     </collision>
@@ -2971,7 +2971,7 @@
   <link name="box120">
     <visual>
       <geometry>
-        <box size="0.180000 0.105000 0.030000"/>
+        <box size="0.180000 0.405009 0.030000"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.359983 0.001900 1.129658"/>
     <material name="wall_colored">
@@ -2980,7 +2980,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.180000 0.105000 0.030000"/>
+        <box size="0.180000 0.405009 0.030000"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.359983 0.001900 1.129658"/>
     </collision>
@@ -2994,7 +2994,7 @@
   <link name="box121">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.466071 0.001900 1.148341"/>
     <material name="wall_colored">
@@ -3003,7 +3003,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.466071 0.001900 1.148341"/>
     </collision>
@@ -3017,7 +3017,7 @@
   <link name="box122">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.764053 0.001900 0.855708"/>
     <material name="wall_colored">
@@ -3026,7 +3026,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.764053 0.001900 0.855708"/>
     </collision>
@@ -3040,7 +3040,7 @@
   <link name="box123">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="1.001328 0.001900 0.855708"/>
     <material name="wall_colored">
@@ -3049,7 +3049,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="1.001328 0.001900 0.855708"/>
     </collision>
@@ -3063,7 +3063,7 @@
   <link name="box124">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.912902 0.001900 0.973738"/>
     <material name="wall_colored">
@@ -3072,7 +3072,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.912902 0.001900 0.973738"/>
     </collision>
@@ -3086,7 +3086,7 @@
   <link name="box125">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.972393 0.001900 0.504780"/>
     <material name="wall_colored">
@@ -3095,7 +3095,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.972393 0.001900 0.504780"/>
     </collision>
@@ -3109,7 +3109,7 @@
   <link name="box126">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.973711 0.001900 0.678893"/>
     <material name="wall_colored">
@@ -3118,7 +3118,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.973711 0.001900 0.678893"/>
     </collision>
@@ -3132,7 +3132,7 @@
   <link name="box127">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.730630 0.001900 0.502362"/>
     <material name="wall_colored">
@@ -3141,7 +3141,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.730630 0.001900 0.502362"/>
     </collision>
@@ -3155,7 +3155,7 @@
   <link name="box128">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.326520 0.001900 0.502362"/>
     <material name="wall_colored">
@@ -3164,7 +3164,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.326520 0.001900 0.502362"/>
     </collision>
@@ -3178,7 +3178,7 @@
   <link name="box129">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.321609 0.001900 0.024525"/>
     <material name="wall_colored">
@@ -3187,7 +3187,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.321609 0.001900 0.024525"/>
     </collision>
@@ -3201,7 +3201,7 @@
   <link name="box130">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.333848 0.001900 1.389202"/>
     <material name="wall_colored">
@@ -3210,7 +3210,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.333848 0.001900 1.389202"/>
     </collision>
@@ -3224,7 +3224,7 @@
   <link name="box131">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.665731 0.001900 0.025323"/>
     <material name="wall_colored">
@@ -3233,7 +3233,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.665731 0.001900 0.025323"/>
     </collision>
@@ -3247,7 +3247,7 @@
   <link name="box132">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.702449 0.001900 1.273727"/>
     <material name="wall_colored">
@@ -3256,7 +3256,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.702449 0.001900 1.273727"/>
     </collision>
@@ -3270,7 +3270,7 @@
   <link name="box133">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.524908 0.001900 0.025323"/>
     <material name="wall_colored">
@@ -3279,7 +3279,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.524908 0.001900 0.025323"/>
     </collision>
@@ -3293,7 +3293,7 @@
   <link name="box134">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.662600 0.001900 1.331864"/>
     <material name="wall_colored">
@@ -3302,7 +3302,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.662600 0.001900 1.331864"/>
     </collision>
@@ -3316,7 +3316,7 @@
   <link name="box135">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.427917 0.001900 0.025323"/>
     <material name="wall_colored">
@@ -3325,7 +3325,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.427917 0.001900 0.025323"/>
     </collision>
@@ -3339,7 +3339,7 @@
   <link name="box136">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.262687 0.001900 1.246189"/>
     <material name="wall_colored">
@@ -3348,7 +3348,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.262687 0.001900 1.246189"/>
     </collision>
@@ -3362,7 +3362,7 @@
   <link name="box137">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="1.002957 0.001900 0.025323"/>
     <material name="wall_colored">
@@ -3371,7 +3371,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="1.002957 0.001900 0.025323"/>
     </collision>
@@ -3385,7 +3385,7 @@
   <link name="box138">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.944821 0.001900 1.151335"/>
     <material name="wall_colored">
@@ -3394,7 +3394,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.944821 0.001900 1.151335"/>
     </collision>
@@ -3408,7 +3408,7 @@
   <link name="box139">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.766150 0.001900 0.025323"/>
     <material name="wall_colored">
@@ -3417,7 +3417,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.766150 0.001900 0.025323"/>
     </collision>
@@ -3431,7 +3431,7 @@
   <link name="box140">
     <visual>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.708013 0.001900 1.151335"/>
     <material name="wall_colored">
@@ -3440,7 +3440,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.225000 0.105000 0.050500"/>
+        <box size="0.225000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="0.708013 0.001900 1.151335"/>
     </collision>
@@ -3454,7 +3454,7 @@
   <link name="box141">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.210839 0.001900 0.025323"/>
     <material name="wall_colored">
@@ -3463,7 +3463,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.210839 0.001900 0.025323"/>
     </collision>
@@ -3477,7 +3477,7 @@
   <link name="box142">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.290394 0.001900 1.304325"/>
     <material name="wall_colored">
@@ -3486,7 +3486,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.290394 0.001900 1.304325"/>
     </collision>
@@ -3500,7 +3500,7 @@
   <link name="box143">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.343177 0.001900 0.622380"/>
     <material name="wall_colored">
@@ -3509,7 +3509,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.343177 0.001900 0.622380"/>
     </collision>
@@ -3523,7 +3523,7 @@
   <link name="box144">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.583012 0.001900 0.681720"/>
     <material name="wall_colored">
@@ -3532,7 +3532,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.583012 0.001900 0.681720"/>
     </collision>
@@ -3546,7 +3546,7 @@
   <link name="box145">
     <visual>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.323396 0.001900 0.748478"/>
     <material name="wall_colored">
@@ -3555,7 +3555,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.170000 0.105000 0.050500"/>
+        <box size="0.170000 0.405009 0.050500"/>
       </geometry>
     <origin rpy="0 0 0" xyz="-0.323396 0.001900 0.748478"/>
     </collision>

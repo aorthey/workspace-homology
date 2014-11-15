@@ -39,9 +39,9 @@ env_fname = "wall.urdf"
 
 ## COLORS
 colorScene=(0.3,0.3,0.3,0.1)
-colorBodyBox=(1,0,0,0.1)
-colorFootBox=(1,1,0,0.1)
-colorHeadBox=(0.2,0.2,0.2,0.1)
+colorBodyBox=(1,0,0,0.2)
+colorFootBox=(1,1,0,0.2)
+colorHeadBox=(0.2,0.2,0.2,0.2)
 colorWalkableSurface=(1,0,1,0.8)
 ###############################################################################
 
@@ -103,12 +103,6 @@ N_candidates = len(Wsurfaces_candidates)
 
 [xstartI, xstartProj, xgoalI, xgoalProj] = \
                 getStartGoalWalkableSurfaces(Wsurfaces_candidates, xstart, xgoal)
-#print "START:# ",xstart[0],"->",xstartProj[0]
-#print "      # ",xstart[1],"->",xstartProj[1]
-#print "      # ",xstart[2],"->",xstartProj[2]
-#print "GOAL: # ",xgoal[0],"->",xgoalProj[0]
-#print "      # ",xgoal[1],"->",xgoalProj[1]
-#print "      # ",xgoal[2],"->",xgoalProj[2]
 
 psize = 80
 plot.point(xstartProj, size=psize,color=(1,0,0,0.9))
@@ -261,7 +255,7 @@ for i in range(0,len(head_boxes)):
                                 w_union.createBox(
                                         ROBOT_FOOT_HEIGHT,\
                                         ROBOT_VOLUME_MIN_HEIGHT-\
-                                        ROBOT_HEAD_SIZE))  \
+                                        ROBOT_HEAD_SIZE))
         #############################################################################
         # Visualize body box
         #############################################################################
@@ -274,44 +268,44 @@ for i in range(0,len(body_boxes)):
         #############################################################################
         # Obtain list of object inside body box (used for planning)
         #############################################################################
-print "----------------------------------------"
-for i in range(0,len(body_boxes)):
-        B = body_boxes[i]
-        B_obj = []
-        for j in range(0,len(pobjects)):
-                O = pobjects[j]
-                d = distancePolytopePolytope(O, B)
-                if d < 0.001:
-                        Ointer = O.intersectWithPolytope(B)
-                        B_obj.append(Ointer)
-                        plot.polytopeFromVertices(\
-                                        Ointer.getVertexRepresentation(),\
-                                        fcolor=(1,0,0,0.6))
-        print "Body box ",i,"has",len(B_obj),"objects associated"
-
-        ### compute distance between objects inside B
-        D_obj = np.zeros((len(B_obj),len(B_obj)))
-        for j in range(0,len(B_obj)):
-                for k in range(0,len(B_obj)):
-                        Bj = B_obj[j]
-                        Bk = B_obj[k]
-                        D_obj[j,k]=D_obj[k,j]=distancePolytopePolytope(Bj,Bk)
-                D_obj[j,j]=1000
-
-        print np.around(D_obj,3)
-
-        homotopyChangingObjects = 0
-        for j in range(0,len(B_obj)):
-                md = np.nanmin(D_obj[j,:])
-                print D_obj[j,:]
-                if md > ROBOT_SPHERE_RADIUS:
-                        ## object changes topology!
-                        B_obj[i].changesTopology(True)
-                        homotopyChangingObjects += 1
-                        print " object",j,"changes topology of body box!"
-
-        print " => ",homotopyChangingObjects,"topological holes"
-        print "----------------------------------------"
+#print "----------------------------------------"
+#for i in range(0,len(body_boxes)):
+#        B = body_boxes[i]
+#        B_obj = []
+#        for j in range(0,len(pobjects)):
+#                O = pobjects[j]
+#                d = distancePolytopePolytope(O, B)
+#                if d < 0.001:
+#                        Ointer = O.intersectWithPolytope(B)
+#                        B_obj.append(Ointer)
+#                        plot.polytopeFromVertices(\
+#                                        Ointer.getVertexRepresentation(),\
+#                                        fcolor=(1,0,0,0.6))
+#        print "Body box ",i,"has",len(B_obj),"objects associated"
+#
+#        ### compute distance between objects inside B
+#        D_obj = np.zeros((len(B_obj),len(B_obj)))
+#        for j in range(0,len(B_obj)):
+#                for k in range(0,len(B_obj)):
+#                        Bj = B_obj[j]
+#                        Bk = B_obj[k]
+#                        D_obj[j,k]=D_obj[k,j]=distancePolytopePolytope(Bj,Bk)
+#                D_obj[j,j]=1000
+#
+#        print np.around(D_obj,3)
+#
+#        homotopyChangingObjects = 0
+#        for j in range(0,len(B_obj)):
+#                md = np.nanmin(D_obj[j,:])
+#                print D_obj[j,:]
+#                if md > ROBOT_SPHERE_RADIUS:
+#                        ## object changes topology!
+#                        B_obj[i].changesTopology(True)
+#                        homotopyChangingObjects += 1
+#                        print " object",j,"changes topology of body box!"
+#
+#        print " => ",homotopyChangingObjects,"topological holes"
+#        print "----------------------------------------"
 
 
 ###############################################################################

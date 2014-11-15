@@ -31,7 +31,7 @@ def URDFtoPolytopes(urdf_fname):
 
                 ## prune small boxes (DEBUG MODE)
                 if DEBUG:
-                        if sx+sy > 0.5:
+                        if sx+sy > 0.7:
                                 K.append([sx,sy,sz,x,y,z,ro,po,yo])
                 else:
                         K.append([sx,sy,sz,x,y,z,ro,po,yo])
