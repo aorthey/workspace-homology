@@ -55,7 +55,7 @@ class Plotter:
 
                 self.polytopeFromVertices(V, fcolor, ecolor)
 
-        def polytopeFromVertices(self,V,fcolor=(0,0,0,0.1), ecolor=(1,1,1,0.4)):
+        def polytopeFromVertices(self,V,fcolor=(0,0,0,0.1), ecolor=(0,0,0,0.1)):
                 self.hull = ConvexHull(V)
                 faces = []
                 for ia, ib, ic in self.hull.simplices:
@@ -63,7 +63,7 @@ class Plotter:
                 items = Poly3DCollection(faces, facecolors=[fcolor],
                                 edgecolors=[ecolor])
                 self.ax.add_collection(items)
-                self.ax.scatter(V[:,0], V[:,1], V[:,2], 'r*')
+                #self.ax.scatter(V[:,0], V[:,1], V[:,2], 'r*')
 
         def capsule(self, radius, length, xyz, rpy):
                 x = xyz[0]

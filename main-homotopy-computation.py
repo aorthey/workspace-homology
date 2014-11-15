@@ -17,6 +17,8 @@ from scipy.spatial import ConvexHull
 from src.pathoptimizer import optimizePath
 from plotter import Plotter
 
+import sys
+
 ###############################################################################
 # CONFIGURE / PARAMETERS 
 ###############################################################################
@@ -28,6 +30,7 @@ from src.robotspecifications import ROBOT_VOLUME_MIN_HEIGHT
 from src.robotspecifications import ROBOT_VOLUME_MAX_HEIGHT
 from src.robotspecifications import ROBOT_MAX_HEAD_DISPLACEMENT
 from src.robotspecifications import ROBOT_HEAD_SIZE
+from src.robotspecifications import ROBOT_MAX_UPPER_BODY_DISTANCE_FROM_FOOT
 ## minimal distance between walkable surfaces, such that we consider them
 ## connected
 MIN_DISTANCE_WALKABLE_SURFACES=0.01
@@ -38,16 +41,18 @@ xgoal = np.array((0,-2,0))
 env_fname = "wall.urdf"
 
 ## COLORS
-colorScene=(0.3,0.3,0.3,0.1)
+colorScene=(0.3,0.3,0.3,0.2)
 colorBodyBox=(1,0,0,0.2)
-colorFootBox=(1,1,0,0.2)
-colorHeadBox=(0.2,0.2,0.2,0.2)
 colorWalkableSurface=(1,0,1,0.8)
 ###############################################################################
 
 plot = Plotter()
 
 pobjects = URDFtoPolytopes(env_fname)
+print "----------------------------------------------------------------"
+print "Loaded environment",env_fname
+print " -- Objects:",len(pobjects)
+
 wsurfaces = WalkableSurfacesFromPolytopes(pobjects)
 
 ###############################################################################
@@ -56,16 +61,24 @@ wsurfaces = WalkableSurfacesFromPolytopes(pobjects)
 
 footBoxCandidate=[]
 for i in range(0,len(wsurfaces)):
-        footBoxCandidate.append(wsurfaces[i].createBox(0, ROBOT_FOOT_HEIGHT))
+        footBoxCandidate.append(wsurfaces[i].createBox(0.01, ROBOT_FOOT_HEIGHT))
 
 ###############################################################################
 # Visualize Complete Scene
 ###############################################################################
 
 for i in range(0,len(pobjects)):
-        plot.polytopeFromVertices(\
-                        pobjects[i].getVertexRepresentation(),\
-                        fcolor=colorScene)
+        V = pobjects[i].getVertexRepresentation()
+
+        middle = True
+        for j in range(0,len(V)):
+                if abs(V[j][1])>0.3:
+                        middle=False
+
+        if middle:
+                plot.polytopeFromVertices(\
+                                pobjects[i].getVertexRepresentation(),\
+                                fcolor=colorScene)
 
 ###############################################################################
 # Project Objects in footBox down, create clipped surfaces
@@ -87,7 +100,6 @@ for i in range(0,len(wsurfaces)):
         for j in range(0,len(p)):
                 Wsplit = WalkableSurface.fromVertices(ap,bp,p[j],iObject)
                 Wsurfaces_candidates.append(Wsplit)
-
 
 print "splitted",len(wsurfaces),"walkable surfaces into",\
                 len(Wsurfaces_candidates),"(reasoning about foot placement)"
@@ -134,10 +146,12 @@ paths=list(nx.all_simple_paths(G, source=xstartI, target=xgoalI))
 indices = []
 print "----------------------------------------------------------------"
 print "found",len(paths),"paths between walkable surfaces:"
+
 for i in range(0,len(paths)):
         print paths[i]
         for k in range(0,len(paths[i])):
                 indices.append(paths[i][k])
+
 indices = sorted(set(indices))
 
 print "----------------------------------------------------------------"
@@ -148,170 +162,245 @@ for I in range(0,len(indices)):
         Wsurfaces_decomposed.append(Wsurfaces_candidates[indices[I]])
 
 ###############################################################################
+# compute paths inside of subgraph to get indices right
+###############################################################################
+N_w = len(Wsurfaces_decomposed)
+WD = np.zeros((N_w,N_w))
+WM = np.zeros((N_w,N_w))
+
+[xstartI, xstartProj, xgoalI, xgoalProj] = \
+                getStartGoalWalkableSurfaces(Wsurfaces_decomposed, xstart, xgoal)
+
+for i in range(0,N_w):
+        for j in range(i+1,N_w):
+                WD[i,j]=WD[j,i]=distanceWalkableSurfaceWalkableSurface(\
+                                Wsurfaces_decomposed[i], \
+                                Wsurfaces_decomposed[j])
+                WM[i,j]=WM[j,i]=(0 if WD[i,j]>MIN_DISTANCE_WALKABLE_SURFACES else 1)
+
+        WM[i,i]=1
+print np.around(WD,2)
+print np.around(WM,2)
+
+G = nx.Graph()
+for i in range(0,N_w):
+        for j in range(0,N_w):
+                if not WD[i,j]>0.01:
+                        G.add_edge(i,j)
+
+paths=list(nx.all_simple_paths(G, source=xstartI, target=xgoalI))
+
+print "----------------------------------------------------------------"
+print "found",len(paths),"paths between walkable surfaces:"
+
+for i in range(0,len(paths)):
+        print paths[i]
+
+## compute neighbors of each walkable surface
+path_neighbors = []
+for i in range(0,N_w):
+        path_neighbors.append([])
+
+for i in range(0,len(paths)):
+        for k in range(0,len(paths[i])):
+                curNode = paths[i][k]
+                if k==0:
+                        nextNode = paths[i][k+1]
+                        path_neighbors[curNode].append(nextNode)
+                else:
+                        if k<len(paths[i])-1:
+                                lastNode = paths[i][k-1]
+                                nextNode = paths[i][k+1]
+                                path_neighbors[curNode].append(nextNode)
+                                path_neighbors[curNode].append(lastNode)
+                                #path_neighbors[curNode] = [lastNode,nextNode]
+                        else:
+                                lastNode = paths[i][k-1]
+                                path_neighbors[curNode].append(lastNode)
+
+print "----------------------------------------------------------------"
+print "Neighbor computation"
+
+for i in range(0,len(path_neighbors)):
+        path_neighbors[i] = sorted(set(path_neighbors[i]))
+        curNode = i
+        nNodes = path_neighbors[i]
+        print "WS",curNode," has neighbors",nNodes
+
+
+
+###############################################################################
 # Visualize decomposed walkable surfaces for the foot
 ###############################################################################
 
-Wsurface_box_compl = []
-for i in range(0,len(Wsurfaces_decomposed)):
+for i in range(0,N_w):
         plot.walkableSurface( \
                         Wsurfaces_decomposed[i].getVertexRepresentation(),\
                         fcolor=colorWalkableSurface)
-        Wsurface_box_compl.append(Wsurfaces_decomposed[i].createBox(0, \
-                2*ROBOT_VOLUME_MAX_HEIGHT))
 
 ###############################################################################
-# Visualize foot boxes
-###############################################################################
-foot_boxes = []
-for i in range(0,len(Wsurfaces_decomposed)):
-        box = Wsurfaces_decomposed[i].createBox(0, ROBOT_FOOT_HEIGHT)
-        foot_boxes.append( box )
-        plot.polytopeFromVertices(box.getVertexRepresentation(),\
-                        fcolor=colorFootBox)
-
-###############################################################################
-# For each walkable surface part, inspect the head topology
+# create complete box over walkable surface, in which swept volume has to lie
 ###############################################################################
 
-head_boxes=[]
-for i in range(0,len(Wsurfaces_decomposed)):
-        W = Wsurfaces_decomposed[i]
-        ap = W.ap
-        bp = W.bp+ROBOT_VOLUME_MIN_HEIGHT-ROBOT_HEAD_SIZE
+Wsurface_box = []
+Wsurface_box_extension = []
+for i in range(0,N_w):
+        box = Wsurfaces_decomposed[i].createBox(0.01, \
+                        ROBOT_VOLUME_MAX_HEIGHT)
+        box_ext = Wsurfaces_decomposed[i].createBox(0.01, \
+                        ROBOT_VOLUME_MAX_HEIGHT,\
+                        DeltaSide=ROBOT_MAX_UPPER_BODY_DISTANCE_FROM_FOOT)
+        Wsurface_box.append(box)
+        Wsurface_box_extension.append(box_ext)
 
-        head_boxes_i=[]
-        WsplitBox = Wsurfaces_decomposed[i].createBox( \
-                        ROBOT_VOLUME_MIN_HEIGHT-ROBOT_HEAD_SIZE,  \
-                        ROBOT_VOLUME_MIN_HEIGHT, \
-                        DeltaSide=ROBOT_MAX_HEAD_DISPLACEMENT)
-
-        p2 = ProjectPolytopesDownInsideBox(\
-                        pobjects,\
-                        Wsurfaces_decomposed[i], \
-                        WsplitBox)
-
-        for k in range(0,len(p2)):
-                HeadSplit = WalkableSurface.fromVertices(\
-                                ap,bp,p2[k],iObject)
-
-                dwp = distanceWalkableSurfacePolytope(HeadSplit,\
-                                Wsurface_box_compl[i].A,\
-                                Wsurface_box_compl[i].b)
-
-                if dwp <= 0.001:
-                        HeadSplitBox = HeadSplit.createBox(0,ROBOT_HEAD_SIZE)
-                        head_boxes_i.append(HeadSplitBox)
-
-        head_boxes.append(head_boxes_i)
-
-###############################################################################
-# Visualize head surfaces
-###############################################################################
-
+Wsurface_objects = []
+for i in range(0,N_w):
+        objects_in_box_i = []
+        for j in range(0,len(pobjects)):
+                O = pobjects[j]
+                B = Wsurface_box_extension[i]
+                d = distancePolytopePolytope(O,B)
+                if d < 0.0001:
+                        objects_in_box_i.append(O)
+        Wsurface_objects.append(objects_in_box_i)
 print "----------------------------------------------------------------"
-for i in range(0,len(head_boxes)):
-        print "walkable surface",indices[i],"has",\
-                        len(head_boxes[i]),"head homotopy classes"
+print "Objects on top of walkable surfaces:"
+print "----------------------------------------------------------------"
+for i in range(0,N_w):
+        print "WS",i,"has",len(Wsurface_objects[i]),"objects associated"
 print "----------------------------------------------------------------"
 
-for i in range(0,len(head_boxes)):
-        for j in range(0,len(head_boxes[i])):
-                plot.walkableSurface( \
-                                head_boxes[i][j].getVertexRepresentation(),\
-                                0.1,fcolor=colorHeadBox)
-
 ###############################################################################
-# Analyse body box to obtain the body homotopy classes
+# Compute stack of boxes on top of each walkable surface
+# each stack will act as a constraint on the swept volume path optimization
 ###############################################################################
 
-## get body box by projecting head surface down onto walkable surface, then
-## taking the convex hull, and building up a new box on top of this convex hull
+Wsurface_box_vstack = []
+delta = ROBOT_VOLUME_MAX_HEIGHT/16
 
-        #############################################################################
-        ### Creating body boxes
-        #############################################################################
-body_boxes = []
-for i in range(0,len(head_boxes)):
+#for i in range(2,N_w-1):
+for i in range(0,N_w):
+        bottomHeight = ROBOT_FOOT_HEIGHT
         W = Wsurfaces_decomposed[i]
-        ap = W.ap
-        bp = W.bp
-        Vw = W.getVertexRepresentation()
+        objs = Wsurface_objects[i]
+        for j in range(0,len(path_neighbors[i])):
+                k = path_neighbors[i][j]
+                print "removing",k,"from",i
+                box = Wsurface_box[k]
+                objs.append(box)
+        #objs.append(box)
+        #objs.append(box)
 
-        for j in range(0,len(head_boxes[i])):
-                V = head_boxes[i][j].getVertexRepresentation()
-                Vp = []
-                for k in range(0,len(V)):
-                        vproj = projectPointOntoHyperplane(V[k],ap,bp)
-                        Vp.append(vproj)
+        #for j in range(0,len(objs)):
+        #        plot.polytopeFromVertices(\
+        #                objs[j].getVertexRepresentation(),\
+        #                fcolor=colorScene)
 
-                Vunion_all=np.vstack((Vw,Vp))
+        Wi_box_vstack=[]
+        foot_box = W.createBox(0,bottomHeight)
+        foot_stack = []
+        foot_stack.append(foot_box)
+        Wi_box_vstack.append(foot_stack)
 
-                hull = ConvexHull(Vunion_all[:,0:2])
-                Vunion=Vunion_all[hull.vertices,:]
-                w_union = WalkableSurface.fromVertices(ap,bp,Vunion,W.iObject)
-                #plot.walkableSurface(w_union.getVertexRepresentation(),\
-                                #thickness=0.2,fcolor=(1,1,0,0.8))
-                body_boxes.append(\
-                                w_union.createBox(
-                                        ROBOT_FOOT_HEIGHT,\
-                                        ROBOT_VOLUME_MIN_HEIGHT-\
-                                        ROBOT_HEAD_SIZE))
-        #############################################################################
-        # Visualize body box
-        #############################################################################
+        while bottomHeight<ROBOT_VOLUME_MAX_HEIGHT:
+                ap = W.ap
+                bp = W.bp+bottomHeight
 
-for i in range(0,len(body_boxes)):
-        plot.polytopeFromVertices( \
-                        body_boxes[i].getVertexRepresentation(), \
-                        fcolor=colorBodyBox)
+                iObject=W.iObject
 
-        #############################################################################
-        # Obtain list of object inside body box (used for planning)
-        #############################################################################
-#print "----------------------------------------"
-#for i in range(0,len(body_boxes)):
-#        B = body_boxes[i]
-#        B_obj = []
-#        for j in range(0,len(pobjects)):
-#                O = pobjects[j]
-#                d = distancePolytopePolytope(O, B)
-#                if d < 0.001:
-#                        Ointer = O.intersectWithPolytope(B)
-#                        B_obj.append(Ointer)
-#                        plot.polytopeFromVertices(\
-#                                        Ointer.getVertexRepresentation(),\
-#                                        fcolor=(1,0,0,0.6))
-#        print "Body box ",i,"has",len(B_obj),"objects associated"
+                delta_box = W.createBox(\
+                                bottomHeight,\
+                                bottomHeight+delta,\
+                                DeltaSide=ROBOT_MAX_UPPER_BODY_DISTANCE_FROM_FOOT)
+
+                pprime = ProjectPolytopesDownInsideBox(\
+                                objs,\
+                                W, \
+                                delta_box)
+
+                hstack = []
+                for k in range(0,len(pprime)):
+
+                        Ksplit = WalkableSurface.fromVertices(\
+                                        ap,bp,pprime[k],iObject)
+
+                        ##new polytope can be outside of walkable surface box
+                        ## in which case there is no connection, and we have to
+                        ## discard it
+                        dwp = distanceWalkableSurfacePolytope(Ksplit,\
+                                        Wsurface_box[i].A,\
+                                        Wsurface_box[i].b-0.01)
+
+                        if dwp <= 0.001:
+                                ### TODO: check if object is changing topology of the box
+                                box = Ksplit.createBox(0,delta)
+                                hstack.append(box)
+
+                if not len(hstack)>0:
+                        ## layer is not existent, i.e. there is an object which
+                        ## blocks the layer completely, for example a roof
+                        ## => break and goto next walkable surface
+                        break
+
+                Wi_box_vstack.append(hstack)
+                bottomHeight+=delta
+
+        Wsurface_box_vstack.append(Wi_box_vstack)
+
+
+### print summary of vstacks on each surface
+for i in range(0,len(Wsurface_box_vstack)):
+        ### TODO: remove, just for visualizing
+        if i==3:
+                continue
+        vstack = Wsurface_box_vstack[i]
+        print "WS",i,"has",len(vstack),"layers"
+        for j in range(0,len(vstack)):
+                hstack = vstack[j]
+                print "  layer",j,"is decomposed into",len(hstack),"boxes"
+                for k in range(0,len(hstack)):
+                        plot.polytopeFromVertices(\
+                                hstack[k].getVertexRepresentation(),\
+                                fcolor=colorBodyBox)
+
+
+
+
+#head_boxes=[]
+#for i in range(0,len(Wsurfaces_decomposed)):
+#        W = Wsurfaces_decomposed[i]
+#        ap = W.ap
+#        bp = W.bp+ROBOT_VOLUME_MIN_HEIGHT-ROBOT_HEAD_SIZE
 #
-#        ### compute distance between objects inside B
-#        D_obj = np.zeros((len(B_obj),len(B_obj)))
-#        for j in range(0,len(B_obj)):
-#                for k in range(0,len(B_obj)):
-#                        Bj = B_obj[j]
-#                        Bk = B_obj[k]
-#                        D_obj[j,k]=D_obj[k,j]=distancePolytopePolytope(Bj,Bk)
-#                D_obj[j,j]=1000
+#        head_boxes_i=[]
+#        WsplitBox = Wsurfaces_decomposed[i].createBox( \
+#                        ROBOT_VOLUME_MIN_HEIGHT-ROBOT_HEAD_SIZE,  \
+#                        ROBOT_VOLUME_MIN_HEIGHT, \
+#                        DeltaSide=ROBOT_MAX_HEAD_DISPLACEMENT)
 #
-#        print np.around(D_obj,3)
+#        p2 = ProjectPolytopesDownInsideBox(\
+#                        pobjects,\
+#                        Wsurfaces_decomposed[i], \
+#                        WsplitBox)
 #
-#        homotopyChangingObjects = 0
-#        for j in range(0,len(B_obj)):
-#                md = np.nanmin(D_obj[j,:])
-#                print D_obj[j,:]
-#                if md > ROBOT_SPHERE_RADIUS:
-#                        ## object changes topology!
-#                        B_obj[i].changesTopology(True)
-#                        homotopyChangingObjects += 1
-#                        print " object",j,"changes topology of body box!"
+#        for k in range(0,len(p2)):
+#                HeadSplit = WalkableSurface.fromVertices(\
+#                                ap,bp,p2[k],iObject)
 #
-#        print " => ",homotopyChangingObjects,"topological holes"
-#        print "----------------------------------------"
-
+#                dwp = distanceWalkableSurfacePolytope(HeadSplit,\
+#                                Wsurface_box_compl[i].A,\
+#                                Wsurface_box_compl[i].b)
+#
+#                if dwp <= 0.001:
+#                        HeadSplitBox = HeadSplit.createBox(0,ROBOT_HEAD_SIZE)
+#                        head_boxes_i.append(HeadSplitBox)
+#
+#        head_boxes.append(head_boxes_i)
 
 ###############################################################################
 # Optimization of paths in each homotopy class
 ###############################################################################
-for k in range(0,len(paths)):
-        optimizePath(xstartProj, xgoalProj, paths[k], Wsurfaces_decomposed)
+#for k in range(0,len(paths)):
+        #optimizePath(xstartProj, xgoalProj, paths[k], Wsurfaces_decomposed)
 
 plot.showEnvironment()

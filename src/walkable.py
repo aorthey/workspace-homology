@@ -141,7 +141,8 @@ class WalkableSurface(Polytope):
                 A_box = A_clean
                 b_box = b_clean
 
-                return Polytope(A_box, b_box)
+                p = Polytope(A_box, b_box)
+                return p
 
 
 def getStartGoalWalkableSurfaces(wsurfaces, xstart, xgoal):
@@ -249,8 +250,6 @@ def ProjectPolytopesDownInsideBox(polytopes, surface, box):
         proj_objects=[]
         N = len(polytopes)
         for i in range(0,N):
-                if i==surface.iObject:
-                        continue
                 p = polytopes[i]
                 A_obj = p.A
                 b_obj = p.b
