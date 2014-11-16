@@ -366,18 +366,18 @@ Wsurface_box_vstack = pickle.load( open( "data/wsurfaces_vstack.dat", "rb" ) )
 ###############################################################################
 ### print summary of vstacks on each surface
 ###############################################################################
-for i in range(0,len(Wsurface_box_vstack)):
-        ### TODO: remove, just for visualizing
-        if i==3:
-                continue
-        vstack = Wsurface_box_vstack[i]
-        print "WS",i,"has",len(vstack),"layers"
-        for j in range(0,len(vstack)):
-                hstack = vstack[j]
-                print "  layer",j,"is decomposed into",len(hstack),"boxes"
-                for k in range(0,len(hstack)):
-                        plot.polytopeFromVertices(\
-                                hstack[k].getVertexRepresentation(),\
-                                fcolor=colorBodyBox)
+#for i in range(0,len(Wsurface_box_vstack)):
+#        ### TODO: remove, just for visualizing
+#        if i==3:
+#                continue
+#        vstack = Wsurface_box_vstack[i]
+#        print "WS",i,"has",len(vstack),"layers"
+#        for j in range(0,len(vstack)):
+#                hstack = vstack[j]
+#                print "  layer",j,"is decomposed into",len(hstack),"boxes"
+#                for k in range(0,len(hstack)):
+#                        plot.polytopeFromVertices(\
+#                                hstack[k].getVertexRepresentation(),\
+#                                fcolor=colorBodyBox)
 
-plot.showEnvironment()
+#plot.showEnvironment()
