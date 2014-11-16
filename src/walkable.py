@@ -148,20 +148,22 @@ class WalkableSurface(Polytope):
 def getStartGoalWalkableSurfaces(wsurfaces, xstart, xgoal):
         N = len(wsurfaces)
 
-        minStartI = 0
+        minStartI = -1
         minStartV = float("inf")
         for i in range(0,N):
                 d = distancePointWalkableSurface(xstart, wsurfaces[i])
-                if d < minStartV:
+                if d <= minStartV:
                         minStartV = d
                         minStartI = i
-        minGoalI = 0
+        minGoalI = -1
         minGoalV = float("inf")
         for i in range(0,N):
                 d = distancePointWalkableSurface(xgoal, wsurfaces[i])
-                if d < minGoalV:
+                print d
+                if d <= minGoalV:
                         minGoalV = d
                         minGoalI = i
+
         if minStartV > 0.5:
                 print "[WARNING]: Distance of start contact to walkable surface seems too big"
         if minGoalV > 0.5:
