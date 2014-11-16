@@ -20,6 +20,7 @@ def axisFromRPY(roll,pitch,yaw):
 
         return np.array((x,y,z))
 
+DEFAULT_EDGE_COLOR = (0,0,0,0.4)
 class Plotter:
         def __init__(self):
                 self.fig=figure(1)
@@ -33,11 +34,11 @@ class Plotter:
                 nx.draw_networkx_nodes(G, pos, node_color='r')
                 nx.draw_networkx_edges(G, pos, edge_color='b', width=1.0,alpha=0.5)
 
-        def walkableSurface(self ,Vin,thickness=0.1, fcolor=(0,0,0,0.1), ecolor=(1,1,1,0.4)):
+        def walkableSurface(self ,Vin,thickness=0.1, fcolor=(0,0,0,0.1), ecolor=DEFAULT_EDGE_COLOR):
                 self.polytopeFromPolygonVertices3D(Vin,thickness=thickness, \
                                 fcolor=fcolor,ecolor=ecolor)
 
-        def polytopeFromPolygonVertices3D(self,Vin,thickness=0.1, fcolor=(0,0,0,0.1), ecolor=(1,1,1,0.4)):
+        def polytopeFromPolygonVertices3D(self,Vin,thickness=0.1, fcolor=(0,0,0,0.1), ecolor=DEFAULT_EDGE_COLOR):
                 Vz = np.zeros((len(Vin),1))
                 Vz.fill(thickness/2)
                 Vup = column_stack((Vin[:,0:2],thickness/2+Vin[:,2]))
@@ -46,7 +47,7 @@ class Plotter:
 
                 self.polytopeFromVertices(V, fcolor, ecolor)
 
-        def polytopeFromVertices2D(self,Vin,thickness=0.1, fcolor=(0,0,0,0.1), ecolor=(1,1,1,0.4)):
+        def polytopeFromVertices2D(self,Vin,thickness=0.1, fcolor=(0,0,0,0.1), ecolor=DEFAULT_EDGE_COLOR):
                 Vz = np.zeros((len(Vin),1))
                 Vz.fill(thickness/2)
                 Vup = column_stack((Vin[:,0:2],Vz))
@@ -55,7 +56,7 @@ class Plotter:
 
                 self.polytopeFromVertices(V, fcolor, ecolor)
 
-        def polytopeFromVertices(self,V,fcolor=(0,0,0,0.1), ecolor=(0,0,0,0.1)):
+        def polytopeFromVertices(self,V,fcolor=(0,0,0,0.1), ecolor=DEFAULT_EDGE_COLOR):
                 self.hull = ConvexHull(V)
                 faces = []
                 for ia, ib, ic in self.hull.simplices:

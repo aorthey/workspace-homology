@@ -1,6 +1,7 @@
 import numpy as np
 import networkx as nx
 from networkx import graphviz_layout
+import pickle
 
 from src.polytope import Polytope
 from src.walkable import WalkableSurface, WalkableSurfacesFromPolytopes
@@ -67,18 +68,18 @@ for i in range(0,len(wsurfaces)):
 # Visualize Complete Scene
 ###############################################################################
 
-for i in range(0,len(pobjects)):
-        V = pobjects[i].getVertexRepresentation()
-
-        middle = True
-        for j in range(0,len(V)):
-                if abs(V[j][1])>0.3:
-                        middle=False
-
-        if middle:
-                plot.polytopeFromVertices(\
-                                pobjects[i].getVertexRepresentation(),\
-                                fcolor=colorScene)
+#for i in range(0,len(pobjects)):
+#        V = pobjects[i].getVertexRepresentation()
+#
+#        middle = True
+#        for j in range(0,len(V)):
+#                if abs(V[j][1])>0.3:
+#                        middle=False
+#
+#        if middle:
+#                plot.polytopeFromVertices(\
+#                                pobjects[i].getVertexRepresentation(),\
+#                                fcolor=colorScene)
 
 ###############################################################################
 # Project Objects in footBox down, create clipped surfaces
@@ -346,9 +347,25 @@ for i in range(0,N_w):
                 bottomHeight+=delta
 
         Wsurface_box_vstack.append(Wi_box_vstack)
+###############################################################################
+# Store xstart, xgoal, paths, wsurfaces and the vstack
+###############################################################################
 
+pickle.dump( xstartProj, open( "data/xstart.dat", "wb" ) )
+pickle.dump( xgoalProj, open( "data/xgoal.dat", "wb" ) )
+pickle.dump( paths, open( "data/paths.dat", "wb" ) )
+pickle.dump( Wsurfaces_decomposed, open( "data/wsurfaces.dat", "wb" ) )
+pickle.dump( Wsurface_box_vstack, open( "data/wsurfaces_vstack.dat", "wb" ) )
 
+xstartProj = pickle.load( open( "data/xstart.dat", "rb" ) )
+xgoalProj = pickle.load( open( "data/xgoal.dat", "rb" ) )
+paths = pickle.load( open( "data/paths.dat", "rb" ) )
+Wsurfaces_decomposed = pickle.load( open( "data/wsurfaces.dat", "rb" ) )
+Wsurface_box_vstack = pickle.load( open( "data/wsurfaces_vstack.dat", "rb" ) )
+
+###############################################################################
 ### print summary of vstacks on each surface
+###############################################################################
 for i in range(0,len(Wsurface_box_vstack)):
         ### TODO: remove, just for visualizing
         if i==3:
@@ -362,45 +379,5 @@ for i in range(0,len(Wsurface_box_vstack)):
                         plot.polytopeFromVertices(\
                                 hstack[k].getVertexRepresentation(),\
                                 fcolor=colorBodyBox)
-
-
-
-
-#head_boxes=[]
-#for i in range(0,len(Wsurfaces_decomposed)):
-#        W = Wsurfaces_decomposed[i]
-#        ap = W.ap
-#        bp = W.bp+ROBOT_VOLUME_MIN_HEIGHT-ROBOT_HEAD_SIZE
-#
-#        head_boxes_i=[]
-#        WsplitBox = Wsurfaces_decomposed[i].createBox( \
-#                        ROBOT_VOLUME_MIN_HEIGHT-ROBOT_HEAD_SIZE,  \
-#                        ROBOT_VOLUME_MIN_HEIGHT, \
-#                        DeltaSide=ROBOT_MAX_HEAD_DISPLACEMENT)
-#
-#        p2 = ProjectPolytopesDownInsideBox(\
-#                        pobjects,\
-#                        Wsurfaces_decomposed[i], \
-#                        WsplitBox)
-#
-#        for k in range(0,len(p2)):
-#                HeadSplit = WalkableSurface.fromVertices(\
-#                                ap,bp,p2[k],iObject)
-#
-#                dwp = distanceWalkableSurfacePolytope(HeadSplit,\
-#                                Wsurface_box_compl[i].A,\
-#                                Wsurface_box_compl[i].b)
-#
-#                if dwp <= 0.001:
-#                        HeadSplitBox = HeadSplit.createBox(0,ROBOT_HEAD_SIZE)
-#                        head_boxes_i.append(HeadSplitBox)
-#
-#        head_boxes.append(head_boxes_i)
-
-###############################################################################
-# Optimization of paths in each homotopy class
-###############################################################################
-#for k in range(0,len(paths)):
-        #optimizePath(xstartProj, xgoalProj, paths[k], Wsurfaces_decomposed)
 
 plot.showEnvironment()
