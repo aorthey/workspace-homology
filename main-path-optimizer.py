@@ -116,10 +116,10 @@ for i in range(0,N_w):
         x_WS.append(Variable(3,M_w[i]))
 
 ## for each foot contact point add the upper body points, one for each layer
-
 ###############################################################################
 # building constraints
 ###############################################################################
+
 constraints = []
 
 ## start/goal regions constraints

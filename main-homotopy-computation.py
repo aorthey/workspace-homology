@@ -2,6 +2,9 @@ import numpy as np
 import networkx as nx
 from networkx import graphviz_layout
 import pickle
+#import time
+
+from timeit import default_timer as timer
 
 from src.polytope import Polytope
 from src.walkable import WalkableSurface, WalkableSurfacesFromPolytopes
@@ -16,7 +19,6 @@ from src.linalg import distanceWalkableSurfacePolytope
 from src.linalg import projectPointOntoHyperplane
 from scipy.spatial import ConvexHull
 from src.pathoptimizer import optimizePath
-from plotter import Plotter
 
 import sys
 
@@ -32,6 +34,8 @@ from src.robotspecifications import ROBOT_VOLUME_MAX_HEIGHT
 from src.robotspecifications import ROBOT_MAX_HEAD_DISPLACEMENT
 from src.robotspecifications import ROBOT_HEAD_SIZE
 from src.robotspecifications import ROBOT_MAX_UPPER_BODY_DISTANCE_FROM_FOOT
+
+start = timer()
 ## minimal distance between walkable surfaces, such that we consider them
 ## connected
 MIN_DISTANCE_WALKABLE_SURFACES=0.01
@@ -46,9 +50,6 @@ colorScene=(0.3,0.3,0.3,0.2)
 colorBodyBox=(1,0,0,0.2)
 colorWalkableSurface=(1,0,1,0.8)
 ###############################################################################
-
-plot = Plotter()
-
 pobjects = URDFtoPolytopes(env_fname)
 print "----------------------------------------------------------------"
 print "Loaded environment",env_fname
@@ -63,23 +64,6 @@ wsurfaces = WalkableSurfacesFromPolytopes(pobjects)
 footBoxCandidate=[]
 for i in range(0,len(wsurfaces)):
         footBoxCandidate.append(wsurfaces[i].createBox(0.01, ROBOT_FOOT_HEIGHT))
-
-###############################################################################
-# Visualize Complete Scene
-###############################################################################
-
-#for i in range(0,len(pobjects)):
-#        V = pobjects[i].getVertexRepresentation()
-#
-#        middle = True
-#        for j in range(0,len(V)):
-#                if abs(V[j][1])>0.3:
-#                        middle=False
-#
-#        if middle:
-#                plot.polytopeFromVertices(\
-#                                pobjects[i].getVertexRepresentation(),\
-#                                fcolor=colorScene)
 
 ###############################################################################
 # Project Objects in footBox down, create clipped surfaces
@@ -117,11 +101,11 @@ N_candidates = len(Wsurfaces_candidates)
 [xstartI, xstartProj, xgoalI, xgoalProj] = \
                 getStartGoalWalkableSurfaces(Wsurfaces_candidates, xstart, xgoal)
 
-psize = 80
-plot.point(xstartProj, size=psize,color=(1,0,0,0.9))
-plot.point(xgoalProj,  size=psize,color=(1,0,0,0.9))
-plot.point(xstart,     size=psize,color=(1,0,0,0.9))
-plot.point(xgoal,      size=psize,color=(1,0,0,0.9))
+#psize = 80
+#plot.point(xstartProj, size=psize,color=(1,0,0,0.9))
+#plot.point(xgoalProj,  size=psize,color=(1,0,0,0.9))
+#plot.point(xstart,     size=psize,color=(1,0,0,0.9))
+#plot.point(xgoal,      size=psize,color=(1,0,0,0.9))
 
 WD = np.zeros((N_candidates,N_candidates))
 WM = np.zeros((N_candidates,N_candidates))
@@ -234,10 +218,10 @@ for i in range(0,len(path_neighbors)):
 # Visualize decomposed walkable surfaces for the foot
 ###############################################################################
 
-for i in range(0,N_w):
-        plot.walkableSurface( \
-                        Wsurfaces_decomposed[i].getVertexRepresentation(),\
-                        fcolor=colorWalkableSurface)
+#for i in range(0,N_w):
+#        plot.walkableSurface( \
+#                        Wsurfaces_decomposed[i].getVertexRepresentation(),\
+#                        fcolor=colorWalkableSurface)
 
 ###############################################################################
 # create complete box over walkable surface, in which swept volume has to lie
@@ -279,7 +263,6 @@ print "----------------------------------------------------------------"
 Wsurface_box_vstack = []
 delta = ROBOT_VOLUME_MAX_HEIGHT/16
 
-#for i in range(2,N_w-1):
 for i in range(0,N_w):
         bottomHeight = ROBOT_FOOT_HEIGHT
         W = Wsurfaces_decomposed[i]
@@ -289,13 +272,6 @@ for i in range(0,N_w):
                 print "removing",k,"from",i
                 box = Wsurface_box[k]
                 objs.append(box)
-        #objs.append(box)
-        #objs.append(box)
-
-        #for j in range(0,len(objs)):
-        #        plot.polytopeFromVertices(\
-        #                objs[j].getVertexRepresentation(),\
-        #                fcolor=colorScene)
 
         Wi_box_vstack=[]
         foot_box = W.createBox(0,bottomHeight)
@@ -363,21 +339,25 @@ paths = pickle.load( open( "data/paths.dat", "rb" ) )
 Wsurfaces_decomposed = pickle.load( open( "data/wsurfaces.dat", "rb" ) )
 Wsurface_box_vstack = pickle.load( open( "data/wsurfaces_vstack.dat", "rb" ) )
 
-###############################################################################
-### print summary of vstacks on each surface
-###############################################################################
-#for i in range(0,len(Wsurface_box_vstack)):
-#        ### TODO: remove, just for visualizing
-#        if i==3:
-#                continue
-#        vstack = Wsurface_box_vstack[i]
-#        print "WS",i,"has",len(vstack),"layers"
-#        for j in range(0,len(vstack)):
-#                hstack = vstack[j]
-#                print "  layer",j,"is decomposed into",len(hstack),"boxes"
-#                for k in range(0,len(hstack)):
-#                        plot.polytopeFromVertices(\
-#                                hstack[k].getVertexRepresentation(),\
-#                                fcolor=colorBodyBox)
+heightProfileVstack = []
+bottomHeight = ROBOT_FOOT_HEIGHT
+heightProfileVstack.append(0)
+while bottomHeight<ROBOT_VOLUME_MAX_HEIGHT:
+        heightProfileVstack.append(bottomHeight)
+        bottomHeight+=delta
 
-#plot.showEnvironment()
+pickle.dump( heightProfileVstack, open("data/height_profile_vstack.dat","wb") )
+end = timer()
+
+ts= np.around(end - start,2)
+tm= int(ts/60)
+tms = np.around(ts - tm*60,2)
+
+
+print "================================================================"
+print "Time elapsed for building free space decomposition:"
+print "================="
+print ts,"s"
+print "================="
+print tm,"m",tms,"s"
+print "================================================================"
