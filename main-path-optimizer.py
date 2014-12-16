@@ -21,33 +21,21 @@ Wsurface_box_vstack = pickle.load( open( "data/wsurfaces_vstack.dat", "rb" ) )
 # Check which path has the best chances of finding a feasible trajectory
 ###############################################################################
 path = path_candidates[1]
-N_w = len(path)
+N_walkablesurfaces = len(path)
 print "path over ",path,"walkable surfaces"
 
 ###############################################################################
 # parameters
 ###############################################################################
-startRegionRadius = 0.05
-goalRegionRadius = 0.05
-distanceWaypoints = 0.5
-
-robotMaxHeight = 1.539
-robotMinKneeHeight = 0.2
-robotMaxKneeHeight = 0.3
-robotKneeAperture = pi/8
-robotHipAperture = pi/200
-robotNeckAperture = pi/16
-robotHeadAperture = pi/16
-robotKneeHeadAperture = pi/32
-robotRadiusSweptVolume = 0.1
 
 A = np.eye(3);
 A[2,2]=0;
-cknee = np.array((0,0,tan(robotKneeAperture)))
-chip = np.array((0,0,tan(robotHipAperture)))
-cneck = np.array((0,0,tan(robotNeckAperture)))
-chead = np.array((0,0,tan(robotHeadAperture)))
-ckneehead = np.array((0,0,tan(robotKneeHeadAperture)))
+cknee = np.array((0,0,tan(ROBOT_APERTURE_KNEE_FOOT)))
+chipfoot = np.array((0,0,tan(ROBOT_APERTURE_HIP_FOOT)))
+chip= np.array((0,0,tan(ROBOT_APERTURE_HIP_KNEE)))
+cwaist= np.array((0,0,tan(ROBOT_APERTURE_WAIST_HIP)))
+cneck = np.array((0,0,tan(ROBOT_APERTURE_NECK_WAIST)))
+chead = np.array((0,0,tan(ROBOT_APERTURE_HEAD_NECK)))
 
 ###############################################################################
 # optimize over the connection between surfaces
@@ -57,7 +45,7 @@ plot = Plotter()
 ## compute connectors
 connector = []
 
-for i in range(0,N_w-1):
+for i in range(0,N_walkablesurfaces-1):
         pi = path[i]
         pnext = path[i+1]
         print "forming connection between ",pi,"and",pnext
@@ -87,7 +75,7 @@ x_goal = Variable(3,1)
 x_start = Variable(3,1)
 
 x_connection = []
-for i in range(0,N_w-1):
+for i in range(0,N_walkablesurfaces-1):
         x_connection.append(Variable(3,1))
 
 
@@ -111,11 +99,24 @@ M_w.append(distanceInMetersToNumberOfPoints(dG))
 print M_w
 
 x_WS = []
-for i in range(0,N_w):
+for i in range(0,N_walkablesurfaces):
         print "WS ",i,"has",M_w[i],"points to optimize"
         x_WS.append(Variable(3,M_w[i]))
 
 ## for each foot contact point add the upper body points, one for each layer
+xknee = []
+xhip = []
+xwaist = []
+xneck = []
+xhead = []
+for i in range(0,N_walkablesurfaces):
+        xknee.append( Variable(3,M_w[i]) )
+        xhip.append( Variable(3,M_w[i]) )
+        xwaist.append( Variable(3,M_w[i]) )
+        xneck.append( Variable(3,M_w[i]) )
+        xhead.append( Variable(3,M_w[i]) )
+
+
 ###############################################################################
 # building constraints
 ###############################################################################
@@ -123,10 +124,10 @@ for i in range(0,N_w):
 constraints = []
 
 ## start/goal regions constraints
-constraints.append(norm(x_goal - goal) <= goalRegionRadius)
-constraints.append(norm(x_start - start) <= startRegionRadius)
+constraints.append(norm(x_start - start) <= PATH_RADIUS_START_REGION)
+constraints.append(norm(x_goal - goal) <= PATH_RADIUS_GOAL_REGION)
 
-for i in range(0,N_w-1):
+for i in range(0,N_walkablesurfaces-1):
         C = connector[i]
         y = x_connection[i]
         constraints.append( np.matrix(C.A)*y <= C.b )
@@ -153,7 +154,7 @@ print prob.value
 if prob.value < inf:
         plot.point(x_goal.value)
         plot.point(x_start.value)
-        for i in range(0,N_w-1):
+        for i in range(0,N_walkablesurfaces-1):
                 if x_connection[i].value is not None:
                         plot.point(x_connection[i].value)
 

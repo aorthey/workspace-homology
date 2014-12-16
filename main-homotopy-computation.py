@@ -25,15 +25,7 @@ import sys
 ###############################################################################
 # CONFIGURE / PARAMETERS 
 ###############################################################################
-from src.robotspecifications import ROBOT_FOOT_RADIUS 
-from src.robotspecifications import ROBOT_MAX_SLOPE
-from src.robotspecifications import ROBOT_SPHERE_RADIUS
-from src.robotspecifications import ROBOT_FOOT_HEIGHT
-from src.robotspecifications import ROBOT_VOLUME_MIN_HEIGHT
-from src.robotspecifications import ROBOT_VOLUME_MAX_HEIGHT
-from src.robotspecifications import ROBOT_MAX_HEAD_DISPLACEMENT
-from src.robotspecifications import ROBOT_HEAD_SIZE
-from src.robotspecifications import ROBOT_MAX_UPPER_BODY_DISTANCE_FROM_FOOT
+from src.robotspecifications import *
 
 start = timer()
 ## minimal distance between walkable surfaces, such that we consider them
@@ -261,7 +253,6 @@ print "----------------------------------------------------------------"
 ###############################################################################
 
 Wsurface_box_vstack = []
-delta = ROBOT_VOLUME_MAX_HEIGHT/16
 
 for i in range(0,N_w):
         bottomHeight = ROBOT_FOOT_HEIGHT
@@ -287,7 +278,7 @@ for i in range(0,N_w):
 
                 delta_box = W.createBox(\
                                 bottomHeight,\
-                                bottomHeight+delta,\
+                                bottomHeight+VSTACK_DELTA,\
                                 DeltaSide=ROBOT_MAX_UPPER_BODY_DISTANCE_FROM_FOOT)
 
                 pprime = ProjectPolytopesDownInsideBox(\
@@ -310,7 +301,7 @@ for i in range(0,N_w):
 
                         if dwp <= 0.001:
                                 ### TODO: check if object is changing topology of the box
-                                box = Ksplit.createBox(0,delta)
+                                box = Ksplit.createBox(0,VSTACK_DELTA)
                                 hstack.append(box)
 
                 if not len(hstack)>0:
@@ -320,7 +311,7 @@ for i in range(0,N_w):
                         break
 
                 Wi_box_vstack.append(hstack)
-                bottomHeight+=delta
+                bottomHeight+=VSTACK_DELTA
 
         Wsurface_box_vstack.append(Wi_box_vstack)
 ###############################################################################
@@ -344,7 +335,7 @@ bottomHeight = ROBOT_FOOT_HEIGHT
 heightProfileVstack.append(0)
 while bottomHeight<ROBOT_VOLUME_MAX_HEIGHT:
         heightProfileVstack.append(bottomHeight)
-        bottomHeight+=delta
+        bottomHeight+=VSTACK_DELTA
 
 pickle.dump( heightProfileVstack, open("data/height_profile_vstack.dat","wb") )
 end = timer()
