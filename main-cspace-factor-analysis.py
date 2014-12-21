@@ -51,178 +51,175 @@ for k in range(0,4):
                 asign=-1
                 bsign=1
 
-        L = 0.8
-        while L < 1.7:
-                L = L+0.005
-                h1 = 0.0
-                hmin=1000
-                hmax=0
+        L = 1.4
+        h1 = 0.0
+        hmin=1000
+        hmax=0
 
-                while h1 <= d0+d1:
-                        h1 = h1+0.001
-                        ###############################################################################
-                        ## Find the max and min h1, such that there is still at least one valid
-                        ## configuration inside X
+        while h1 <= d0+d1:
+                h1 = h1+0.005
+                ###############################################################################
+                ## Find the max and min h1, such that there is still at least one valid
+                ## configuration inside X
 
-                        ## upper bounds: h1 <= d0+d1
-                        ###############################################################################
+                ## upper bounds: h1 <= d0+d1
+                ###############################################################################
 
-                        ## given h1, compute the 
-                        ## a : distance from knee to the main axis through foot, hip and waist.
-                        ## b : distance from neck to the main axis through foot, hip and waist.
+                ## given h1, compute the 
+                ## a : distance from knee to the main axis through foot, hip and waist.
+                ## b : distance from neck to the main axis through foot, hip and waist.
 
-                        ## http://mathworld.wolfram.com/Circle-CircleIntersection.html
-                        h2 = L - h1 - d2
-                        a=asign*0.5*(1/h1)*sqrt(4*h1*h1*d0*d0-pow(h1*h1-d1*d1+d0*d0,2)) 
-                        b=bsign*0.5*(1/h2)*sqrt(4*h2*h2*d3*d3-pow(h2*h2-d4*d4+d3*d3,2)) 
+                ## http://mathworld.wolfram.com/Circle-CircleIntersection.html
+                h2 = L - h1 - d2
+                a=asign*0.5*(1/h1)*sqrt(4*h1*h1*d0*d0-pow(h1*h1-d1*d1+d0*d0,2)) 
+                b=bsign*0.5*(1/h2)*sqrt(4*h2*h2*d3*d3-pow(h2*h2-d4*d4+d3*d3,2)) 
 
-                        qh1 = np.array((0.0,0.0,0.0,0.0,0.0))
-                        if abs(-a/d0) > 1 or abs(a/d1) > 1:
-                                print "fatal error: knee must be below foot, not allowed"
-                                continue
+                qh1 = np.array((0.0,0.0,0.0,0.0,0.0))
+                if abs(-a/d0) > 1 or abs(a/d1) > 1:
+                        print "fatal error: knee must be below foot, not allowed"
+                        continue
 
-                        qh1[0] = asin(-a/d0)
-                        qh1[1] = asin(a/d1)
-                        qh1[2] = 0.0
+                qh1[0] = asin(-a/d0)
+                qh1[1] = asin(a/d1)
+                qh1[2] = 0.0
 
-                        if abs(-b/d3) > 1 or abs(b/d4) > 1:
-                                print "fatal error: knee must be below foot, not allowed"
-                                continue
+                if abs(-b/d3) > 1 or abs(b/d4) > 1:
+                        print "fatal error: knee must be below foot, not allowed"
+                        continue
 
-                        qh1[3] = asin(-b/d3)
-                        qh1[4] = asin(b/d4)
+                qh1[3] = asin(-b/d3)
+                qh1[4] = asin(b/d4)
 
+                q = qh1
+                ###############################################################################
+                ## generate X and visualize
+                ###############################################################################
 
-                        q = qh1
-                        ###############################################################################
-                        ## generate X and visualize
-                        ###############################################################################
+                if not((q<=qaU).all() and (q>=qaL).all()):
+                        #print "not in range of tan configuration"
+                        continue
+                if h1 < hmin:
+                        hmin = h1
+                if h1 >= hmax:
+                        hmax = h1
 
-                        if not((q<=qaU).all() and (q>=qaL).all()):
-                                #print "not in range of tan configuration"
-                                continue
-                        if h1 < hmin:
-                                hmin = h1
-                        if h1 >= hmax:
-                                hmax = h1
+                ## compute q -> x
 
-                        ## compute q -> x
+                x = np.zeros((Npts,1))
+                heights = np.zeros((Npts,1))
+                heights[0]=0
+                heights[1]=ROBOT_FOOT_HEIGHT
 
-                        x = np.zeros((Npts,1))
-                        heights = np.zeros((Npts,1))
-                        heights[0]=0
-                        heights[1]=ROBOT_FOOT_HEIGHT
+                for i in range(1,len(heights)):
+                        heights[i] = VSTACK_DELTA+heights[i-1]
 
-                        for i in range(1,len(heights)):
-                                heights[i] = VSTACK_DELTA+heights[i-1]
+                knee_height = d0*cos(q[0])
+                hip_height = knee_height+d1*cos(q[1])
+                waist_height = hip_height+d2*cos(q[2])
+                neck_height = waist_height+d3*cos(q[3])
+                head_height = neck_height+d4*cos(q[4])
 
-                        knee_height = d0*cos(q[0])
-                        hip_height = knee_height+d1*cos(q[1])
-                        waist_height = hip_height+d2*cos(q[2])
-                        neck_height = waist_height+d3*cos(q[3])
-                        head_height = neck_height+d4*cos(q[4])
+                xctr=1
+                xd=0
 
-                        xctr=1
-                        xd=0
+                x[0]=0
+                t0 = tan((q[0]))
+                t1 = tan((q[1]))
+                t2 = tan((q[2]))
+                t3 = tan((q[3]))
+                t4 = tan((q[4]))
+                ###############################################################################
+                ### foot-to-knee path
+                ###############################################################################
+                while heights[xctr] <= knee_height:
+                        x[xctr] = heights[xctr]*t0
+                        xctr=xctr+1
 
-                        x[0]=0
-                        t0 = tan((q[0]))
-                        t1 = tan((q[1]))
-                        t2 = tan((q[2]))
-                        t3 = tan((q[3]))
-                        t4 = tan((q[4]))
-                        ###############################################################################
-                        ### foot-to-knee path
-                        ###############################################################################
-                        while heights[xctr] <= knee_height:
-                                x[xctr] = heights[xctr]*t0
-                                xctr=xctr+1
+                ################################################################################
+                #### knee-to-hip path
+                ################################################################################
+                offset = knee_height*t0
+                kneepos = offset
+                while heights[xctr] < hip_height:
+                        x[xctr] = (heights[xctr]-knee_height)*t1+offset
+                        xctr=xctr+1
 
-                        ################################################################################
-                        #### knee-to-hip path
-                        ################################################################################
-                        offset = knee_height*t0
-                        kneepos = offset
-                        while heights[xctr] < hip_height:
-                                x[xctr] = (heights[xctr]-knee_height)*t1+offset
-                                xctr=xctr+1
+                ################################################################################
+                #### hip-to-waist path
+                ################################################################################
 
-                        ################################################################################
-                        #### hip-to-waist path
-                        ################################################################################
+                offset = knee_height*t0+(hip_height-knee_height)*t1
+                hippos = offset
 
-                        offset = knee_height*t0+(hip_height-knee_height)*t1
-                        hippos = offset
+                while heights[xctr] < waist_height:
+                        x[xctr] = (heights[xctr]-hip_height)*t2+offset
+                        xctr=xctr+1
 
-                        while heights[xctr] < waist_height:
-                                x[xctr] = (heights[xctr]-hip_height)*t2+offset
-                                xctr=xctr+1
+                ################################################################################
+                #### waist-to-neck path
+                ################################################################################
+                offset = knee_height*t0\
+                                +(hip_height-knee_height)*t1\
+                                +(waist_height-hip_height)*t2
 
-                        ################################################################################
-                        #### waist-to-neck path
-                        ################################################################################
-                        offset = knee_height*t0\
-                                        +(hip_height-knee_height)*t1\
-                                        +(waist_height-hip_height)*t2
+                waistpos = offset
 
-                        waistpos = offset
-
-                        while heights[xctr] < neck_height:
-                                x[xctr] = (heights[xctr]-waist_height)*t3+offset
-                                xctr=xctr+1
-                        ################################################################################
-                        #### neck-to-head path
-                        ################################################################################
-                        offset = knee_height*t0\
-                                        +(hip_height-knee_height)*t1\
-                                        +(waist_height-hip_height)*t2\
-                                        +(neck_height-waist_height)*t3
-                        neckpos = offset
+                while heights[xctr] < neck_height:
+                        x[xctr] = (heights[xctr]-waist_height)*t3+offset
+                        xctr=xctr+1
+                ################################################################################
+                #### neck-to-head path
+                ################################################################################
+                offset = knee_height*t0\
+                                +(hip_height-knee_height)*t1\
+                                +(waist_height-hip_height)*t2\
+                                +(neck_height-waist_height)*t3
+                neckpos = offset
 
 
-                        while xctr<len(heights) and heights[xctr] < head_height:
-                                x[xctr] = (heights[xctr]-neck_height)*t4+offset
-                                xctr=xctr+1
+                while xctr<len(heights) and heights[xctr] < head_height:
+                        x[xctr] = (heights[xctr]-neck_height)*t4+offset
+                        xctr=xctr+1
 
-                        headpos = knee_height*t0\
-                                        +(hip_height-knee_height)*t1\
-                                        +(waist_height-hip_height)*t2\
-                                        +(neck_height-waist_height)*t3\
-                                        +(head_height-neck_height)*t4
+                headpos = knee_height*t0\
+                                +(hip_height-knee_height)*t1\
+                                +(waist_height-hip_height)*t2\
+                                +(neck_height-waist_height)*t3\
+                                +(head_height-neck_height)*t4
 
-                        if abs(hippos) >= 0.005:
-                                exit
-                        if abs(waistpos) >= 0.005:
-                                exit
+                if abs(hippos) >= 0.005:
+                        exit
+                if abs(waistpos) >= 0.005:
+                        exit
 
-                        Xarray.append(x)
+                Xarray.append(x)
 
-                        ### display x
-                        #fig=figure(1)
-                        #fig.clf()
-                        #ax = fig.gca()
+                ### display x
+                fig=figure(1)
+                fig.clf()
+                ax = fig.gca()
 
 
-                        #plot([0,-a],[0,knee_height],'-b',linewidth=5.0)
-                        #plot([-a,0],[knee_height,hip_height],'-b',linewidth=5.0)
-                        #plot([0,0],[hip_height,waist_height],'-b',linewidth=5.0)
-                        #plot([0,-b],[waist_height,neck_height],'-b',linewidth=5.0)
-                        #plot([-b,headpos],[neck_height,head_height],'-b',linewidth=5.0)
-                        #print q[4]
+                plot([0,-a],[0,knee_height],'-b',linewidth=5.0)
+                plot([-a,0],[knee_height,hip_height],'-b',linewidth=5.0)
+                plot([0,0],[hip_height,waist_height],'-b',linewidth=5.0)
+                plot([0,-b],[waist_height,neck_height],'-b',linewidth=5.0)
+                plot([-b,headpos],[neck_height,head_height],'-b',linewidth=5.0)
+                print q[4]
 
-                        #y=heights
-                        #ax.scatter(x,y,marker='o',c='r')
-                        #plot(x,y,'-r')
-                        #lenlines=0.6
-                        #plot([-lenlines,lenlines],[head_height,head_height],'-k',linewidth=3.0)
-                        #plot([-lenlines,lenlines],[neck_height,neck_height],'-k',linewidth=2.0)
-                        #plot([-lenlines,lenlines],[waist_height,waist_height],'-k',linewidth=2.0)
-                        #plot([-lenlines,lenlines],[hip_height,hip_height],'-k',linewidth=2.0)
-                        #plot([-lenlines,lenlines],[knee_height,knee_height],'-k',linewidth=2.0)
+                y=heights
+                ax.scatter(x,y,marker='o',c='r')
+                plot(x,y,'-r')
+                lenlines=0.6
+                plot([-lenlines,lenlines],[head_height,head_height],'-k',linewidth=3.0)
+                plot([-lenlines,lenlines],[neck_height,neck_height],'-k',linewidth=2.0)
+                plot([-lenlines,lenlines],[waist_height,waist_height],'-k',linewidth=2.0)
+                plot([-lenlines,lenlines],[hip_height,hip_height],'-k',linewidth=2.0)
+                plot([-lenlines,lenlines],[knee_height,knee_height],'-k',linewidth=2.0)
 
-                        #for i in range(0,len(heights)):
-                        #        plot([-lenlines,lenlines],[heights[i],heights[i]],'-b')
-                        #plt.pause(0.1)
+                for i in range(0,len(heights)):
+                        plot([-lenlines,lenlines],[heights[i],heights[i]],'-b')
+                plt.pause(0.1)
 
 print "for h1 in",hmin,hmax
 print "sampled",len(Xarray),"points"
@@ -269,6 +266,7 @@ X = Xproj[0,:]
 Y = Xproj[1,:]
 Z = Xproj[2,:]
 
+pickle.dump( S, open( "data/cspaceEigenvalues.dat", "wb" ) )
 pickle.dump( X, open( "data/cspaceX.dat", "wb" ) )
 pickle.dump( Y, open( "data/cspaceY.dat", "wb" ) )
 pickle.dump( Z, open( "data/cspaceZ.dat", "wb" ) )
