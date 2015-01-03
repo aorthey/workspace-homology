@@ -1,5 +1,6 @@
 import numpy as np
 from numpy import dot
+from itertools import combinations
 from cvxpy import *
 from math import acos,cos,sin,atan2
 from src.polytope import Polytope
@@ -180,6 +181,20 @@ def distancePolytopePolytope(Pi, Pj):
         prob = Problem(objective, constraints)
         return sqrt(abs(prob.solve())).value
 
+def distancePolytopePolytopeNdim(Pi, Pj):
+        Ai = Pi.A
+        bi = Pi.b
+        Aj = Pj.A
+        bj = Pj.b
+        N = Ai.shape[1]
+        xob = Variable(N,1)
+        yob = Variable(N,1)
+        objective = Minimize(sum_squares(xob  - yob ))
+        #constraints = [np.dot(Ai,xob)<= bi,np.dot(Aj,yob) <= bj]
+        constraints = [np.matrix(Ai)*xob<= bi,np.matrix(Aj)*yob <= bj]
+        prob = Problem(objective, constraints)
+        return sqrt(abs(prob.solve())).value
+
 def distanceWalkableSurfacePolytope(W, A, b):
         xob = Variable(3)
         yob = Variable(3)
@@ -256,3 +271,24 @@ def distanceWalkableSurfaceHyperplane(W, ai, bi):
                 xx[2]=x[2]
         return [d,xx]
 
+def hyperplanesToVertices(A,b):
+        M = A.shape[0]
+        N = A.shape[1]
+
+        vertices = []
+        for rowlist in combinations(range(M), N):
+                Ap = A[np.ix_(rowlist,range(0,N))]
+                bp = b[np.ix_(rowlist)]
+                if np.linalg.det(Ap) != 0:
+                        xp = np.linalg.solve(Ap,bp)
+                        #keep care of numerical instabilities 
+                        # by adding an offset to b
+                        P = np.less_equal(dot(A,xp),b+0.0001)
+                        if P.all():
+                                vertices.append(xp)
+
+        if len(vertices)==0:
+                #print "[WARNING] number of vertices for object is NULL"
+                return []
+
+        return vertices

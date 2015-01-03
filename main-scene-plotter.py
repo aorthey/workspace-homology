@@ -1,6 +1,8 @@
 from src.urdfparser import URDFtoPolytopes
 from plotter import Plotter
 import pickle
+import sys
+sys.path.append("..")
 
 ## COLORS
 colorScene=(0.1,0.1,0.1,0.5)

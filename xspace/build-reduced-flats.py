@@ -5,14 +5,14 @@ import pickle
 Xname = "../data/xspacemanifold-same-axes/xsamples.dat"
 Hname = "../data/xspacemanifold-same-axes/hsamples.dat"
 
-Xnamer = "../data/xspacemanifold-same-axes/xsamples-reduced.dat"
-Hnamer = "../data/xspacemanifold-same-axes/hsamples-reduced.dat"
 
 Xarray = pickle.load( open( Xname, "rb" ) )
 Harray = pickle.load( open( Hname, "rb" ) )
 
 N = len(Xarray)
 Nr = 100
+Xnamer = "../data/xspacemanifold-same-axes/xsamples-reduced-"+str(Nr)+".dat"
+Hnamer = "../data/xspacemanifold-same-axes/hsamples-reduced-"+str(Nr)+".dat"
 
 Xarray = Xarray[0:Nr]
 Harray = Harray[0:Nr]

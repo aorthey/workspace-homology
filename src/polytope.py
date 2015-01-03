@@ -36,6 +36,15 @@ class Polytope:
                 bij = np.vstack((bi,bj))
                 return Polytope(Aij,bij)
 
+        def unionWithPolytope(self, rhs):
+                Ai = self.A
+                bi = self.b
+                Aj = rhs.A
+                bj = rhs.b
+                Aij = np.vstack((Ai,Aj))
+                bij = np.vstack((bi,bj))
+                return Polytope(Aij,bij)
+
 
         def isTopologyChanging(self):
                 return self.isTopologyChanging_
@@ -89,3 +98,25 @@ class Polytope:
                 Iv = np.argsort(theta.T)
                 self.V = V[Iv][0]
                 return self.V
+
+        def getVertexRepresentationUnsorted(self):
+                M = self.A.shape[0]
+                N = self.A.shape[1]
+
+                vertices = []
+                for rowlist in combinations(range(M), N):
+                        Ap = self.A[np.ix_(rowlist,range(0,N))]
+                        bp = self.b[np.ix_(rowlist)]
+                        if np.linalg.det(Ap) != 0:
+                                xp = np.linalg.solve(Ap,bp)
+                                #keep care of numerical instabilities 
+                                # by adding an offset to b
+                                P = np.less_equal(dot(self.A,xp),self.b+0.0001)
+                                if P.all():
+                                        vertices.append(xp)
+
+                if len(vertices)==0:
+                        #print "[WARNING] number of vertices for object is NULL"
+                        return []
+
+                return vertices
