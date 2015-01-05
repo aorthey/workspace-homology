@@ -5,6 +5,105 @@ from cvxpy import *
 from math import acos,cos,sin,atan2
 from src.polytope import Polytope
 
+def PCAprojectionOnList(X):
+        return PCAprojection(specialListToNumpy(X))
+
+def specialListToNumpy(X):
+        N = len(X[0][0])
+        M = len(X)
+
+        xx = np.zeros((N,M))
+        for j in range(0,M):
+                for i in range(0,N):
+                        xx[i,j] = X[j][0][i]
+        return xx
+
+def listToNumpy(X):
+        N = len(X[0])
+        M = len(X)
+
+        xx = np.zeros((N,M))
+        for j in range(0,M):
+                for i in range(0,N):
+                        xx[i,j] = X[j][i]
+        return xx
+
+def findProjectionMatrix(xl,xr):
+        N = len(xl)
+        A = Variable(N,N)
+        objfunc = sum_squares(A*xl-xr)
+        objective = Minimize(objfunc)
+        constraints = []
+
+        prob = Problem(objective, constraints)
+        d = sqrt(abs(prob.solve())).value
+        return [np.array(A.value),d]
+
+def projectOnSmallestSubspace(X):
+        X=specialListToNumpy(X)
+        N = X.shape[0]
+        M = X.shape[1]
+
+        if M<=2:
+                ## only one or two points
+                return X
+        else:
+                ## try to find one hyperplane which fits
+                V = 1
+                A = Variable(V,N)
+                b = Variable(V)
+
+
+                objfunc = sum_squares(A*X[:,0]-b)
+                for i in range(0,M):
+                        objfunc = objfunc+sum_squares(A*X[:,i]-b)
+                objective = Minimize(objfunc)
+                constraints = []
+
+                prob = Problem(objective, constraints)
+                d = sqrt(abs(prob.solve())).value
+                print "2d projection:",d
+
+
+def PCAprojection(xx):
+
+        N = xx.shape[0]
+        M = xx.shape[1]
+
+        ## normalize and centering
+        for i in range(0,N):
+                xd = 0
+                for j in range(0,M):
+                        xd = xd+xx[i,j]
+                xd = xd/N
+                for j in range(0,M):
+                        xx[i,j]=xx[i,j]-xd
+
+        [U,S,V]=np.linalg.svd(xx)
+        uu = np.around(U,2)
+
+        #print "size xx:",xx.shape
+        #print "eigenvalues:",np.around(S,2)
+        ##take the first three orthonormal bases
+        X1 = uu[:,0]
+        X2 = uu[:,1]
+        X3 = uu[:,2]
+
+        Xproj = np.zeros((3,M))
+        for i in range(0,M):
+                xtmp = np.dot(X1.T,xx[:,i])
+                ytmp = np.dot(X2.T,xx[:,i])
+                ztmp = np.dot(X3.T,xx[:,i])
+                Xproj[0,i] = xtmp
+                Xproj[1,i] = ytmp
+                Xproj[2,i] = ztmp
+
+        X = Xproj[0,:]
+        Y = Xproj[1,:]
+        Z = Xproj[2,:]
+
+        return [X,Y,Z,np.around(S,2)]
+
 def intersection(p1, p2):
         N1=p1.numberOfHalfspaces()
         N2=p2.numberOfHalfspaces()

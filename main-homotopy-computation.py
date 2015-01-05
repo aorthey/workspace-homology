@@ -255,7 +255,7 @@ print "----------------------------------------------------------------"
 Wsurface_box_vstack = []
 
 for i in range(0,N_w):
-        bottomHeight = ROBOT_FOOT_HEIGHT
+        bottomHeight = VSTACK_DELTA
         W = Wsurfaces_decomposed[i]
         objs = Wsurface_objects[i]
         for j in range(0,len(path_neighbors[i])):
@@ -291,6 +291,9 @@ for i in range(0,N_w):
 
                         Ksplit = WalkableSurface.fromVertices(\
                                         ap,bp,pprime[k],iObject)
+
+                        ##check that layer is big enough
+                        Ksplit
 
                         ##new polytope can be outside of walkable surface box
                         ## in which case there is no connection, and we have to

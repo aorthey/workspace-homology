@@ -29,7 +29,6 @@ d2=ROBOT_DIST_WAIST_HIP
 d3=ROBOT_DIST_NECK_WAIST
 d4=ROBOT_DIST_HEAD_NECK
 
-
 start = timer()
 ## real limits from the hardware
 #qL = np.array((-1.31,-0.03,-2.18,-0.09,-0.52))
@@ -55,26 +54,35 @@ maxH2 = 0
 minH3 = 100000
 maxH3 = 0
 
-h1low = 0.305
-h1high = 0.620
-h2low = -0.425
-h2high = 0.435
-h3low = 0.950
-h3high = 1.520
+h1low = 0.3
+h1high = 0.8
+h2low = -0.43
+h2high = 0.42
+h3low = 1.04
+h3high = 1.61
 
-h1step = 0.005
-h2step = 0.005
-h3step = 0.005
+#h1step = 0.005
+#h2step = 0.005
+#h3step = 0.005
+
+h1step = 0.05
+h2step = 0.05
+h3step = 0.05
 
 h3=h3low
 NCtr = 0
+NfeasibleCtr = 0
 XLarray = []
 XRarray = []
 XMarray = []
 Harray = []
 
-while h3 < h3high:
+imgCtr=0
+while h3 <= h3high:
         h3 = h3+h3step
+
+        ## check the size of array (if only one, then continue)
+        M = 0
 
         ##iterate over homotopy classes (HC)
         for k in range(0,4):
@@ -93,32 +101,42 @@ while h3 < h3high:
 
                                 [xL,xM,xR] = hspace2xspace(k,h1,h2,h3)
 
-                                if h2 >= maxH2:
-                                        maxH2 = h2
-                                if h2 <= minH2:
-                                        minH2 = h2
-                                if h1 >= maxH1:
-                                        maxH1 = h1
-                                if h1 <= minH1:
-                                        minH1 = h1
 
                                 if xL is not None:
+                                        if h1 >= maxH1:
+                                                maxH1 = h1
+                                        if h1 <= minH1:
+                                                minH1 = h1
+                                        if h2 >= maxH2:
+                                                maxH2 = h2
+                                        if h2 <= minH2:
+                                                minH2 = h2
+                                        if h3 >= maxH3:
+                                                maxH3 = h3
+                                        if h3 <= minH3:
+                                                minH3 = h3
+
+                                        NfeasibleCtr = NfeasibleCtr+1
+                                        M = M+1
+
                                         XLarray.append(xL)
                                         XRarray.append(xL)
                                         XMarray.append(xL)
                                         Harray.append([k,h1,h2,h3])
-                                        #xspaceDisplay(xL,xM,xR)
+
+                                        imgCtr=imgCtr+1
+                                        xspaceToImage(xL,xM,xR,imgCtr)
                                 #### display x
 
         #print "for h1 in",hmin,hmax
         Nsamples=len(XLarray)
         mem = memory_usage_psutil()
-        print "h3=",h3," and points=",Nsamples," (memory usage:",mem,")"
+        print "h3=",h3," and points=",M," (total:",Nsamples,", memory usage:",mem,")"
         if mem > 14000:
                 print "memory limit reached:",mem
                 sys.exit(1)
 
-NfeasibleCtr = len(XLarray)
+NfeasibleCtrReduced = len(XLarray)
 
 XLname = "../data/xspacemanifold-same-axes/xsamplesL.dat"
 XRname = "../data/xspacemanifold-same-axes/xsamplesR.dat"
@@ -137,6 +155,7 @@ print "======================================================================="
 print "Samples:"
 print "  N   = "+str(NCtr)
 print "  N_f = "+str(NfeasibleCtr)
+print "  N_f_r = "+str(NfeasibleCtrReduced)
 print "======================================================================="
 print "interval of H values"
 print "h1=\["+str(minH1)+","+str(maxH1)+"\]"
@@ -152,3 +171,9 @@ print "Time elapsed for building flats"
 print "================="
 print ts,"s"
 print "================================================================"
+
+folder = "xspaceWalk"
+ffmpegstr = "ffmpeg -y -framerate 10 -start_number 0 -i ../data/"+folder+"/xspaceWalk%d.png -pix_fmt yuv420p ../data/"+folder+"/out.mp4"
+vlcstr = "vlc ../data/"+folder+"/out.mp4"
+os.system(ffmpegstr)
+os.system(vlcstr)

@@ -97,6 +97,9 @@ class Plotter:
         def show(self):
                 plt.show()
 
+        def set_view(self,azim,elev):
+                self.ax.view_init(elev=elev, azim=azim)
+
 
         def display_capsule2(self, Xc, rpy, length, r, color='r'):
                 ## modified code from https://github.com/roboptim/roboptim-analysis/blob/master/bin/capsule_display

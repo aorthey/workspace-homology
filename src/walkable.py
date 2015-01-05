@@ -14,7 +14,7 @@ from src.linalg import getMeanFromVerticesNumpy
 from src.linalg import distancePointWalkableSurface
 from src.linalg import projectPointOntoWalkableSurface
 from itertools import combinations
-from math import acos,cos,sin,atan2
+from math import acos,cos,sin,atan2,fabs
 import Polygon, Polygon.IO
 
 class WalkableSurface(Polytope):
@@ -119,7 +119,7 @@ class WalkableSurface(Polytope):
                 for j in range(0,len(self.A)):
                         aj = self.A[j]
                         bj = self.b[j]
-                        if np.dot(self.ap,aj) >0.99: 
+                        if fabs(np.dot(self.ap,aj)) >0.99: 
                                 ##hard alignment, either
                                 ##parallel or equal => discard
                                 continue
@@ -142,6 +142,37 @@ class WalkableSurface(Polytope):
                 b_box = b_clean
 
                 p = Polytope(A_box, b_box)
+                return p
+        def createTinyHelperBox(self, DeltaL, DeltaU):
+                p = self.createBox(DeltaL, DeltaU)
+                for i in range(0,len(p.A)):
+                        ai = p.A[i]
+                        for j in range(i+1,len(p.A)):
+                                aj = p.A[j]
+                                if fabs(np.dot(ai,aj)) > 0.99:
+                                        z = np.array((0,0,1))
+                                        if fabs(np.dot(ai,z)) < 0.01 and fabs(np.dot(aj,z)) < 0.01:
+                                                ## ai,aj are opposite, so we can check
+                                                ## the b value
+                                                bi = p.b[i]
+                                                bj = p.b[j]
+                                                v = bi*ai - bj*aj
+                                                bb = np.linalg.norm(v)
+                                                if bb > 0.1:
+                                                        d = np.linalg.norm((bj+bb*0.4)*aj-bi*ai)
+                                                        if d < bb:
+                                                                p.b[j] = bj+bb*0.4
+                                                        else:
+                                                                p.b[j] = bj-bb*0.4
+
+                                                        d = np.linalg.norm((bi+bb*0.4)*ai-bj*aj)
+
+                                                        if d < bb:
+                                                                p.b[i] = bi+bb*0.4
+                                                        else:
+                                                                p.b[i] = bi-bb*0.4
+
+
                 return p
 
 
@@ -223,7 +254,7 @@ def WalkableSurfacesFromPolytopes(polytopes):
                                 prob = Problem(objective, constraints)
                                 solver_output = prob.solve(solver=ECOS)
                                 radius = prob.value
-                                if radius >= ROBOT_FOOT_HEIGHT:
+                                if radius >= ROBOT_FOOT_RADIUS:
                                         #print ctrW,": radius on surface: ",radius
                                         ##surface is walkable
                                         ctrW = ctrW + 1

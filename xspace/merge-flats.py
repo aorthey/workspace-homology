@@ -11,6 +11,7 @@ from mpl_toolkits.mplot3d import axes3d
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection 
 import matplotlib.pyplot as plt 
 from timeit import default_timer as timer
+from xspace.hspace2xspaceHRP import *
 import numpy as np
 import pickle
 
@@ -21,14 +22,24 @@ def memory_usage_psutil():
     mem = process.get_memory_info()[0] / float(2 ** 20)
     return mem
 
+Nr = 10000
+XLname = "../data/xspacemanifold-same-axes/xsamplesL-reduced-"+str(Nr)+".dat"
+XRname = "../data/xspacemanifold-same-axes/xsamplesR-reduced-"+str(Nr)+".dat"
+XMname = "../data/xspacemanifold-same-axes/xsamplesM-reduced-"+str(Nr)+".dat"
+Hname = "../data/xspacemanifold-same-axes/hsamples-reduced-"+str(Nr)+".dat"
+
+XLname = "../data/xspacemanifold-same-axes/xsamplesL.dat"
+XRname = "../data/xspacemanifold-same-axes/xsamplesR.dat"
+XMname = "../data/xspacemanifold-same-axes/xsamplesM.dat"
+Hname = "../data/xspacemanifold-same-axes/hsamples.dat"
+
 #Xname = "../data/xspacemanifold-same-axes/xsamples.dat"
 #Hname = "../data/xspacemanifold-same-axes/hsamples.dat"
-Nr = 1000
-Xname = "../data/xspacemanifold-same-axes/xsamples-reduced-"+str(Nr)+".dat"
-Hname = "../data/xspacemanifold-same-axes/hsamples-reduced-"+str(Nr)+".dat"
 HeadName = "../data/xspacemanifold-same-axes/headersamples.dat"
 start = timer()
-Xarray = pickle.load( open( Xname, "rb" ) )
+XLarray = pickle.load( open( XLname, "rb" ) )
+XRarray = pickle.load( open( XRname, "rb" ) )
+XMarray = pickle.load( open( XMname, "rb" ) )
 Harray = pickle.load( open( Hname, "rb" ) )
 [Npts, VSTACK_DELTA, heights] = pickle.load( open( HeadName, "rb" ) )
 end = timer()
@@ -40,61 +51,70 @@ print "================="
 print ts,"s"
 print "================================================================"
 
-print len(Xarray)
-N_f = len(Xarray)
+print len(XLarray)
+N_f = len(XLarray)
 
 #print heights
 Llimit = -0.5
 Rlimit = 0.5
-#Aarray = []
-#barray = []
+
+Aarray = []
+ARKarray = []
+barray = []
 polytopes = []
 
 omem = memory_usage_psutil()
 
 h3cur = 0
-XarraySameH3 = []
+XLarraySameH3 = []
+
 for i in range(0,N_f):
-        x = Xarray[i]
+        x = XLarray[i]
         ## build polytope from flat description
         [k,h1,h2,h3] = Harray[i]
 
         if h3 > h3cur:
                 ## reset if h3 changes, and perform linear regression
+                print "=== h3",h3,"(",len(XLarraySameH3),"samples)"
                 h3cur = h3
-                ## check the size of array (if only one, then continue)
-                if len(XarraySameH3)>0:
-                        ctr=0
-                        while heights[ctr] < h3cur:
-                                ctr=ctr+1
-                        ctr=ctr-1
+                N = len(XLarraySameH3)
 
-                        ## take the points below H3
-                        ## compute the dimension of the reduced space Xr
-                        ## take boxes in X as points in Xr
-                        ## do k-means or regression to compute the 
-                        Nh = len(XarraySameH3)
-                        print "h3=",h3,"|",len(XarraySameH3)," -> ",Nh,"samples"
-                        print "h3=",h3,"|",len(XarraySameH3[0])," -> ",ctr,"samples"
+                XLarraySameH3 = sorted(XLarraySameH3,key=lambda tmp: tmp[1])
+                ## check all h2 in the same group 
 
-                        d = np.zeros((Nh,Nh))
-                        for j in range(0,Nh):
-                                for k in range(j+1,Nh):
-                                        xj = XarraySameH3[j]
-                                        xk = XarraySameH3[k]
-                                        v = xj-xk
-                                        d[j,k] = np.dot(v.T,v)
-                                        if d[j,k] <= 0.0001:
-                                                del XarraySameH3[k]
-
-                        print "reduced from ",Nh,"to",len(XarraySameH3),"samples"
-                        #print np.around(d,2)
+                ###### Split XLarraySameH3 into M arrays, whereby each subarray
+                ###### has the same h2 value (could use some optimization)
+                h2cur = -5
+                XLarraySameH3SameH2 = []
+                for j in range(0,N):
+                        [xj,h2j] = XLarraySameH3[j]
+                        if j==N-1:
+                                XLarraySameH3SameH2.append([xj])
+                        if h2j > h2cur or j==N-1:
+                                if len(XLarraySameH3SameH2)>Npts:
+                                        print "h2:",h2cur,"has",len(XLarraySameH3SameH2),"samples"
+                                        ## plot the first two PCA's
+                                        [X,Y,Z,S]=PCAprojectionOnList(XLarraySameH3SameH2)
+                                        print S
+                                        #projectOnSmallestSubspace(XLarraySameH3)
+                                
 
 
-                XarraySameH3 = []
-                XarraySameH3.append(x)
+
+                                h2cur = h2j
+                                XLarraySameH3SameH2 = []
+                                XLarraySameH3SameH2.append([xj])
+                        else:
+                                XLarraySameH3SameH2.append([xj])
+
+                ## reset for next round
+                #if N>0:
+                        #[X,Y,Z,S]=PCAprojectionOnList(XLarraySameH3)
+                        #sys.exit(0)
+                XLarraySameH3 = []
+                XLarraySameH3.append([x,h2])
         else:
-                XarraySameH3.append(x)
+                XLarraySameH3.append([x,h2])
 
         A = np.zeros((2*Npts,Npts))
         b = np.zeros((2*Npts))
@@ -121,60 +141,48 @@ for i in range(0,N_f):
 
         if not V.all():
                 print "[ERROR] polytope does not include its center member"
-                print A,x.flatten(),b.flatten()
+                print A,x.flatten(),b.flatten(),V
+                for j in range(0,len(x)):
+                        xj = x[j]
+                        if not V[j]:
+                                print j,V[j],xj,A[j,:],b[j]
+                        if not V[j+Npts]:
+                                print j+Npts,V[j+Npts],xj,A[j+Npts,:],b[j+Npts],heights[j],h3
+                sys.exit(0)
 
+        ### A defines hyperrectangle
+        Aarray.append(A)
+        barray.append(b.flatten())
         P = Polytope(A,b.flatten(),x.flatten())
         polytopes.append(P)
 
-        ##we start with h3 fixed, meaning we can check which points lie on a
-        ## line!
+        xr = XRarray[i]
+        ##find flat conversion matrix, A*x = xr
+
+        [Ark,d] = findProjectionMatrix(x,xr)
+        if d > 0.001:
+                print x,xr
+                print "error to big between xl and xr:",d
+                sys.exit(0)
+
+        ARKarray.append(Ark)
 
         ###DEBUG:
-        if 0:
-                fig=figure(1)
-                fig.clf()
-                ax = fig.gca()
-
-                y=heights
-                #ax.scatter(x,y,marker='o',c='r')
-                #plot(x,y,'-r')
-
-                #lenlines=0.6
-                #plt.gca().set_aspect('equal', adjustable='box')
-                #for j in range(0,len(heights)):
-                #        plot([-lenlines,lenlines],[heights[j],heights[j]],'-b')
-
-                #plt.pause(0.1)
-                ## generate random points inside the polytope
-                for j in range(0,1):
-                        fig.clf()
-                        ax = fig.gca()
-                        x_r = np.zeros((Npts))
-
-                        for k in range(0,Npts):
-                                r=b[k]
-                                l=-b[k+Npts]
-                                x_r[k]=rnd.uniform(l,r)
-                                #print l,"<=",np.dot(A[k],x_r),",",np.dot(A[k+Npts],x_r),"<=",r," (",np.dot(A[k],x_r)<=b[k],",",np.dot(A[k+Npts],x_r)<=b[k+Npts],")"
-
-                        ax.scatter(x_r,y,marker='o',c='r')
-                        #plot(x_r,y,'-r')
-                        V = (np.dot(A,x_r) <= b.flatten())
-                        V = (np.dot(A,x.flatten()) <= b.flatten())
-                        print V.all()
-
-                        lenlines=0.6
-                        plt.gca().set_aspect('equal', adjustable='box')
-                        for i in range(0,len(heights)):
-                                plot([-lenlines,lenlines],[heights[i],heights[i]],'-b')
-
-                        plt.pause(0.001)
+        #xspaceDisplay(x,x,x)
 
 end = timer()
 ts= np.around(end - start,2)
+
+Aname = "../data/polytopes/A.dat"
+ARKname = "../data/polytopes/Ark.dat"
+bname = "../data/polytopes/b.dat"
+pickle.dump( Aarray, open( Aname, "wb" ) )
+pickle.dump( barray, open( bname, "wb" ) )
+pickle.dump( ARKarray, open( ARKname, "wb" ) )
 print "================================================================"
 print "Time elapsed for computing polytopes from flats"
 print "================="
 print ts,"s"
 print "================================================================"
 print N_f,"samples have a memory footprint of",np.around(memory_usage_psutil()-omem,2),"MB"
+

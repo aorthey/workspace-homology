@@ -77,16 +77,18 @@ def hspace2xspace(k,h1,h2,h3):
         ## b : distance from neck to the main axis through foot, hip and waist.
 
         ## http://mathworld.wolfram.com/Circle-CircleIntersection.html
-        t2 = h3 - h1 - d2
-        d5 = sqrt(h2*h2+t2*t2)
+        l = h3 - h1 - d2
+        d5 = sqrt(h2*h2+l*l)
 
-        sqrtA = 4*h1*h1*d0*d0-pow(h1*h1-d1*d1+d0*d0,2)
+        l0 = h1-dankle
+        sqrtA = 4*l0*l0*d0*d0-pow(l0*l0-d1*d1+d0*d0,2)
         sqrtB = 4*d5*d5*d3*d3-pow(d5*d5-d4*d4+d3*d3,2)
+
         if sqrtA < 0:
                 return [None,None,None]
         if sqrtB < 0:
                 return [None,None,None]
-        a=asign*0.5*(1/h1)*sqrt(sqrtA) 
+        a=asign*0.5*(1/l0)*sqrt(sqrtA) 
         b=bsign*0.5*(1/d5)*sqrt(sqrtB) 
 
         if math.isnan(b):
@@ -108,7 +110,7 @@ def hspace2xspace(k,h1,h2,h3):
         q[2] = 0.0
 
         q[3] = asin(h2/d5)+asin(b/d3)
-        v = np.array((h2-d3*sin(q[3]),t2-d3*cos(q[3])))
+        v = np.array((h2-d3*sin(q[3]),l-d3*cos(q[3])))
         zaxis = np.array((0,1))
         vn = v/np.linalg.norm(v)
 
@@ -220,6 +222,22 @@ def hspace2xspace(k,h1,h2,h3):
                         +(neck_height-waist_height)*t3\
                         +(head_height-neck_height)*t4
 
+        ##DEBUG:
+        DEBUG=1
+
+        if DEBUG:
+                v = hip_height-h1
+                d = sqrt(v*v)
+                if d > 0.001:
+                        print "hip height not equal to h1, error in algorithm"
+                        print hip_height,h1
+                        sys.exit(0)
+                v = head_height-h3
+                d = sqrt(v*v)
+                if d > 0.001:
+                        print "head height not equal to h3, error in algorithm"
+                        print head_height,h3
+                        sys.exit(0)
         return [xL,xM,xR]
 
 def xspaceDisplay(xL,xM,xR):
@@ -240,3 +258,22 @@ def xspaceDisplay(xL,xM,xR):
                 plot([-lenlines,lenlines],[heights[i],heights[i]],'-b')
         plt.pause(0.1)
 
+def xspaceToImage(xL,xM,xR,did):
+        fig=figure(1)
+        fig.clf()
+        ax = fig.gca()
+
+        ax.scatter(xL,heights,marker='o',c='r')
+        plot(xL,heights,'-r')
+        ax.scatter(xR,heights,marker='o',c='r')
+        plot(xR,heights,'-r')
+        ax.scatter(xM,heights,marker='o',c='r')
+        plot(xM,heights,'-r')
+        lenlines=0.6
+
+        plt.gca().set_aspect('equal', adjustable='box')
+        for i in range(0,len(heights)):
+                plot([-lenlines,lenlines],[heights[i],heights[i]],'-b')
+        #plt.pause(0.1)
+        fname = "../data/xspaceWalk/xspaceWalk"+str(did)+".png"
+        savefig(fname, bbox_inches='tight')
