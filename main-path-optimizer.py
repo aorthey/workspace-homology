@@ -189,8 +189,8 @@ for i in range(0,XspaceMinima):
         for j in range(0,N_walkablesurfaces-1):
                 Cstack = upperBodyConnector[j]
                 for k in range(0,Npts):
-                        vv = x_connection[j] + rho[k]*v1 + heights[k]*v2
-                        #mincon.append( np.matrix(Cstack[k].A)*vv == Cstack[k].b)
+                        vv = x_connection[j] - rho[k]*v1 + heights[k]*v2
+                        mincon.append( np.matrix(Cstack[k].A)*vv <= Cstack[k].b)
 
         for j in range(0,len(constraints)):
                 mincon.append(constraints[j])
@@ -220,14 +220,14 @@ if prob.value < inf:
                         plot.point(x_connection[i].value)
                         for k in range(0,Npts):
                                 offset = 0.2
-                                pt = x_connection[i].value+(rho.value[k]*v1+heights[k]*v2+offset*v3).T
+                                pt = x_connection[i].value+(-rho.value[k]*v1+heights[k]*v2+offset*v3).T
                                 plot.point(pt,size=100,color=(0,0,0,1))
 
                         rhoR = np.matrix(Ai)*rho.value
 
                         for k in range(0,Npts):
                                 offset = 0.2
-                                pt = x_connection[i].value+(rhoR[k]*v1+heights[k]*v2+offset*v3).T
+                                pt = x_connection[i].value+(-rhoR[k]*v1+heights[k]*v2+offset*v3).T
                                 plot.point(pt,size=100,color=(0,0,0,1))
 
 plot.set_view(90,0)
