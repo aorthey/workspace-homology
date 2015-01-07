@@ -24,9 +24,9 @@ DEFAULT_EDGE_COLOR = (0,0,0,0.4)
 class Plotter:
         def __init__(self):
                 self.fig=figure(1)
-                self.graph=figure(2)
-                self.robot_fig = figure(3)
-                self.rax = self.robot_fig.gca(projection='3d')
+                #self.graph=figure(2)
+                #self.robot_fig = figure(3)
+                #self.rax = self.robot_fig.gca(projection='3d')
                 self.ax = self.fig.gca(projection='3d')
 
         def graphLayout(self, G):
@@ -92,8 +92,14 @@ class Plotter:
                 self.robot_fig.show()
 
         def showEnvironment(self):
+                self.ax.set_zlim(0, 1.5)
                 self.fig.show()
 
+        def pause(self,t):
+                plt.pause(t)
+
+        def clear(self):
+                self.fig.clf()
         def show(self):
                 plt.show()
 

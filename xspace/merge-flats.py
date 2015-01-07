@@ -70,6 +70,7 @@ XLarraySameH3 = []
 
 for i in range(0,N_f):
         x = XLarray[i]
+        xl = XLarray[i]
         ## build polytope from flat description
         [k,h1,h2,h3] = Harray[i]
 
@@ -159,7 +160,12 @@ for i in range(0,N_f):
         xr = XRarray[i]
         ##find flat conversion matrix, A*x = xr
 
-        [Ark,d] = findProjectionMatrix(x,xr)
+        [Ark,d] = findProjectionMatrix(xl,xr)
+
+        xrProj = np.array(np.matrix(Ark)*xl)
+        vtt = xrProj-xr
+        d = np.dot(vtt.T,vtt)
+
         if d > 0.001:
                 print x,xr
                 print "error to big between xl and xr:",d
@@ -168,7 +174,7 @@ for i in range(0,N_f):
         ARKarray.append(Ark)
 
         ###DEBUG:
-        #xspaceDisplay(x,x,x)
+        #xspaceDisplay(x,x,xrProj)
 
 end = timer()
 ts= np.around(end - start,2)

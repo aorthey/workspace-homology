@@ -11,13 +11,22 @@ from src.util import *
 
 from src.linalg import *
 from src.walkable import WalkableSurface, WalkableSurfacesFromPolytopes
-from src.robotspecifications import *
-
+from src.robotspecifications import * 
 start= pickle.load( open( "data/xstart.dat", "rb" ) )
 goal= pickle.load( open( "data/xgoal.dat", "rb" ) )
 path_candidates = pickle.load( open( "data/paths.dat", "rb" ) )
 Wsurfaces_decomposed = pickle.load( open( "data/wsurfaces.dat", "rb" ) )
 Wsurface_box_vstack = pickle.load( open( "data/wsurfaces_vstack.dat", "rb" ) )
+
+DEBUG=1
+
+svLeftColor = (0.5,0,0.5,1)
+svRightColor = (0.5,0,0,1)
+colorScene=(0.6,0.6,0.6,0.2)
+
+### start/goal direction
+start_normal = np.array((1,1,0))
+goal_normal = np.array((1,0,0))
 
 HeadName = "data/xspacemanifold-same-axes/headersamples.dat"
 [Npts, VSTACK_DELTA, heights] = pickle.load( open( HeadName, "rb" ) )
@@ -33,32 +42,22 @@ bflat = pickle.load( open( bname, "rb" ) )
 XspaceDimension = Aflat[0].shape[1]
 XspaceMinima = len(Aflat)
 print XspaceDimension
+
 ###############################################################################
 # Check which path has the best chances of finding a feasible trajectory
 ###############################################################################
 path = path_candidates[1]
 N_walkablesurfaces = len(path)
-print "path over ",path,"walkable surfaces"
+print "found",len(path_candidates),"paths"
+for i in range(0,len(path_candidates)):
+        print i,":",path_candidates[i]
 
-###############################################################################
-# parameters
-###############################################################################
-
-A = np.eye(3);
-A[2,2]=0;
-
-cknee = np.array((0,0,tan(ROBOT_APERTURE_KNEE_FOOT)))
-chipfoot = np.array((0,0,tan(ROBOT_APERTURE_HIP_FOOT)))
-chip= np.array((0,0,tan(ROBOT_APERTURE_HIP_KNEE)))
-cwaist= np.array((0,0,tan(ROBOT_APERTURE_WAIST_HIP)))
-cneck = np.array((0,0,tan(ROBOT_APERTURE_NECK_WAIST)))
-chead = np.array((0,0,tan(ROBOT_APERTURE_HEAD_NECK)))
+print "choosing path",1,"over ",path,"walkable surfaces"
 
 ###############################################################################
 # optimize over the connection between surfaces
 ###############################################################################
 plot = Plotter()
-
 ## compute connectors
 connector = []
 upperBodyConnector = []
@@ -87,22 +86,15 @@ for i in range(0,N_walkablesurfaces-1):
         connector.append(connectorWtoWnext)
 
         ### create upper body connectors
-        colorScene=(0.8,0.1,0.1,0.5)
         upperBodyConnectorStack = []
         for j in range(0,XspaceDimension):
                 if j < len(Wstack):
                         Winter = Wstack[j][0].intersectWithPolytope(WstackNext[j][0])
                         upperBodyConnectorStack.append(Winter)
-                        plot.polytopeFromVertices(\
-                                        Winter.getVertexRepresentation(),\
-                                        fcolor=colorScene)
                 else:
                         ## create helper box for higher dimensions
                         Whelper = connectorWtoWnext.createTinyHelperBox(heights[j],heights[j]+VSTACK_DELTA)
                         upperBodyConnectorStack.append(Whelper)
-                        plot.polytopeFromVertices(\
-                                        Whelper.getVertexRepresentation(),\
-                                        fcolor=colorScene)
 
         upperBodyConnector.append(upperBodyConnectorStack)
 ###############################################################################
@@ -113,13 +105,13 @@ x_goal = Variable(3,1)
 x_start = Variable(3,1)
 
 x_connection = []
-x_connection_upper_body = []
+#x_connection_upper_body = []
 for i in range(0,N_walkablesurfaces-1):
         x_connection.append(Variable(3,1))
-        yycon = []
-        for j in range(0,Npts):
-                yycon.append(Variable(3,1))
-        x_connection_upper_body.append(yycon)
+        #yycon = []
+        #for j in range(0,Npts):
+        #        yycon.append(Variable(3,1))
+        #x_connection_upper_body.append(yycon)
 
 ## compute number of points per walkable surface, depending on the distance to
 ## the next connector segment
@@ -138,12 +130,15 @@ for i in range(0,N_c-1):
 dG = distancePointWalkableSurface(goal, connector[N_c-1])
 M_w.append(distanceInMetersToNumberOfPoints(dG))
 
-print M_w
-
 x_WS = []
 for i in range(0,N_walkablesurfaces):
         print "WS ",i,"has",M_w[i],"points to optimize"
-        x_WS.append(Variable(3,M_w[i]))
+
+        x_WS_tmp = []
+        for j in range(0,M_w[i]):
+                x_WS_tmp.append(Variable(3,1))
+        x_WS.append(x_WS_tmp)
+        #x_WS.append(Variable(3,M_w[i]))
 
 
 ###############################################################################
@@ -156,6 +151,16 @@ constraints = []
 constraints.append(norm(x_start - start) <= PATH_RADIUS_START_REGION)
 constraints.append(norm(x_goal - goal) <= PATH_RADIUS_GOAL_REGION)
 
+pstart = path[0]
+pend = path[len(path)-1]
+W=Wsurfaces_decomposed[pstart]
+constraints.append( np.matrix(W.A)*x_start <= W.b )
+constraints.append( np.matrix(W.ap)*x_start == W.bp)
+W=Wsurfaces_decomposed[pend]
+constraints.append( np.matrix(W.A)*x_goal <= W.b )
+constraints.append( np.matrix(W.ap)*x_goal == W.bp)
+
+
 for i in range(0,N_walkablesurfaces-1):
         ### constraints for points on the connection of the WS
         C = connector[i]
@@ -163,11 +168,36 @@ for i in range(0,N_walkablesurfaces-1):
         constraints.append( np.matrix(C.A)*y <= C.b )
         constraints.append( np.matrix(C.ap)*y == C.bp)
 
-        ### constraints for upper body constraints at the intersection pts
-        #yy = x_connection_upper_body[i]
-        #Cstack = upperBodyConnector[i]
-        #for j in range(0,XspaceDimension):
-        #        constraints.append( np.matrix(Cstack[j].A)*yy[j] == Cstack[j].b)
+for i in range(0,N_walkablesurfaces):
+        #### x_WS should contain only points on the surface
+        W=Wsurfaces_decomposed[path[i]]
+        plot.walkableSurface( \
+                        W.getVertexRepresentation(),\
+                        fcolor=colorScene,\
+                        thickness=0.01)
+        for j in range(0,M_w[i]):
+                constraints.append( np.matrix(W.A)*x_WS[i][j] <= W.b)
+                constraints.append( np.matrix(W.ap)*x_WS[i][j] == W.bp)
+
+### constraint: x_WS should lie in the same functional space
+
+### constraint: x_WS connections
+constraints.append( x_WS[0][0] == x_start)
+constraints.append( x_WS[0][M_w[0]-1] == x_connection[0])
+
+for i in range(1,N_walkablesurfaces-1):
+        Lws = len(x_WS[i])-1
+        constraints.append( x_WS[i][0] == x_connection[i-1])
+        constraints.append( x_WS[i][Lws] == x_connection[i])
+
+Lws = len(x_WS[N_walkablesurfaces-1])-1
+constraints.append( x_WS[N_walkablesurfaces-1][0] == x_connection[N_walkablesurfaces-2])
+constraints.append( x_WS[N_walkablesurfaces-1][Lws] == x_goal)
+
+### constraint: distance between x_WS
+for i in range(0,N_walkablesurfaces):
+        for j in range(1,len(x_WS[i])):
+                constraints.append(norm(x_WS[i][j] - x_WS[i][j-1]) <= PATH_DIST_WAYPOINTS_MAX)
 
 ###############################################################################
 # building objective
@@ -175,60 +205,152 @@ for i in range(0,N_walkablesurfaces-1):
 v2 = np.array((0,0,1))
 v1 = np.array((1,0,0))
 v3 = np.array((0,1,0))
-for i in range(0,XspaceMinima):
-        objective = Minimize(norm(x_connection[0]))
+minimaIter = 0
+
+if DEBUG:
+        startMinima = 19
+else:
+        startMinima = 0
+
+for i in range(startMinima,XspaceMinima):
         Ae = Aflat[i]
         be = bflat[i]
         mincon = []
-        Ai = Aleftrightconv[i]
-
+        Ark = Aleftrightconv[i]
         rho = Variable(XspaceDimension)
+
+        ## constraint: points only from manifold flat inside X
+        objective = Minimize(norm(rho)+norm(np.matrix(Ark)*rho))
         mincon.append( np.matrix(Ae)*rho <= be)
-        mincon.append( np.matrix(Ae)*np.matrix(Ai)*rho <= be)
+
+        ## how many dimensions are there until the linear subspace starts?
+        maxNonzeroDim = np.max(np.nonzero(Ark)[0])
+
+        ## constraint: all intersection points have to be inside of an environment box
 
         for j in range(0,N_walkablesurfaces-1):
-                Cstack = upperBodyConnector[j]
-                for k in range(0,Npts):
-                        vv = x_connection[j] - rho[k]*v1 + heights[k]*v2
-                        mincon.append( np.matrix(Cstack[k].A)*vv <= Cstack[k].b)
+                Ebox = upperBodyConnector[j]
+                for k in range(0,maxNonzeroDim):
+                        vv = x_connection[j] + rho[k]*v1 + heights[k]*v2
+                        mincon.append( np.matrix(Ebox[k].A)*vv <= Ebox[k].b)
+                        rhoR = np.matrix(Ark)*rho
+                        vvR = x_connection[j] + rhoR[k]*v1 + heights[k]*v2
+                        mincon.append( np.matrix(Ebox[k].A)*vvR <= Ebox[k].b)
 
         for j in range(0,len(constraints)):
                 mincon.append(constraints[j])
 
-
         ###############################################################################
         # solve
         ###############################################################################
-        #print "optimizing path from",start,"to",goal
         prob = Problem(objective, mincon)
         #prob.solve(solver=cvx.SCS, verbose=True)
         prob.solve(solver=cvx.SCS)
         #prob.solve(solver=cvx.CVXOPT)
-        print prob.value
+        print prob.value,"(minima",i,"/",XspaceMinima,")"
         if prob.value < inf:
-                print "minima",i,"admits a solution"
-                break
+                ## BICONVEX condition: check second convex problem on feasibility
+                ### constraint: all points have to be inside of an environment box
+                ## inbetween Rho
+                ibRho = []
+                mincon = []
+                objective=[]
+                vp = []
+                for j in range(0,N_walkablesurfaces):
+                        #W=Wsurfaces_decomposed[path[j]]
+                        W = Wsurface_box_vstack[path[j]]
+                        ibRho_tmp=[]
+                        vp_tmp=[]
+                        for p in range(0,len(x_WS[j])):
+                                ibRho_tmp.append(Variable(XspaceDimension))
+                                ## vp: normal to tangent at x_WS[j][p]
+                                vp_tmp.append(v1)
+
+                        for p in range(0,len(x_WS[j])):
+                                mincon.append( np.matrix(Ae)*ibRho_tmp[p] <= be)
+                                for k in range(0,maxNonzeroDim):
+                                        vv = x_WS[j][p].value + ibRho_tmp[p][k]*vp_tmp[p] + heights[k]*v2
+                                        mincon.append( np.matrix(W[k][0].A)*vv <= W[k][0].b)
+                                        rhoR = np.matrix(Ark)*ibRho_tmp[p]
+                                        vvR = x_WS[j][p].value + rhoR[k]*vp_tmp[p] + heights[k]*v2
+                                        mincon.append( np.matrix(W[k][0].A)*vvR <= W[k][0].b)
+
+                        ibRho.append(ibRho_tmp)
+                        vp.append(vp_tmp)
+
+                objective = Minimize(norm(ibRho[0][0]))
+                prob = Problem(objective, mincon)
+                prob.solve(solver=cvx.SCS)
+                print prob.value,"(minima",i,"/",XspaceMinima,")"
+
+                if prob.value<inf:
+                        minimaIter = i
+                        print "minima",i,"admits a solution"
+                        break
 
 ###############################################################################
 # plot
 ###############################################################################
 if prob.value < inf:
+        Ark = Aleftrightconv[minimaIter]
+        rhoR = np.matrix(Ark)*rho.value
         plot.point(x_goal.value,color=(0,0,0,0.9))
         plot.point(x_start.value)
+        maxNonzeroDim = np.max(np.nonzero(Ark)[0])
+        firstIS = None
+        lastIS = None
         for i in range(0,N_walkablesurfaces-1):
                 if x_connection[i].value is not None:
+
+                        #### plot intersection foot pos
                         plot.point(x_connection[i].value)
-                        for k in range(0,Npts):
-                                offset = 0.2
-                                pt = x_connection[i].value+(-rho.value[k]*v1+heights[k]*v2+offset*v3).T
-                                plot.point(pt,size=100,color=(0,0,0,1))
 
-                        rhoR = np.matrix(Ai)*rho.value
+                        #### plot intersection SV boundary left
+                        offset = 0.15 ## for visibility reasons
+                        for k in range(0,maxNonzeroDim):
+                                pt = x_connection[i].value+(rho.value[k]*v1+heights[k]*v2+offset*v3).T
+                                plot.point(pt,size=100,color=svLeftColor)
 
-                        for k in range(0,Npts):
-                                offset = 0.2
-                                pt = x_connection[i].value+(-rhoR[k]*v1+heights[k]*v2+offset*v3).T
-                                plot.point(pt,size=100,color=(0,0,0,1))
+                        #### plot intersection SV boundary right
+                        for k in range(0,maxNonzeroDim):
+                                rhoR = np.matrix(Ark)*rho.value
+                                pt = x_connection[i].value+(rhoR[k]*v1+heights[k]*v2+offset*v3).T 
+                                plot.point(pt,size=100,color=svRightColor)
+                        #### plot intersection E-boxes
+                        for k in range(0,maxNonzeroDim):
+                                W = upperBodyConnector[i][k]
+                                plot.polytopeFromVertices(\
+                                                W.getVertexRepresentation(),\
+                                                fcolor=colorScene)
 
-plot.set_view(90,0)
-plot.showEnvironment()
+        ### plot goal/start swept volume boundary
+        for k in range(0,maxNonzeroDim):
+                pt = x_start.value+(rho.value[k]*start_normal+heights[k]*v2).T
+                plot.point(pt,size=100,color=svLeftColor)
+                pt = x_goal.value+(rho.value[k]*goal_normal+heights[k]*v2).T
+                plot.point(pt,size=100,color=svLeftColor)
+        for k in range(0,maxNonzeroDim):
+                rhoR = np.matrix(Ark)*rho.value
+                pt = x_start.value+(rhoR[k]*start_normal+heights[k]*v2).T
+                plot.point(pt,size=100,color=svRightColor)
+                pt = x_goal.value+(rhoR[k]*goal_normal+heights[k]*v2).T
+                plot.point(pt,size=100,color=svRightColor)
+
+        ### plot paths on each WS
+        for i in range(0,N_walkablesurfaces):
+                for j in range(0,len(x_WS[i])):
+                        print x_WS[i][j].value
+                        plot.point(x_WS[i][j].value,size=100,color=svLeftColor)
+                        for k in range(0,maxNonzeroDim):
+                                pt = x_WS[i][j].value.T+(ibRho[i][j][k].value*vp[i][j]+heights[k]*v2).T
+                                plot.point(np.array(pt).flatten(),size=100,color=svLeftColor)
+                        for k in range(0,maxNonzeroDim):
+                                ibRhoR = np.matrix(Ark)*ibRho[i][j].value
+                                pt = x_WS[i][j].value.T+(ibRhoR[k]*vp[i][j]+heights[k]*v2).T
+                                plot.point(np.array(pt).flatten(),size=100,color=svRightColor)
+
+        print "done"
+        plot.set_view(90,0)
+        plot.showEnvironment()
+else:
+        print "problem not feasible"

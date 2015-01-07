@@ -22,6 +22,8 @@ def memory_usage_psutil():
     mem = process.get_memory_info()[0] / float(2 ** 20)
     return mem
 
+VIDEO_DEBUG = 0
+
 dankle=ROBOT_DIST_FOOT_SOLE
 d0=ROBOT_DIST_KNEE_FOOT
 d1=ROBOT_DIST_HIP_KNEE
@@ -30,13 +32,6 @@ d3=ROBOT_DIST_NECK_WAIST
 d4=ROBOT_DIST_HEAD_NECK
 
 start = timer()
-## real limits from the hardware
-#qL = np.array((-1.31,-0.03,-2.18,-0.09,-0.52))
-#qU = np.array((0.73,2.62,0.73,1.05,0.79))
-## artificial limits imposed by tangens (-pi/2,pi/2)
-tlimit = pi/3
-qaL = np.array((-tlimit,-tlimit,-tlimit,-tlimit,-tlimit))
-qaU = np.array((tlimit,tlimit,tlimit,tlimit,tlimit))
 
 ###############################################################################
 ## X \in \R^Npts, the space of points, 
@@ -54,20 +49,20 @@ maxH2 = 0
 minH3 = 100000
 maxH3 = 0
 
-h1low = 0.3
+h1low = 0.2
 h1high = 0.8
-h2low = -0.43
-h2high = 0.42
-h3low = 1.04
+h2low = -0.2
+h2high = 0.2
+h3low = 0.4
 h3high = 1.61
 
 #h1step = 0.005
 #h2step = 0.005
 #h3step = 0.005
 
-h1step = 0.05
-h2step = 0.05
-h3step = 0.05
+h1step = 0.1
+h2step = 0.1
+h3step = 0.1
 
 h3=h3low
 NCtr = 0
@@ -120,12 +115,14 @@ while h3 <= h3high:
                                         M = M+1
 
                                         XLarray.append(xL)
-                                        XRarray.append(xL)
-                                        XMarray.append(xL)
+                                        XRarray.append(xR)
+                                        XMarray.append(xM)
                                         Harray.append([k,h1,h2,h3])
 
                                         imgCtr=imgCtr+1
-                                        xspaceToImage(xL,xM,xR,imgCtr)
+                                        #xspaceDisplay(xL,xM,xR)
+                                        if VIDEO_DEBUG:
+                                                xspaceToImage(xL,xM,xR,imgCtr)
                                 #### display x
 
         #print "for h1 in",hmin,hmax
@@ -139,14 +136,14 @@ while h3 <= h3high:
 NfeasibleCtrReduced = len(XLarray)
 
 XLname = "../data/xspacemanifold-same-axes/xsamplesL.dat"
-XRname = "../data/xspacemanifold-same-axes/xsamplesR.dat"
 XMname = "../data/xspacemanifold-same-axes/xsamplesM.dat"
+XRname = "../data/xspacemanifold-same-axes/xsamplesR.dat"
 Hname = "../data/xspacemanifold-same-axes/hsamples.dat"
 HeadName = "../data/xspacemanifold-same-axes/headersamples.dat"
 
 pickle.dump( XLarray, open( XLname, "wb" ) )
-pickle.dump( XRarray, open( XRname, "wb" ) )
 pickle.dump( XMarray, open( XMname, "wb" ) )
+pickle.dump( XRarray, open( XRname, "wb" ) )
 pickle.dump( Harray, open( Hname, "wb" ) )
 
 pickle.dump( [Npts, VSTACK_DELTA, heights], open( HeadName, "wb" ) )
@@ -172,8 +169,9 @@ print "================="
 print ts,"s"
 print "================================================================"
 
-folder = "xspaceWalk"
-ffmpegstr = "ffmpeg -y -framerate 10 -start_number 0 -i ../data/"+folder+"/xspaceWalk%d.png -pix_fmt yuv420p ../data/"+folder+"/out.mp4"
-vlcstr = "vlc ../data/"+folder+"/out.mp4"
-os.system(ffmpegstr)
-os.system(vlcstr)
+if VIDEO_DEBUG:
+        folder = "xspaceWalk"
+        ffmpegstr = "ffmpeg -y -framerate 10 -start_number 0 -i ../data/"+folder+"/xspaceWalk%d.png -pix_fmt yuv420p ../data/"+folder+"/out.mp4"
+        vlcstr = "vlc ../data/"+folder+"/out.mp4"
+        os.system(ffmpegstr)
+        os.system(vlcstr)
