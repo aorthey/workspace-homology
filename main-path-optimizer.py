@@ -23,7 +23,7 @@ DEBUG=1
 svLeftColor = (0.5,0,0.5,1)
 svRightColor = (0.5,0,0,1)
 colorScene=(0.6,0.6,0.6,0.2)
-
+svPointSize=50
 ### start/goal direction
 start_normal = np.array((1,1,0))
 goal_normal = np.array((1,0,0))
@@ -208,7 +208,7 @@ v3 = np.array((0,1,0))
 minimaIter = 0
 
 if DEBUG:
-        startMinima = 19
+        startMinima = 20
 else:
         startMinima = 0
 
@@ -292,6 +292,7 @@ for i in range(startMinima,XspaceMinima):
 # plot
 ###############################################################################
 if prob.value < inf:
+        print "plotting workspace swept volume approximation"
         Ark = Aleftrightconv[minimaIter]
         rhoR = np.matrix(Ark)*rho.value
         plot.point(x_goal.value,color=(0,0,0,0.9))
@@ -309,13 +310,14 @@ if prob.value < inf:
                         offset = 0.15 ## for visibility reasons
                         for k in range(0,maxNonzeroDim):
                                 pt = x_connection[i].value+(rho.value[k]*v1+heights[k]*v2+offset*v3).T
-                                plot.point(pt,size=100,color=svLeftColor)
+                                plot.point(pt,size=svPointSize,color=svLeftColor)
 
                         #### plot intersection SV boundary right
+                        rhoR = np.matrix(Ark)*rho.value
                         for k in range(0,maxNonzeroDim):
-                                rhoR = np.matrix(Ark)*rho.value
                                 pt = x_connection[i].value+(rhoR[k]*v1+heights[k]*v2+offset*v3).T 
-                                plot.point(pt,size=100,color=svRightColor)
+                                plot.point(pt,size=svPointSize,color=svRightColor)
+
                         #### plot intersection E-boxes
                         for k in range(0,maxNonzeroDim):
                                 W = upperBodyConnector[i][k]
@@ -326,30 +328,28 @@ if prob.value < inf:
         ### plot goal/start swept volume boundary
         for k in range(0,maxNonzeroDim):
                 pt = x_start.value+(rho.value[k]*start_normal+heights[k]*v2).T
-                plot.point(pt,size=100,color=svLeftColor)
+                plot.point(pt,size=svPointSize,color=svLeftColor)
                 pt = x_goal.value+(rho.value[k]*goal_normal+heights[k]*v2).T
-                plot.point(pt,size=100,color=svLeftColor)
+                plot.point(pt,size=svPointSize,color=svLeftColor)
         for k in range(0,maxNonzeroDim):
                 rhoR = np.matrix(Ark)*rho.value
                 pt = x_start.value+(rhoR[k]*start_normal+heights[k]*v2).T
-                plot.point(pt,size=100,color=svRightColor)
+                plot.point(pt,size=svPointSize,color=svRightColor)
                 pt = x_goal.value+(rhoR[k]*goal_normal+heights[k]*v2).T
-                plot.point(pt,size=100,color=svRightColor)
+                plot.point(pt,size=svPointSize,color=svRightColor)
 
         ### plot paths on each WS
         for i in range(0,N_walkablesurfaces):
                 for j in range(0,len(x_WS[i])):
-                        print x_WS[i][j].value
-                        plot.point(x_WS[i][j].value,size=100,color=svLeftColor)
+                        plot.point(x_WS[i][j].value,size=svPointSize,color=svLeftColor)
                         for k in range(0,maxNonzeroDim):
                                 pt = x_WS[i][j].value.T+(ibRho[i][j][k].value*vp[i][j]+heights[k]*v2).T
-                                plot.point(np.array(pt).flatten(),size=100,color=svLeftColor)
+                                plot.point(np.array(pt).flatten(),size=svPointSize,color=svLeftColor)
+                        ibRhoR = np.matrix(Ark)*ibRho[i][j].value
                         for k in range(0,maxNonzeroDim):
-                                ibRhoR = np.matrix(Ark)*ibRho[i][j].value
-                                pt = x_WS[i][j].value.T+(ibRhoR[k]*vp[i][j]+heights[k]*v2).T
-                                plot.point(np.array(pt).flatten(),size=100,color=svRightColor)
+                                pt = x_WS[i][j].value+(ibRhoR[k]*vp[i][j]+heights[k]*v2).T
+                                plot.point(np.array(pt).flatten(),size=svPointSize,color=svRightColor)
 
-        print "done"
         plot.set_view(90,0)
         plot.showEnvironment()
 else:
