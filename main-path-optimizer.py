@@ -3,7 +3,7 @@ import cvxpy as cvx
 import pickle
 import sys
 sys.path.append("..")
-from plotter import Plotter
+from plotter import Plotter,rotFromRPY
 from numpy import inf,array,zeros
 from cvxpy import *
 from math import tan,pi
@@ -19,14 +19,23 @@ Wsurfaces_decomposed = pickle.load( open( "data/wsurfaces.dat", "rb" ) )
 Wsurface_box_vstack = pickle.load( open( "data/wsurfaces_vstack.dat", "rb" ) )
 
 DEBUG=1
+v2 = np.array((0,0,1))
+v1 = np.array((1,0,0))
+v3 = np.array((0,1,0))
 
 svLeftColor = (0.5,0,0.5,1)
 svRightColor = (0.5,0,0,1)
 colorScene=(0.6,0.6,0.6,0.2)
 svPointSize=50
+
 ### start/goal direction
 start_normal = np.array((1,1,0))
 goal_normal = np.array((1,0,0))
+
+startNormal = np.array((1,1,0))
+goalNormal = np.array((1,0,0))
+startNormalNormal = np.dot(rotFromRPY(0,0,-pi/2),startNormal)
+goalNormalNormal = np.dot(rotFromRPY(0,0,-pi/2),goalNormal)
 
 HeadName = "data/xspacemanifold-same-axes/headersamples.dat"
 [Npts, VSTACK_DELTA, heights] = pickle.load( open( HeadName, "rb" ) )
@@ -105,14 +114,10 @@ x_goal = Variable(3,1)
 x_start = Variable(3,1)
 
 x_connection = []
-#x_connection_upper_body = []
 for i in range(0,N_walkablesurfaces-1):
         x_connection.append(Variable(3,1))
-        #yycon = []
-        #for j in range(0,Npts):
-        #        yycon.append(Variable(3,1))
-        #x_connection_upper_body.append(yycon)
 
+###############################################################################
 ## compute number of points per walkable surface, depending on the distance to
 ## the next connector segment
 M_w = []
@@ -133,13 +138,20 @@ M_w.append(distanceInMetersToNumberOfPoints(dG))
 x_WS = []
 for i in range(0,N_walkablesurfaces):
         print "WS ",i,"has",M_w[i],"points to optimize"
-
         x_WS_tmp = []
         for j in range(0,M_w[i]):
                 x_WS_tmp.append(Variable(3,1))
         x_WS.append(x_WS_tmp)
-        #x_WS.append(Variable(3,M_w[i]))
 
+
+### we have to know the intersection normals, and the normal to those normals
+connectorNormalNormal = []
+connectorNormal= []
+for i in range(0,N_walkablesurfaces-1):
+        ## TODO: use normal of intersection, and rotate it via
+        ## rotfromrpy(0,0,pi) to the right 
+        connectorNormalNormal.append(np.array((1,0,0)))
+        connectorNormal.append(np.array((0,1,0)))
 
 ###############################################################################
 # building constraints
@@ -160,7 +172,7 @@ W=Wsurfaces_decomposed[pend]
 constraints.append( np.matrix(W.A)*x_goal <= W.b )
 constraints.append( np.matrix(W.ap)*x_goal == W.bp)
 
-
+###############################################################################
 for i in range(0,N_walkablesurfaces-1):
         ### constraints for points on the connection of the WS
         C = connector[i]
@@ -168,6 +180,7 @@ for i in range(0,N_walkablesurfaces-1):
         constraints.append( np.matrix(C.A)*y <= C.b )
         constraints.append( np.matrix(C.ap)*y == C.bp)
 
+###############################################################################
 for i in range(0,N_walkablesurfaces):
         #### x_WS should contain only points on the surface
         W=Wsurfaces_decomposed[path[i]]
@@ -179,8 +192,10 @@ for i in range(0,N_walkablesurfaces):
                 constraints.append( np.matrix(W.A)*x_WS[i][j] <= W.b)
                 constraints.append( np.matrix(W.ap)*x_WS[i][j] == W.bp)
 
+###############################################################################
 ### constraint: x_WS should lie in the same functional space
 
+###############################################################################
 ### constraint: x_WS connections
 constraints.append( x_WS[0][0] == x_start)
 constraints.append( x_WS[0][M_w[0]-1] == x_connection[0])
@@ -194,17 +209,52 @@ Lws = len(x_WS[N_walkablesurfaces-1])-1
 constraints.append( x_WS[N_walkablesurfaces-1][0] == x_connection[N_walkablesurfaces-2])
 constraints.append( x_WS[N_walkablesurfaces-1][Lws] == x_goal)
 
+###############################################################################
 ### constraint: distance between x_WS
 for i in range(0,N_walkablesurfaces):
         for j in range(1,len(x_WS[i])):
                 constraints.append(norm(x_WS[i][j] - x_WS[i][j-1]) <= PATH_DIST_WAYPOINTS_MAX)
 
 ###############################################################################
+### constraint: x_WS before the intersection should have the same orientation as
+### the intersection
+
+for i in range(0,N_walkablesurfaces-1):
+        v = connectorNormal[i]
+        Lws = len(x_WS[i])-1
+        ## trois points: x before the intersection, x at the intersection and x
+        ## after the intersection. They all should lie on a line perpendicular to
+        ## the normalnormal of the intersection
+        xbefore = x_WS[i][Lws-1]
+        xconnect = x_WS[i+1][0]
+        xafter = x_WS[i+1][1]
+
+        gammaA = Variable(1)
+        gammaB = Variable(1)
+        constraints.append( gammaA*v + xconnect == xafter )
+        constraints.append( gammaB*v + xconnect == xbefore )
+
+###############################################################################
+### constraint: the first point after start should have same orientation as start
+v = startNormalNormal
+xnext = x_WS[0][1]
+gammaStart = Variable(1)
+constraints.append( gammaStart*v + x_WS[0][0] == xnext )
+
+### constraint: the first point before goal should have same orientation as goal
+v = goalNormalNormal
+N = len(x_WS)
+M = len(x_WS[N-1])
+xbefore = x_WS[N-1][M-2]
+xgoal = x_WS[N-1][M-1]
+
+gammaGoal = Variable(1)
+constraints.append( gammaGoal*v + xgoal == xbefore )
+
+
+###############################################################################
 # building objective
 ###############################################################################
-v2 = np.array((0,0,1))
-v1 = np.array((1,0,0))
-v3 = np.array((0,1,0))
 minimaIter = 0
 
 if DEBUG:
@@ -247,7 +297,7 @@ for i in range(startMinima,XspaceMinima):
         #prob.solve(solver=cvx.SCS, verbose=True)
         prob.solve(solver=cvx.SCS)
         #prob.solve(solver=cvx.CVXOPT)
-        print prob.value,"(minima",i,"/",XspaceMinima,")"
+        print "minima",i,"/",XspaceMinima," => ",prob.value
         if prob.value < inf:
                 ## BICONVEX condition: check second convex problem on feasibility
                 ### constraint: all points have to be inside of an environment box
@@ -257,14 +307,28 @@ for i in range(startMinima,XspaceMinima):
                 objective=[]
                 vp = []
                 for j in range(0,N_walkablesurfaces):
-                        #W=Wsurfaces_decomposed[path[j]]
                         W = Wsurface_box_vstack[path[j]]
                         ibRho_tmp=[]
                         vp_tmp=[]
                         for p in range(0,len(x_WS[j])):
                                 ibRho_tmp.append(Variable(XspaceDimension))
                                 ## vp: normal to tangent at x_WS[j][p]
-                                vp_tmp.append(v1)
+                                if p+1<len(x_WS[j]):
+                                        xc = x_WS[j][p].value
+                                        xn = x_WS[j][p+1].value
+                                else:
+                                        xc = x_WS[j][p-1].value
+                                        xn = x_WS[j][p].value
+                                v = xn-xc
+                                v = v/np.linalg.norm(v)
+                                vr = np.dot(rotFromRPY(0,0,pi/2),v)
+                                vp_tmp.append(vr)
+                                #vp_tmp.append(v1)
+                                #if p > len(x_WS[j])-2:
+                                #        print xn,xc,x_WS[j+1][0].value,x_WS[j+1][1].value
+                                #        print np.around(v,2)
+                                #        print np.around(vr,2)
+                                #        sys.exit(0)
 
                         for p in range(0,len(x_WS[j])):
                                 mincon.append( np.matrix(Ae)*ibRho_tmp[p] <= be)
@@ -281,7 +345,7 @@ for i in range(startMinima,XspaceMinima):
                 objective = Minimize(norm(ibRho[0][0]))
                 prob = Problem(objective, mincon)
                 prob.solve(solver=cvx.SCS)
-                print prob.value,"(minima",i,"/",XspaceMinima,")"
+                print "minima",i,"/",XspaceMinima," (2nd cvx problem) => ",prob.value
 
                 if prob.value<inf:
                         minimaIter = i
@@ -300,23 +364,25 @@ if prob.value < inf:
         maxNonzeroDim = np.max(np.nonzero(Ark)[0])
         firstIS = None
         lastIS = None
+
+        ## plot intersection environment boxes
         for i in range(0,N_walkablesurfaces-1):
                 if x_connection[i].value is not None:
 
                         #### plot intersection foot pos
-                        plot.point(x_connection[i].value)
+                        #plot.point(x_connection[i].value)
 
                         #### plot intersection SV boundary left
-                        offset = 0.15 ## for visibility reasons
-                        for k in range(0,maxNonzeroDim):
-                                pt = x_connection[i].value+(rho.value[k]*v1+heights[k]*v2+offset*v3).T
-                                plot.point(pt,size=svPointSize,color=svLeftColor)
+                        #offset = 0.15 ## for visibility reasons
+                        #for k in range(0,maxNonzeroDim):
+                        #        pt = x_connection[i].value+(rho.value[k]*v1+heights[k]*v2+offset*v3).T
+                        #        #plot.point(pt,size=svPointSize,color=svLeftColor)
 
-                        #### plot intersection SV boundary right
-                        rhoR = np.matrix(Ark)*rho.value
-                        for k in range(0,maxNonzeroDim):
-                                pt = x_connection[i].value+(rhoR[k]*v1+heights[k]*v2+offset*v3).T 
-                                plot.point(pt,size=svPointSize,color=svRightColor)
+                        ##### plot intersection SV boundary right
+                        #rhoR = np.matrix(Ark)*rho.value
+                        #for k in range(0,maxNonzeroDim):
+                        #        pt = x_connection[i].value+(rhoR[k]*v1+heights[k]*v2+offset*v3).T 
+                        #        #plot.point(pt,size=svPointSize,color=svRightColor)
 
                         #### plot intersection E-boxes
                         for k in range(0,maxNonzeroDim):
@@ -326,30 +392,43 @@ if prob.value < inf:
                                                 fcolor=colorScene)
 
         ### plot goal/start swept volume boundary
-        for k in range(0,maxNonzeroDim):
-                pt = x_start.value+(rho.value[k]*start_normal+heights[k]*v2).T
-                plot.point(pt,size=svPointSize,color=svLeftColor)
-                pt = x_goal.value+(rho.value[k]*goal_normal+heights[k]*v2).T
-                plot.point(pt,size=svPointSize,color=svLeftColor)
-        for k in range(0,maxNonzeroDim):
-                rhoR = np.matrix(Ark)*rho.value
-                pt = x_start.value+(rhoR[k]*start_normal+heights[k]*v2).T
-                plot.point(pt,size=svPointSize,color=svRightColor)
-                pt = x_goal.value+(rhoR[k]*goal_normal+heights[k]*v2).T
-                plot.point(pt,size=svPointSize,color=svRightColor)
+        #for k in range(0,maxNonzeroDim):
+        #        pt = x_start.value+(rho.value[k]*start_normal+heights[k]*v2).T
+        #        #plot.point(pt,size=svPointSize,color=svLeftColor)
+        #        pt = x_goal.value+(rho.value[k]*goal_normal+heights[k]*v2).T
+        #        #plot.point(pt,size=svPointSize,color=svLeftColor)
+        #for k in range(0,maxNonzeroDim):
+        #        rhoR = np.matrix(Ark)*rho.value
+        #        pt = x_start.value+(rhoR[k]*start_normal+heights[k]*v2).T
+        #        #plot.point(pt,size=svPointSize,color=svRightColor)
+        #        pt = x_goal.value+(rhoR[k]*goal_normal+heights[k]*v2).T
+        #        #plot.point(pt,size=svPointSize,color=svRightColor)
 
         ### plot paths on each WS
+        ###  build one path for each dimension:
+        svPathPoints = 0
         for i in range(0,N_walkablesurfaces):
-                for j in range(0,len(x_WS[i])):
-                        plot.point(x_WS[i][j].value,size=svPointSize,color=svLeftColor)
-                        for k in range(0,maxNonzeroDim):
-                                pt = x_WS[i][j].value.T+(ibRho[i][j][k].value*vp[i][j]+heights[k]*v2).T
-                                plot.point(np.array(pt).flatten(),size=svPointSize,color=svLeftColor)
-                        ibRhoR = np.matrix(Ark)*ibRho[i][j].value
-                        for k in range(0,maxNonzeroDim):
-                                pt = x_WS[i][j].value+(ibRhoR[k]*vp[i][j]+heights[k]*v2).T
-                                plot.point(np.array(pt).flatten(),size=svPointSize,color=svRightColor)
+                svPathPoints = svPathPoints + len(x_WS[i])
 
+        svPathsLeft = np.zeros((maxNonzeroDim, svPathPoints, 3))
+        svPathsRight = np.zeros((maxNonzeroDim, svPathPoints, 3))
+        svPathsMiddle = np.zeros((maxNonzeroDim, svPathPoints, 3))
+        for k in range(0,maxNonzeroDim):
+                ctr = 0
+                for i in range(0,N_walkablesurfaces):
+                        for j in range(0,len(x_WS[i])):
+                                svPathsMiddle[k][ctr] = x_WS[i][j].value.T
+                                pt = x_WS[i][j].value+(ibRho[i][j][k].value*vp[i][j].T+heights[k]*v2).T
+                                svPathsLeft[k][ctr] = np.array(pt).flatten()
+                                ibRhoR = np.matrix(Ark)*ibRho[i][j].value
+                                #pt = x_WS[i][j].value+(ibRhoR[k]*vp[i][j]+heights[k]*v2).T
+                                pt = x_WS[i][j].value+(np.array(ibRhoR[k]).flatten()[0]*vp[i][j].T+heights[k]*v2).T
+                                svPathsRight[k][ctr] = np.array(pt).flatten()
+                                ctr = ctr+1 
+
+        plot.lines(svPathsLeft,'-or')
+        plot.lines(svPathsRight,'-om')
+        plot.lines(svPathsMiddle,'-ok')
         plot.set_view(90,0)
         plot.showEnvironment()
 else:

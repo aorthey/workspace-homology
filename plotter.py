@@ -7,6 +7,7 @@ from scipy.spatial import Delaunay
 from scipy.spatial import ConvexHull
 import matplotlib.pyplot as plt
 
+### counterclock wise rotation
 def rotFromRPY(tx,ty,tz):
         Rx = np.array([[1,0,0], [0, cos(tx), -sin(tx)], [0, sin(tx), cos(tx)]])
         Ry = np.array([[cos(ty), 0, -sin(ty)], [0, 1, 0], [sin(ty), 0, cos(ty)]])
@@ -92,6 +93,8 @@ class Plotter:
                 self.robot_fig.show()
 
         def showEnvironment(self):
+                self.ax.set_xlim(-2, 2)
+                self.ax.set_ylim(-2, 2)
                 self.ax.set_zlim(0, 1.5)
                 self.fig.show()
 
@@ -105,6 +108,16 @@ class Plotter:
 
         def set_view(self,azim,elev):
                 self.ax.view_init(elev=elev, azim=azim)
+
+        def lines(self, L,style='o-r'):
+                N = L.shape[0]
+                M = L.shape[1]
+                for i in range(0,N):
+                        l = L[i].T
+                        x = l[:][0]
+                        y = l[:][1]
+                        z = l[:][2]
+                        self.ax.plot(x, y, z, style,linewidth=8.0)
 
 
         def display_capsule2(self, Xc, rpy, length, r, color='r'):
