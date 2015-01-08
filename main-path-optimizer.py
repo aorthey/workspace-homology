@@ -8,7 +8,6 @@ from numpy import inf,array,zeros
 from cvxpy import *
 from math import tan,pi
 from src.util import *
-
 from src.linalg import *
 from src.walkable import WalkableSurface, WalkableSurfacesFromPolytopes
 from src.robotspecifications import * 
@@ -18,7 +17,11 @@ path_candidates = pickle.load( open( "data/paths.dat", "rb" ) )
 Wsurfaces_decomposed = pickle.load( open( "data/wsurfaces.dat", "rb" ) )
 Wsurface_box_vstack = pickle.load( open( "data/wsurfaces_vstack.dat", "rb" ) )
 
+
 DEBUG=1
+if DEBUG:
+        goal[0]=0.4
+
 v2 = np.array((0,0,1))
 v1 = np.array((1,0,0))
 v3 = np.array((0,1,0))
@@ -277,7 +280,6 @@ for i in range(startMinima,XspaceMinima):
         maxNonzeroDim = np.max(np.nonzero(Ark)[0])
 
         ## constraint: all intersection points have to be inside of an environment box
-
         for j in range(0,N_walkablesurfaces-1):
                 Ebox = upperBodyConnector[j]
                 for k in range(0,maxNonzeroDim):
@@ -323,12 +325,6 @@ for i in range(startMinima,XspaceMinima):
                                 v = v/np.linalg.norm(v)
                                 vr = np.dot(rotFromRPY(0,0,pi/2),v)
                                 vp_tmp.append(vr)
-                                #vp_tmp.append(v1)
-                                #if p > len(x_WS[j])-2:
-                                #        print xn,xc,x_WS[j+1][0].value,x_WS[j+1][1].value
-                                #        print np.around(v,2)
-                                #        print np.around(vr,2)
-                                #        sys.exit(0)
 
                         for p in range(0,len(x_WS[j])):
                                 mincon.append( np.matrix(Ae)*ibRho_tmp[p] <= be)
@@ -368,41 +364,11 @@ if prob.value < inf:
         ## plot intersection environment boxes
         for i in range(0,N_walkablesurfaces-1):
                 if x_connection[i].value is not None:
-
-                        #### plot intersection foot pos
-                        #plot.point(x_connection[i].value)
-
-                        #### plot intersection SV boundary left
-                        #offset = 0.15 ## for visibility reasons
-                        #for k in range(0,maxNonzeroDim):
-                        #        pt = x_connection[i].value+(rho.value[k]*v1+heights[k]*v2+offset*v3).T
-                        #        #plot.point(pt,size=svPointSize,color=svLeftColor)
-
-                        ##### plot intersection SV boundary right
-                        #rhoR = np.matrix(Ark)*rho.value
-                        #for k in range(0,maxNonzeroDim):
-                        #        pt = x_connection[i].value+(rhoR[k]*v1+heights[k]*v2+offset*v3).T 
-                        #        #plot.point(pt,size=svPointSize,color=svRightColor)
-
-                        #### plot intersection E-boxes
                         for k in range(0,maxNonzeroDim):
                                 W = upperBodyConnector[i][k]
                                 plot.polytopeFromVertices(\
                                                 W.getVertexRepresentation(),\
                                                 fcolor=colorScene)
-
-        ### plot goal/start swept volume boundary
-        #for k in range(0,maxNonzeroDim):
-        #        pt = x_start.value+(rho.value[k]*start_normal+heights[k]*v2).T
-        #        #plot.point(pt,size=svPointSize,color=svLeftColor)
-        #        pt = x_goal.value+(rho.value[k]*goal_normal+heights[k]*v2).T
-        #        #plot.point(pt,size=svPointSize,color=svLeftColor)
-        #for k in range(0,maxNonzeroDim):
-        #        rhoR = np.matrix(Ark)*rho.value
-        #        pt = x_start.value+(rhoR[k]*start_normal+heights[k]*v2).T
-        #        #plot.point(pt,size=svPointSize,color=svRightColor)
-        #        pt = x_goal.value+(rhoR[k]*goal_normal+heights[k]*v2).T
-        #        #plot.point(pt,size=svPointSize,color=svRightColor)
 
         ### plot paths on each WS
         ###  build one path for each dimension:
@@ -421,7 +387,6 @@ if prob.value < inf:
                                 pt = x_WS[i][j].value+(ibRho[i][j][k].value*vp[i][j].T+heights[k]*v2).T
                                 svPathsLeft[k][ctr] = np.array(pt).flatten()
                                 ibRhoR = np.matrix(Ark)*ibRho[i][j].value
-                                #pt = x_WS[i][j].value+(ibRhoR[k]*vp[i][j]+heights[k]*v2).T
                                 pt = x_WS[i][j].value+(np.array(ibRhoR[k]).flatten()[0]*vp[i][j].T+heights[k]*v2).T
                                 svPathsRight[k][ctr] = np.array(pt).flatten()
                                 ctr = ctr+1 
