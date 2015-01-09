@@ -56,8 +56,8 @@ def hspace2xspace(k,h1,h2,h3):
 
         ## real limits from the hardware (but they apply relative to the
         ## previous joint)
-        #qL = np.array((-1.31,-0.03,-2.18,-0.09,-0.52))
-        #qU = np.array((0.73,2.62,0.73,1.05,0.79))
+        thetaL = np.array((-1.31,-0.03,-2.18,-0.09,-0.52))
+        thetaU = np.array((0.73,2.62,0.73,1.05,0.79))
 
         ## artificial limits imposed by tangens (-pi/2,pi/2)
         tlimit = pi/2
@@ -69,7 +69,9 @@ def hspace2xspace(k,h1,h2,h3):
         ## X \in \R^Npts
         ###############################################################################
 
-        q = np.array((0.0,0.0,0.0,0.0,0.0))
+        theta = np.array((0.0,0.0,0.0,0.0,0.0)) ## real c-space values
+
+        q = np.array((0.0,0.0,0.0,0.0,0.0)) ## deviation from main axes values
 
         ## given h1, compute the 
         ## a : distance from knee to the main axis through foot, hip and waist.
@@ -143,6 +145,29 @@ def hspace2xspace(k,h1,h2,h3):
         t2 = tan((q[2]))
         t3 = tan((q[3]))
         t4 = tan((q[4]))
+        ###############################################################################
+        ### compute theta from q
+        ###############################################################################
+        if asign == -1:
+                theta[0] = q[0]
+                theta[1] = q[0]+q[1]
+                theta[2] = -q[1]
+        else:
+                theta[0] = -q[0]
+                theta[1] = -q[0]-q[1]
+                theta[2] = -q[1]
+        if bsign == -1:
+                theta[3] = q[3]
+                theta[4] = q[3]+q[4]
+        else:
+                theta[3] = -q[3]
+                theta[4] = -q[3]-q[4]
+
+        ## bsign!?
+        if not((theta<=thetaU).all() and (theta>=thetaL).all()):
+                print "not in range of limit configuration",theta
+                return [None,None,None]
+
         ###############################################################################
         ### foot-to-knee path
         ###############################################################################

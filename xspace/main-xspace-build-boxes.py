@@ -22,7 +22,7 @@ def memory_usage_psutil():
     mem = process.get_memory_info()[0] / float(2 ** 20)
     return mem
 
-VIDEO_DEBUG = 0
+VIDEO_DEBUG = 1
 
 dankle=ROBOT_DIST_FOOT_SOLE
 d0=ROBOT_DIST_KNEE_FOOT
@@ -60,9 +60,9 @@ h3high = 1.61
 #h2step = 0.005
 #h3step = 0.005
 
-h1step = 0.1
-h2step = 0.1
-h3step = 0.1
+h1step = 0.05
+h2step = 0.05
+h3step = 0.05
 
 h3=h3low
 NCtr = 0
@@ -171,7 +171,7 @@ print "================================================================"
 
 if VIDEO_DEBUG:
         folder = "xspaceWalk"
-        ffmpegstr = "ffmpeg -y -framerate 10 -start_number 0 -i ../data/"+folder+"/xspaceWalk%d.png -pix_fmt yuv420p ../data/"+folder+"/out.mp4"
+        ffmpegstr = "ffmpeg -y -framerate 8 -start_number 0 -i ../data/"+folder+"/xspaceWalk%d.png -pix_fmt yuv420p ../data/"+folder+"/out.mp4"
         vlcstr = "vlc ../data/"+folder+"/out.mp4"
         os.system(ffmpegstr)
         os.system(vlcstr)

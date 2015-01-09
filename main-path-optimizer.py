@@ -17,7 +17,6 @@ path_candidates = pickle.load( open( "data/paths.dat", "rb" ) )
 Wsurfaces_decomposed = pickle.load( open( "data/wsurfaces.dat", "rb" ) )
 Wsurface_box_vstack = pickle.load( open( "data/wsurfaces_vstack.dat", "rb" ) )
 
-
 DEBUG=1
 if DEBUG:
         goal[0]=0.4
@@ -261,7 +260,7 @@ constraints.append( gammaGoal*v + xgoal == xbefore )
 minimaIter = 0
 
 if DEBUG:
-        startMinima = 20
+        startMinima = 0
 else:
         startMinima = 0
 
