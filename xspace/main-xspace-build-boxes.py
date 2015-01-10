@@ -7,7 +7,7 @@ from math import cos,sin,tan,pi,asin,acos,atan2,atan
 import pickle
 import numpy as np
 from src.robotspecifications import *
-from xspace.hspace2xspaceHRP import *
+from xspace.hspace2xspaceFIXED import *
 
 from pylab import *
 from mpl_toolkits.mplot3d import axes3d
@@ -22,7 +22,7 @@ def memory_usage_psutil():
     mem = process.get_memory_info()[0] / float(2 ** 20)
     return mem
 
-VIDEO_DEBUG = 1
+VIDEO_DEBUG = 0
 
 dankle=ROBOT_DIST_FOOT_SOLE
 d0=ROBOT_DIST_KNEE_FOOT
@@ -169,8 +169,10 @@ print "================="
 print ts,"s"
 print "================================================================"
 
-if VIDEO_DEBUG:
+if VIDEO_DEBUG and NfeasibleCtrReduced > 0:
         folder = "xspaceWalk"
+        rmrfstr = "rm -rf ../data/"+folder+"/out.mp4"
+        os.system(rmrfstr)
         ffmpegstr = "ffmpeg -y -framerate 8 -start_number 0 -i ../data/"+folder+"/xspaceWalk%d.png -pix_fmt yuv420p ../data/"+folder+"/out.mp4"
         vlcstr = "vlc ../data/"+folder+"/out.mp4"
         os.system(ffmpegstr)

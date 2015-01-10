@@ -2,46 +2,32 @@ from pylab import *
 from timeit import default_timer as timer
 import sys
 sys.path.append("..")
+
 import random as rnd
 from math import cos,sin,tan,pi,asin,acos,atan2,atan
 import pickle
 import numpy as np
 from src.robotspecifications import *
+from xspace.htoq import *
 
 from mpl_toolkits.mplot3d import axes3d
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection 
 import matplotlib.pyplot as plt 
-
 import os 
 
 Npts = 40
 heights = np.zeros((Npts,1))
 heights[0]=0
+
+##DEBUG:
+DEBUG=1
+
 for i in range(1,len(heights)):
         heights[i] = VSTACK_DELTA+heights[i-1]
 
 def hspace2xspace(k,h1,h2,h3):
-        asign = 1
-        bsign = 1
-        if k==0:
-                asign=1
-                bsign=1
-                qL = np.array((0,-2.62,0,0.0,-0.52))
-                qU = np.array((1.31,0,0,1.05,0.79))
-        if k==1:
-                asign=1
-                bsign=-1
-        if k==2:
-                asign=-1
-                bsign=-1
-        if k==3:
-                asign=-1
-                bsign=1
-        if k>3 or k<0:
-                print "[WARNING] k not in {0,1,2,3}"
-                return [None,None,None]
 
-        dankle=ROBOT_DIST_FOOT_SOLE
+        dk=ROBOT_DIST_FOOT_SOLE
         d0=ROBOT_DIST_KNEE_FOOT
         d1=ROBOT_DIST_HIP_KNEE
         d2=ROBOT_DIST_WAIST_HIP 
@@ -55,86 +41,41 @@ def hspace2xspace(k,h1,h2,h3):
         dt3 = ROBOT_THICKNESS_NECK_WAIST*0.5
         dt4 = ROBOT_THICKNESS_HEAD_NECK*0.5
 
+        [q,theta] = htoq(k,h1,h2,h3)
 
-        ## real limits from the hardware (but they apply relative to the
-        ## previous joint)
+        ###############################################################################
+        ### check limits
+        ###############################################################################
+
+        ## real limits from the hardware (relative to the previous joint)
         thetaL = np.array((-1.31,-0.03,-2.18,-0.09,-0.52))
         thetaU = np.array((0.73,2.62,0.73,1.05,0.79))
-
+        if not((theta<=thetaU).all() and (theta>=thetaL).all()):
+                return [None,None,None]
 
         ## artificial limits imposed by tangens (-pi/2,pi/2)
         tlimit = pi/2
-        qaL = np.array((-tlimit,-pi/2.0,-tlimit,-tlimit,-pi/6))
-        qaU = np.array((tlimit,pi/2.0,tlimit,tlimit,pi/6))
+        qaL = np.array((-tlimit,-pi/2.0,-tlimit,-tlimit,-tlimit))
+        qaU = np.array((tlimit,pi/2.0,tlimit,tlimit,tlimit))
 
-        Npts = 40
+        if not((q<=qaU).all() and (q>=qaL).all()):
+                return [None,None,None]
+
         ###############################################################################
         ## X \in \R^Npts
         ###############################################################################
 
-        theta = np.array((0.0,0.0,0.0,0.0,0.0)) ## real c-space values
-
-        q = np.array((0.0,0.0,0.0,0.0,0.0)) ## deviation from main axes values
-
         ## given h1, compute the 
         ## a : distance from knee to the main axis through foot, hip and waist.
         ## b : distance from neck to the main axis through foot, hip and waist.
-
         ## http://mathworld.wolfram.com/Circle-CircleIntersection.html
-        l = h3 - h1 - d2
-        if l < 0:
-                return [None,None,None]
-
-        d5 = sqrt(h2*h2+l*l)
-
-        l0 = h1-dankle
-        if l0 < 0:
-                return [None,None,None]
-
-        sqrtA = 4*l0*l0*d0*d0-pow(l0*l0-d1*d1+d0*d0,2)
-        sqrtB = 4*d5*d5*d3*d3-pow(d5*d5-d4*d4+d3*d3,2)
-
-        if sqrtA < 0:
-                return [None,None,None]
-        if sqrtB < 0:
-                return [None,None,None]
-        a=0.5*(1/l0)*sqrt(sqrtA) 
-        b=0.5*(1/d5)*sqrt(sqrtB) 
-
-        if math.isnan(b):
-                #print "triangle inequality d3+d4 > d5 is not fulfilled"
-                return [None,None,None]
-        if math.isnan(a):
-                #print "triangle inequality d0+d1 > dist(foot,hip) is not fulfilled"
-                return [None,None,None]
-
-        q = np.array((0.0,0.0,0.0,0.0,0.0))
-        if abs(-a/d0) > 1 or abs(a/d1) > 1:
-                print "fatal error: knee is below foot, not allowed"
-                return [None,None,None]
-
-        q[0] = -asign*asin(a/d0)
-        q[1] = asign*asin(a/d1)
-        q[2] = 0.0
-
-        q[3] = asin(h2/d5)+bsign*asin(b/d3)
-
-        v = np.array((h2-d3*sin(q[3]),l-d3*cos(q[3])))
-        zaxis = np.array((0,1))
-        vn = v/np.linalg.norm(v)
-
-        q[4]=acos(np.dot(zaxis,vn))*vn[0]/abs(vn[0])
-
-        if not((q<=qaU).all() and (q>=qaL).all()):
-                #print "not in range of tan configuration",q
-                return [None,None,None]
 
         ## compute q -> x
         xL = np.zeros((Npts,1))
         xM = np.zeros((Npts,1))
         xR = np.zeros((Npts,1))
 
-        knee_height = d0*cos(q[0])+dankle
+        knee_height = d0*cos(q[0])+dk
         hip_height = knee_height+d1*cos(q[1])
         waist_height = hip_height+d2*cos(q[2])
         neck_height = waist_height+d3*cos(q[3])
@@ -151,50 +92,18 @@ def hspace2xspace(k,h1,h2,h3):
         t2 = tan((q[2]))
         t3 = tan((q[3]))
         t4 = tan((q[4]))
-        ###############################################################################
-        ### compute theta from q
-        ###############################################################################
-        if q[0] > 0:
-                theta[0] = -q[0]
-                theta[1] = -(q[0]+q[1])
-                theta[2] = q[1]
-        else:
-                theta[0] = q[0]
-                theta[1] = q[0]+q[1]
-                theta[2] = -q[1]
-
-        #if q[3] > 0:
-        #        theta[3] = -q[3]
-        #        theta[4] = -(q[3]+q[4])
-        #else:
-        #        theta[3] = q[3]
-        #        theta[4] = q[3]+q[4]
-
-
-
-        #if bsign == -1:
-        #        theta[3] = q[3]
-        #        theta[4] = q[3]+q[4]
-        #else:
-        #        theta[3] = -q[3]
-        #        theta[4] = -q[3]-q[4]
-
-        ### bsign!?
-        if not((theta<=thetaU).all() and (theta>=thetaL).all()):
-                print "not in range of limit configuration",theta
-                return [None,None,None]
 
         ###############################################################################
         ### foot-to-knee path
         ###############################################################################
-        while heights[xctr] <= dankle:
+        while heights[xctr] <= dk:
                 xL[xctr] = xL[0]
                 xR[xctr] = xR[0]
                 xM[xctr] = xM[0]
                 xctr=xctr+1
 
         while heights[xctr] <= knee_height:
-                x = (heights[xctr]-dankle)*t0
+                x = (heights[xctr]-dk)*t0
                 xL[xctr] = x - dt0
                 xR[xctr] = x + dt0
                 xM[xctr]=x
@@ -203,7 +112,7 @@ def hspace2xspace(k,h1,h2,h3):
         ################################################################################
         #### knee-to-hip path
         ################################################################################
-        offset = (knee_height-dankle)*t0
+        offset = (knee_height-dk)*t0
         kneepos = offset
         while heights[xctr] < hip_height:
                 x = (heights[xctr]-knee_height)*t1+offset
@@ -216,7 +125,7 @@ def hspace2xspace(k,h1,h2,h3):
         #### hip-to-waist path
         ################################################################################
 
-        offset = (knee_height-dankle)*t0+(hip_height-knee_height)*t1
+        offset = (knee_height-dk)*t0+(hip_height-knee_height)*t1
         hippos = offset
 
         while heights[xctr] < waist_height:
@@ -229,7 +138,7 @@ def hspace2xspace(k,h1,h2,h3):
         ################################################################################
         #### waist-to-neck path
         ################################################################################
-        offset = (knee_height-dankle)*t0\
+        offset = (knee_height-dk)*t0\
                         +(hip_height-knee_height)*t1\
                         +(waist_height-hip_height)*t2
 
@@ -244,7 +153,7 @@ def hspace2xspace(k,h1,h2,h3):
         ################################################################################
         #### neck-to-head path
         ################################################################################
-        offset = (knee_height-dankle)*t0\
+        offset = (knee_height-dk)*t0\
                         +(hip_height-knee_height)*t1\
                         +(waist_height-hip_height)*t2\
                         +(neck_height-waist_height)*t3
@@ -258,14 +167,12 @@ def hspace2xspace(k,h1,h2,h3):
                 xM[xctr]=x
                 xctr=xctr+1
 
-        headpos = (knee_height-dankle)*t0\
+        headpos = (knee_height-dk)*t0\
                         +(hip_height-knee_height)*t1\
                         +(waist_height-hip_height)*t2\
                         +(neck_height-waist_height)*t3\
                         +(head_height-neck_height)*t4
 
-        ##DEBUG:
-        DEBUG=1
 
         if DEBUG:
                 v = hip_height-h1
