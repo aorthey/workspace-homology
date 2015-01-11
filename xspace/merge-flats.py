@@ -22,20 +22,12 @@ def memory_usage_psutil():
     mem = process.get_memory_info()[0] / float(2 ** 20)
     return mem
 
-Nr = 10000
-XLname = "../data/xspacemanifold-same-axes/xsamplesL-reduced-"+str(Nr)+".dat"
-XRname = "../data/xspacemanifold-same-axes/xsamplesR-reduced-"+str(Nr)+".dat"
-XMname = "../data/xspacemanifold-same-axes/xsamplesM-reduced-"+str(Nr)+".dat"
-Hname = "../data/xspacemanifold-same-axes/hsamples-reduced-"+str(Nr)+".dat"
-
 XLname = "../data/xspacemanifold-same-axes/xsamplesL.dat"
 XRname = "../data/xspacemanifold-same-axes/xsamplesR.dat"
 XMname = "../data/xspacemanifold-same-axes/xsamplesM.dat"
 Hname = "../data/xspacemanifold-same-axes/hsamples.dat"
-
-#Xname = "../data/xspacemanifold-same-axes/xsamples.dat"
-#Hname = "../data/xspacemanifold-same-axes/hsamples.dat"
 HeadName = "../data/xspacemanifold-same-axes/headersamples.dat"
+
 start = timer()
 XLarray = pickle.load( open( XLname, "rb" ) )
 XRarray = pickle.load( open( XRname, "rb" ) )
@@ -67,6 +59,7 @@ omem = memory_usage_psutil()
 
 h3cur = 0
 XLarraySameH3 = []
+HVarray = []
 
 for i in range(0,N_f):
         x = XLarray[i]
@@ -98,9 +91,6 @@ for i in range(0,N_f):
                                         [X,Y,Z,S]=PCAprojectionOnList(XLarraySameH3SameH2)
                                         print S
                                         #projectOnSmallestSubspace(XLarraySameH3)
-                                
-
-
 
                                 h2cur = h2j
                                 XLarraySameH3SameH2 = []
@@ -134,9 +124,6 @@ for i in range(0,N_f):
                         b[j] = Rlimit
                         A[j+Npts,:] = -e
                         b[j+Npts] = -Llimit
-
-        #Aarray.append(A)
-        #barray.append(b)
 
         V = (np.dot(A,x.flatten()) <= b.flatten())
 
@@ -172,16 +159,16 @@ for i in range(0,N_f):
                 sys.exit(0)
 
         ARKarray.append(Ark)
-
-        ###DEBUG:
-        #xspaceDisplay(x,x,xrProj)
+        HVarray.append(Harray[i])
 
 end = timer()
 ts= np.around(end - start,2)
 
+Hname = "../data/polytopes/H.dat"
 Aname = "../data/polytopes/A.dat"
 ARKname = "../data/polytopes/Ark.dat"
 bname = "../data/polytopes/b.dat"
+pickle.dump( HVarray, open( Hname, "wb" ) )
 pickle.dump( Aarray, open( Aname, "wb" ) )
 pickle.dump( barray, open( bname, "wb" ) )
 pickle.dump( ARKarray, open( ARKname, "wb" ) )

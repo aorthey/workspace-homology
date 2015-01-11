@@ -51,7 +51,7 @@ def hspace2xspace(k,h1,h2,h3):
         thetaL = np.array((-1.31,-0.03,-2.18,-0.09,-0.52))
         thetaU = np.array((0.73,2.62,0.73,1.05,0.79))
         if not((theta<=thetaU).all() and (theta>=thetaL).all()):
-                return [None,None,None]
+                return [None,None,None,None,None]
 
         ## artificial limits imposed by tangens (-pi/2,pi/2)
         tlimit = pi/2
@@ -59,7 +59,7 @@ def hspace2xspace(k,h1,h2,h3):
         qaU = np.array((tlimit,pi/2.0,tlimit,tlimit,tlimit))
 
         if not((q<=qaU).all() and (q>=qaL).all()):
-                return [None,None,None]
+                return [None,None,None,None,None]
 
         ###############################################################################
         ## X \in \R^Npts
@@ -187,7 +187,7 @@ def hspace2xspace(k,h1,h2,h3):
                         print "head height not equal to h3, error in algorithm"
                         print head_height,h3
                         sys.exit(0)
-        return [xL,xM,xR]
+        return [xL,xM,xR,q,theta]
 
 def xspaceDisplay(xL,xM,xR):
         xspacePlot(xL,xM,xR)

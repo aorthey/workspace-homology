@@ -10,6 +10,7 @@ from math import tan,pi
 from src.util import *
 from src.linalg import *
 from src.walkable import WalkableSurface, WalkableSurfacesFromPolytopes
+from xspace.htoq import *
 from src.robotspecifications import * 
 start= pickle.load( open( "data/xstart.dat", "rb" ) )
 goal= pickle.load( open( "data/xgoal.dat", "rb" ) )
@@ -39,13 +40,16 @@ goalNormal = np.array((1,0,0))
 startNormalNormal = np.dot(rotFromRPY(0,0,-pi/2),startNormal)
 goalNormalNormal = np.dot(rotFromRPY(0,0,-pi/2),goalNormal)
 
+
 HeadName = "data/xspacemanifold-same-axes/headersamples.dat"
 [Npts, VSTACK_DELTA, heights] = pickle.load( open( HeadName, "rb" ) )
 
 Aname = "data/polytopes/A.dat"
 ARKname = "data/polytopes/Ark.dat"
 bname = "data/polytopes/b.dat"
+HName = "data/polytopes/H.dat"
 
+Harray = pickle.load( open( HName, "rb" ) )
 Aflat = pickle.load( open( Aname, "rb" ) )
 Aleftrightconv = pickle.load( open( ARKname, "rb" ) )
 bflat = pickle.load( open( bname, "rb" ) )
@@ -260,9 +264,13 @@ constraints.append( gammaGoal*v + xgoal == xbefore )
 minimaIter = 0
 
 if DEBUG:
+        startMinima = 21
         startMinima = 0
 else:
         startMinima = 0
+
+allValuesFirst = []
+allValuesSecond = []
 
 for i in range(startMinima,XspaceMinima):
         Ae = Aflat[i]
@@ -299,6 +307,7 @@ for i in range(startMinima,XspaceMinima):
         prob.solve(solver=cvx.SCS)
         #prob.solve(solver=cvx.CVXOPT)
         print "minima",i,"/",XspaceMinima," => ",prob.value
+        allValuesFirst.append(prob.value)
         if prob.value < inf:
                 ## BICONVEX condition: check second convex problem on feasibility
                 ### constraint: all points have to be inside of an environment box
@@ -342,10 +351,27 @@ for i in range(startMinima,XspaceMinima):
                 prob.solve(solver=cvx.SCS)
                 print "minima",i,"/",XspaceMinima," (2nd cvx problem) => ",prob.value
 
+                allValuesSecond.append(prob.value)
                 if prob.value<inf:
                         minimaIter = i
                         print "minima",i,"admits a solution"
-                        break
+                        #break
+        else:
+                allValuesSecond.append(prob.value)
+
+###############################################################################
+# statistics
+###############################################################################
+inf = float('inf')
+
+validMinima = np.sum(np.array(allValuesFirst) < inf)
+validMinimatwo = np.sum(np.array(allValuesSecond) < inf)
+
+pp = float(validMinima)/float(XspaceMinima)
+pptwo = float(validMinimatwo)/float(XspaceMinima)
+
+print validMinima,"of",XspaceMinima,"are valid (",pp,"%)"
+print validMinima,"of",XspaceMinima,"second minima are valid (",pptwo,"%)"
 
 ###############################################################################
 # plot
@@ -378,6 +404,7 @@ if prob.value < inf:
         svPathsLeft = np.zeros((maxNonzeroDim, svPathPoints, 3))
         svPathsRight = np.zeros((maxNonzeroDim, svPathPoints, 3))
         svPathsMiddle = np.zeros((maxNonzeroDim, svPathPoints, 3))
+        thetaV = np.zeros((svPathPoints, 5))
         for k in range(0,maxNonzeroDim):
                 ctr = 0
                 for i in range(0,N_walkablesurfaces):
@@ -389,11 +416,28 @@ if prob.value < inf:
                                 pt = x_WS[i][j].value+(np.array(ibRhoR[k]).flatten()[0]*vp[i][j].T+heights[k]*v2).T
                                 svPathsRight[k][ctr] = np.array(pt).flatten()
                                 ctr = ctr+1 
+        ctr=0
+        for i in range(0,N_walkablesurfaces):
+                for j in range(0,len(x_WS[i])):
+                        [k,h1,h2,h3] = Harray[minimaIter]
+                        thetaV[ctr] = htoq(k,h1,h2,h3)[1]
+                        ctr = ctr+1 
 
+        svLeftFname= "data/path/xpathL.dat"
+        svRightFname = "data/path/xpathR.dat"
+        svMiddleFname = "data/path/xpathM.dat"
+        svQValuesFname = "data/path/xpathQ.dat"
+
+
+        pickle.dump( svPathsLeft, open( svLeftFname, "wb" ) )
+        pickle.dump( svPathsRight, open( svRightFname, "wb" ) )
+        pickle.dump( svPathsMiddle, open( svMiddleFname, "wb" ) )
+        pickle.dump( thetaV, open( svQValuesFname, "wb" ) )
         plot.lines(svPathsLeft,'-or')
         plot.lines(svPathsRight,'-om')
         plot.lines(svPathsMiddle,'-ok')
         plot.set_view(90,0)
         plot.showEnvironment()
+
 else:
         print "problem not feasible"

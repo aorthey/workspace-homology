@@ -71,6 +71,8 @@ XLarray = []
 XRarray = []
 XMarray = []
 Harray = []
+THETAarray=[]
+Qarray=[]
 
 imgCtr=0
 while h3 <= h3high:
@@ -94,7 +96,7 @@ while h3 <= h3high:
                                 NCtr = NCtr+1
                                 h1 = h1+h1step
 
-                                [xL,xM,xR] = hspace2xspace(k,h1,h2,h3)
+                                [xL,xM,xR,q,theta] = hspace2xspace(k,h1,h2,h3)
 
 
                                 if xL is not None:
@@ -117,6 +119,8 @@ while h3 <= h3high:
                                         XLarray.append(xL)
                                         XRarray.append(xR)
                                         XMarray.append(xM)
+                                        THETAarray.append(theta)
+                                        Qarray.append(q)
                                         Harray.append([k,h1,h2,h3])
 
                                         imgCtr=imgCtr+1
@@ -138,6 +142,8 @@ NfeasibleCtrReduced = len(XLarray)
 XLname = "../data/xspacemanifold-same-axes/xsamplesL.dat"
 XMname = "../data/xspacemanifold-same-axes/xsamplesM.dat"
 XRname = "../data/xspacemanifold-same-axes/xsamplesR.dat"
+THETAname = "../data/xspacemanifold-same-axes/xsamplesTheta.dat"
+Qname = "../data/xspacemanifold-same-axes/xsamplesQ.dat"
 Hname = "../data/xspacemanifold-same-axes/hsamples.dat"
 HeadName = "../data/xspacemanifold-same-axes/headersamples.dat"
 
@@ -145,6 +151,8 @@ pickle.dump( XLarray, open( XLname, "wb" ) )
 pickle.dump( XMarray, open( XMname, "wb" ) )
 pickle.dump( XRarray, open( XRname, "wb" ) )
 pickle.dump( Harray, open( Hname, "wb" ) )
+pickle.dump( Qarray, open( Qname, "wb" ) )
+pickle.dump( THETAarray, open( THETAname, "wb" ) )
 
 pickle.dump( [Npts, VSTACK_DELTA, heights], open( HeadName, "wb" ) )
 
