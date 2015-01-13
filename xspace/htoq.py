@@ -79,6 +79,17 @@ def htoq(k,h1,h2,h3):
         v4n = v4/np.linalg.norm(v4)
         v4pn = v4p/np.linalg.norm(v4p)
 
+        ###check assumption on injectivity
+        inj_assumptions = \
+                [((v0+vk)[2] > vk[2]),
+                ((v0+v1)[2] > v0[2]),
+                ((v1+v2)[2] > v1[2]),
+                ((v2+v3)[2] > v2[2]),
+                ((v3+v4)[2] > v3[2])]
+        if np.sum(inj_assumptions) < len(inj_assumptions):
+                ## trajectory not injective
+                return [None,None]
+
         xx = np.array((1,0,0))
         yy = np.array((0,1,0))
         zz = np.array((0,0,1))
@@ -124,7 +135,13 @@ def htoq(k,h1,h2,h3):
                         ## take left path, such that p0p1p2p3p4p5p6 is active
                         g3 = acos(np.dot(v3n.T,zz))
                         g4 = acos(np.dot(v4n.T,zz))
-                        g4rel = acos(np.dot(v3n.T,v4n.T))
+                        dd = np.dot(v3n.T,v4n.T)
+                        
+                        if dd >= 0.999:
+                                dd = 0.999
+                        if dd <= -0.999:
+                                dd = -0.999
+                        g4rel = acos(dd)
 
                         if v3n[0]>0:
                                 q[3] = g3
@@ -145,6 +162,8 @@ def htoq(k,h1,h2,h3):
                                 vtest = np.dot(RYneg,v3n)
                                 if np.dot(v4n,vtest) < 0:
                                         print "Assumption that v4 lies on the right side of v3 is violated"
+                                        print k,h1,h2,h3
+                                        print v3n,v4n
                                         sys.exit(0)
                 else:
                         ## take right path, such that p0p1p2p3p4p5'p6 is active

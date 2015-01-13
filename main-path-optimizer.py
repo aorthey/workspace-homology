@@ -1,3 +1,4 @@
+from timeit import default_timer as timer
 import numpy as np
 import cvxpy as cvx
 import pickle
@@ -263,21 +264,23 @@ constraints.append( gammaGoal*v + xgoal == xbefore )
 ###############################################################################
 minimaIter = 0
 
-if DEBUG:
-        startMinima = 21
-        startMinima = 0
-else:
-        startMinima = 0
+startMinima = 594
+
 
 allValuesFirst = []
 allValuesSecond = []
 
+start = timer()
+
+bestMinima = 0
+bestMinimaValue = inf
 for i in range(startMinima,XspaceMinima):
         Ae = Aflat[i]
         be = bflat[i]
         mincon = []
         Ark = Aleftrightconv[i]
         rho = Variable(XspaceDimension)
+
 
         ## constraint: points only from manifold flat inside X
         objective = Minimize(norm(rho)+norm(np.matrix(Ark)*rho))
@@ -308,7 +311,7 @@ for i in range(startMinima,XspaceMinima):
         #prob.solve(solver=cvx.CVXOPT)
         print "minima",i,"/",XspaceMinima," => ",prob.value
         allValuesFirst.append(prob.value)
-        if prob.value < inf:
+        if prob.value < inf and prob.value > -inf:
                 ## BICONVEX condition: check second convex problem on feasibility
                 ### constraint: all points have to be inside of an environment box
                 ## inbetween Rho
@@ -355,10 +358,29 @@ for i in range(startMinima,XspaceMinima):
                 if prob.value<inf:
                         minimaIter = i
                         print "minima",i,"admits a solution"
+                        if bestMinimaValue > prob.value:
+                                bestMinimaValue = prob.value
+                                bestMinima = i
                         #break
         else:
                 allValuesSecond.append(prob.value)
+        if i%100==0:
+                end = timer()
+                ts= np.around(end - start,2)
+                print "================================================================"
+                print "Time elapsed after checking",i,"minima:"
+                print ts,"s"
+                print "================================================================"
 
+
+end = timer()
+ts= np.around(end - start,2)
+
+print "================================================================"
+print "Time elapsed for checking all",XspaceMinima,"minima"
+print "================="
+print ts,"s"
+print "================================================================"
 ###############################################################################
 # statistics
 ###############################################################################
@@ -370,8 +392,9 @@ validMinimatwo = np.sum(np.array(allValuesSecond) < inf)
 pp = float(validMinima)/float(XspaceMinima)
 pptwo = float(validMinimatwo)/float(XspaceMinima)
 
-print validMinima,"of",XspaceMinima,"are valid (",pp,"%)"
-print validMinima,"of",XspaceMinima,"second minima are valid (",pptwo,"%)"
+print validMinima,"of",XspaceMinima,"are valid (",pp*100,"%)"
+print validMinima,"of",XspaceMinima,"second minima are valid (",pptwo*100,"%)"
+print "best minima:",bestMinima,"with value",bestMinimaValue
 
 ###############################################################################
 # plot

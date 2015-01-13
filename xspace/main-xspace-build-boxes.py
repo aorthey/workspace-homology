@@ -52,17 +52,17 @@ maxH3 = 0
 h1low = 0.2
 h1high = 0.8
 h2low = -0.2
-h2high = 0.2
-h3low = 0.4
-h3high = 1.61
+h2high = 0.8
+h3low = 0.7
+h3high = 1.7
 
 #h1step = 0.005
 #h2step = 0.005
 #h3step = 0.005
 
-h1step = 0.05
-h2step = 0.05
-h3step = 0.05
+h1step = 0.005
+h2step = 0.005
+h3step = 0.01
 
 h3=h3low
 NCtr = 0

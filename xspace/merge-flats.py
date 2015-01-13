@@ -67,49 +67,8 @@ for i in range(0,N_f):
         ## build polytope from flat description
         [k,h1,h2,h3] = Harray[i]
 
-        if h3 > h3cur:
-                ## reset if h3 changes, and perform linear regression
-                print "=== h3",h3,"(",len(XLarraySameH3),"samples)"
-                h3cur = h3
-                N = len(XLarraySameH3)
-
-                XLarraySameH3 = sorted(XLarraySameH3,key=lambda tmp: tmp[1])
-                ## check all h2 in the same group 
-
-                ###### Split XLarraySameH3 into M arrays, whereby each subarray
-                ###### has the same h2 value (could use some optimization)
-                h2cur = -5
-                XLarraySameH3SameH2 = []
-                for j in range(0,N):
-                        [xj,h2j] = XLarraySameH3[j]
-                        if j==N-1:
-                                XLarraySameH3SameH2.append([xj])
-                        if h2j > h2cur or j==N-1:
-                                if len(XLarraySameH3SameH2)>Npts:
-                                        print "h2:",h2cur,"has",len(XLarraySameH3SameH2),"samples"
-                                        ## plot the first two PCA's
-                                        [X,Y,Z,S]=PCAprojectionOnList(XLarraySameH3SameH2)
-                                        print S
-                                        #projectOnSmallestSubspace(XLarraySameH3)
-
-                                h2cur = h2j
-                                XLarraySameH3SameH2 = []
-                                XLarraySameH3SameH2.append([xj])
-                        else:
-                                XLarraySameH3SameH2.append([xj])
-
-                ## reset for next round
-                #if N>0:
-                        #[X,Y,Z,S]=PCAprojectionOnList(XLarraySameH3)
-                        #sys.exit(0)
-                XLarraySameH3 = []
-                XLarraySameH3.append([x,h2])
-        else:
-                XLarraySameH3.append([x,h2])
-
         A = np.zeros((2*Npts,Npts))
         b = np.zeros((2*Npts))
-        #print k,h1,h2,h3
         for j in range(0,Npts):
                 e = np.zeros((Npts))
                 e[j] = 1
@@ -145,8 +104,8 @@ for i in range(0,N_f):
         polytopes.append(P)
 
         xr = XRarray[i]
-        ##find flat conversion matrix, A*x = xr
 
+        ##find flat conversion matrix, A*x = xr
         [Ark,d] = findProjectionMatrix(xl,xr)
 
         xrProj = np.array(np.matrix(Ark)*xl)

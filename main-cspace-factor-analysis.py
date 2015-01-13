@@ -275,6 +275,7 @@ while h3 < h3high:
         #print "for h1 in",hmin,hmax
         #print "sampled",len(Xarray),"points"
         Nsamples=len(Xarray)
+
         ###############################################################################
         ## PCA on xpoints, visualizing in 3d
         ###############################################################################
