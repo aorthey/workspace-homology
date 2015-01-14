@@ -60,9 +60,9 @@ h3high = 1.7
 #h2step = 0.005
 #h3step = 0.005
 
-h1step = 0.005
-h2step = 0.005
-h3step = 0.01
+h1step = 0.05
+h2step = 0.05
+h3step = 0.05
 
 h3=h3low
 NCtr = 0
@@ -124,7 +124,6 @@ while h3 <= h3high:
                                         Harray.append([k,h1,h2,h3])
 
                                         imgCtr=imgCtr+1
-                                        #xspaceDisplay(xL,xM,xR)
                                         if VIDEO_DEBUG:
                                                 xspaceToImage(xL,xM,xR,imgCtr)
                                 #### display x

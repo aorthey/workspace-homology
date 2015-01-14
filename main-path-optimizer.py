@@ -13,6 +13,8 @@ from src.linalg import *
 from src.walkable import WalkableSurface, WalkableSurfacesFromPolytopes
 from xspace.htoq import *
 from src.robotspecifications import * 
+from xspace.connectorsGetMiddlePath import * 
+
 start= pickle.load( open( "data/xstart.dat", "rb" ) )
 goal= pickle.load( open( "data/xgoal.dat", "rb" ) )
 path_candidates = pickle.load( open( "data/paths.dat", "rb" ) )
@@ -41,7 +43,6 @@ goalNormal = np.array((1,0,0))
 startNormalNormal = np.dot(rotFromRPY(0,0,-pi/2),startNormal)
 goalNormalNormal = np.dot(rotFromRPY(0,0,-pi/2),goalNormal)
 
-
 HeadName = "data/xspacemanifold-same-axes/headersamples.dat"
 [Npts, VSTACK_DELTA, heights] = pickle.load( open( HeadName, "rb" ) )
 
@@ -62,12 +63,12 @@ print XspaceDimension
 ###############################################################################
 # Check which path has the best chances of finding a feasible trajectory
 ###############################################################################
-path = path_candidates[1]
-N_walkablesurfaces = len(path)
 print "found",len(path_candidates),"paths"
 for i in range(0,len(path_candidates)):
         print i,":",path_candidates[i]
 
+path = path_candidates[1]
+N_walkablesurfaces = len(path)
 print "choosing path",1,"over ",path,"walkable surfaces"
 
 ###############################################################################
@@ -108,7 +109,8 @@ for i in range(0,N_walkablesurfaces-1):
                         Winter = Wstack[j][0].intersectWithPolytope(WstackNext[j][0])
                         upperBodyConnectorStack.append(Winter)
                 else:
-                        ## create helper box for higher dimensions
+                        ## create helper box for higher dimensions (the small
+                        ## boxes which contain only 1 point
                         Whelper = connectorWtoWnext.createTinyHelperBox(heights[j],heights[j]+VSTACK_DELTA)
                         upperBodyConnectorStack.append(Whelper)
 
@@ -131,13 +133,27 @@ M_w = []
 
 N_c = len(connector)
 dI = distancePointWalkableSurface(start, connector[0])
-M_w.append(distanceInMetersToNumberOfPoints(dI))
+NdI = distanceInMetersToNumberOfPoints(dI)
+
+pathPlanes = []
+Xmiddle = getMiddlePathStart(start,connector[0],W,NdI)
+pathPlanesStart = middlePathToHyperplane(Xmiddle)
+
+for i in range(0,len(pathPlanesStart)):
+        pathPlanes.append(pathPlanesStart[i])
+
+M_w.append(NdI)
+
+sys.exit(0)
 
 for i in range(0,N_c-1):
         C = connector[i]
         Cnext = connector[i+1]
         dcc = distanceWalkableSurfaceWalkableSurface(C,Cnext)
-        M_w.append(distanceInMetersToNumberOfPoints(dcc))
+        Ndcc = distanceInMetersToNumberOfPoints(dcc)
+        M_w.append(Ndcc)
+        W=Wsurfaces_decomposed[path[i+1]]
+        Xmiddle = getMiddlePath(C,Cnext,W,Ndcc)
 
 dG = distancePointWalkableSurface(goal, connector[N_c-1])
 M_w.append(distanceInMetersToNumberOfPoints(dG))
@@ -198,6 +214,16 @@ for i in range(0,N_walkablesurfaces):
         for j in range(0,M_w[i]):
                 constraints.append( np.matrix(W.A)*x_WS[i][j] <= W.b)
                 constraints.append( np.matrix(W.ap)*x_WS[i][j] == W.bp)
+
+###############################################################################
+for i in range(0,N_walkablesurfaces):
+        ### constraints for points being on the hyperplanes of the middle path
+        P = pathPlanes[i]
+        for j in range(1,len(P)-1):
+                constraints.append( np.matrix(W.A)*x_WS[i][j] <= W.b)
+                constraints.append( np.matrix(W.ap)*x_WS[i][j] == W.bp)
+        constraints.append( np.matrix(C.A)*y <= C.b )
+        constraints.append( np.matrix(C.ap)*y == C.bp)
 
 ###############################################################################
 ### constraint: x_WS should lie in the same functional space
@@ -264,7 +290,7 @@ constraints.append( gammaGoal*v + xgoal == xbefore )
 ###############################################################################
 minimaIter = 0
 
-startMinima = 594
+startMinima = 0
 
 
 allValuesFirst = []
