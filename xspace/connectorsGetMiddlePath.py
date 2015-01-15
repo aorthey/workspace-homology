@@ -3,37 +3,41 @@ import cvxpy as cvx
 import numpy as np
 import sys
 from src.linalg import *
+from plotter import rotFromRPY
+from math import pi
+from src.functional_basis import *
 
+M = 100
+t = np.linspace(0,1,M)
+F = Fpoly(t)
 ## input: 
 ##      I1,I2   intersections as polytopes 
 ##      W       the walkable surface inbetween I1,I2
 ##      N       number of points on top of W to optimize
 ## output: 
 ##      X       middle path on top of W
-def getMiddlePath(I1,I2,W,N):
+def getMiddlePath(I1,I2,n1,n2,W,N):
         V1 = I1.getVertexRepresentation()
         V2 = I2.getVertexRepresentation()
         m1 = getMeanFromVerticesList(V1).flatten()
         m2 = getMeanFromVerticesList(V2).flatten()
-        return getMiddlePathFromIntersectionVertices(m1,m2,W,N)
-def getMiddlePathStart(p1,I2,W,N):
+        return getMiddlePathFromIntersectionVertices(m1,m2,n1,n2,W,N)
+def getMiddlePathStart(p1,I2,n1,n2,W,N):
         V2 = I2.getVertexRepresentation()
         m2 = getMeanFromVerticesList(V2).flatten()
-        return getMiddlePathFromIntersectionVertices(p1,m2,W,N)
-def getMiddlePathGoal(I1,p2,W,N):
+        return getMiddlePathFromIntersectionVertices(p1,m2,n1,n2,W,N)
+
+def getMiddlePathGoal(I1,p2,n1,n2,W,N):
         V1 = I1.getVertexRepresentation()
         m1 = getMeanFromVerticesList(V1).flatten()
-        return getMiddlePathFromIntersectionVertices(m1,p2,W,N)
+        return getMiddlePathFromIntersectionVertices(m1,p2,n1,n2,W,N)
 
 
-def getMiddlePathFromIntersectionVertices(m1,m2,W,N):
+def getMiddlePathFromIntersectionVertices(m1,m2,n1,n2,W,N):
         VW = W.getVertexRepresentation()
         ## compute geometrical middle
         p1 = projectPointOntoWalkableSurface(m1, W).flatten().T
         p2 = projectPointOntoWalkableSurface(m2, W).flatten().T
-
-        #print np.dot(W.A,p1).T <= W.b.flatten()
-        #print np.dot(W.A,p2).T <= W.b.flatten()
 
         ## set up optimization problem
         constraints = []
@@ -46,14 +50,30 @@ def getMiddlePathFromIntersectionVertices(m1,m2,W,N):
         constraints.append( x[0] == p1 )
         constraints.append( x[N-1] == p2 )
 
-        constraints.append( x[1] == p2 )
-        constraints.append( x[N-2] == p2 )
+        ###############################################################################
+        ### constraints on functional space
+        ###############################################################################
+        Fweight = Variable(M,3)
+        if N >= M:
+                print "functional space not big enough",M,"<",N
+                sys.exit(0)
+
+        for i in range(0,N):
+                constraints.append( x[i] == Fweight.T*F[i] )
+
+        objfunc += norm(Fweight)
+        ###############################################################################
+        gamma1 = Variable(1,1)
+        constraints.append( x[1] == gamma1*n1 + x[0] )
+        gamma2 = Variable(1,1)
+        constraints.append( x[N-2] == gamma2*n2 + x[N-1] )
+
         for i in range(0,N):
                 constraints.append( np.matrix(W.A)*x[i] <= W.b)
                 constraints.append( np.matrix(W.ap)*x[i] == W.bp)
 
         for i in range(0,N-1):
-                constraints.append( norm(x[i]-x[i+1]) < 0.2)
+                constraints.append( norm(x[i]-x[i+1]) < 0.12)
 
         for i in range(0,N):
                 for j in range(0,len(VW)):
@@ -84,11 +104,9 @@ def middlePathToHyperplane(X):
                 a = xnext-xcur
                 a = a/np.linalg.norm(a)
                 b = np.dot(xcur.T,a)
-                hyperplanes.append([a,b])
+                R = rotFromRPY(0,0,pi/2)
+                ar = np.dot(R,a)
+                hyperplanes.append([a,b,ar,xcur])
+        hyperplanes.append([a,b,ar,xnext])
         return hyperplanes
                 
-
-                
-
-
-
