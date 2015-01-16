@@ -104,6 +104,8 @@ def PCAprojection(xx):
 
         return [X,Y,Z,np.around(S,2)]
 
+
+
 def intersection(p1, p2):
         N1=p1.numberOfHalfspaces()
         N2=p2.numberOfHalfspaces()
@@ -268,12 +270,13 @@ def distancePointPolytope(v, A, b):
 
 #def distancePolytopePolytope(Ai, bi, Aj, bj):
 def distancePolytopePolytope(Pi, Pj):
+        N = Pi.A.shape[1]
         Ai = Pi.A
         bi = Pi.b
         Aj = Pj.A
         bj = Pj.b
-        xob = Variable(3)
-        yob = Variable(3)
+        xob = Variable(N)
+        yob = Variable(N)
         objective = Minimize(sum_squares(xob  - yob ))
         #constraints = [np.dot(Ai,xob)<= bi,np.dot(Aj,yob) <= bj]
         constraints = [np.matrix(Ai)*xob<= bi,np.matrix(Aj)*yob <= bj]

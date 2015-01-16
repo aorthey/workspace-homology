@@ -119,6 +119,8 @@ for i in range(0,N_f):
 
         ARKarray.append(Ark)
         HVarray.append(Harray[i])
+        if i%100==0:
+                print i,"/",N_f,"converted to polytopes"
 
 end = timer()
 ts= np.around(end - start,2)

@@ -109,6 +109,21 @@ class Plotter:
         def set_view(self,azim,elev):
                 self.ax.view_init(elev=elev, azim=azim)
 
+        def line(self, L,style='-r',lw=5.0):
+                x=[]
+                y=[]
+                z=[]
+                for i in range(0,len(L)):
+                        x.append(L[i][0])
+                        y.append(L[i][1])
+                        z.append(L[i][2])
+
+                x = np.array(x).flatten()
+                y = np.array(y).flatten()
+                z = np.array(z).flatten()
+
+                self.ax.plot(x, y, z, style,linewidth=lw)
+
         def lines(self, L,style='o-r'):
                 N = L.shape[0]
                 M = L.shape[1]

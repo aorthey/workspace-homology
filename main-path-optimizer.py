@@ -14,12 +14,13 @@ from src.walkable import WalkableSurface, WalkableSurfacesFromPolytopes
 from xspace.htoq import *
 from src.robotspecifications import * 
 from xspace.connectorsGetMiddlePath import * 
+from xspace.connectorComputeNormal import * 
 
-start= pickle.load( open( "data/xstart.dat", "rb" ) )
-goal= pickle.load( open( "data/xgoal.dat", "rb" ) )
-path_candidates = pickle.load( open( "data/paths.dat", "rb" ) )
-Wsurfaces_decomposed = pickle.load( open( "data/wsurfaces.dat", "rb" ) )
-Wsurface_box_vstack = pickle.load( open( "data/wsurfaces_vstack.dat", "rb" ) )
+start= pickle.load( open( "data/environment/xstart.dat", "rb" ) )
+goal= pickle.load( open( "data/environment/xgoal.dat", "rb" ) )
+path_candidates = pickle.load( open( "data/environment/paths.dat", "rb" ) )
+Wsurfaces_decomposed = pickle.load( open( "data/environment/wsurfaces.dat", "rb" ) )
+Wsurface_box_vstack = pickle.load( open( "data/environment/wsurfaces_vstack.dat", "rb" ) )
 
 DEBUG=1
 if DEBUG:
@@ -35,22 +36,20 @@ colorScene=(0.6,0.6,0.6,0.2)
 svPointSize=50
 
 ### start/goal direction
-start_normal = np.array((1,1,0))
-goal_normal = np.array((1,0,0))
-
-startNormal = np.array((1,1,0))
-goalNormal = np.array((1,0,0))
-startNormalNormal = np.dot(rotFromRPY(0,0,-pi/2),startNormal)
-goalNormalNormal = np.dot(rotFromRPY(0,0,-pi/2),goalNormal)
+#startNormal = np.array((1,-1,0))
+#goalNormal = np.array((0,1,0))
+startNormal = np.array((1,-1,0))
+goalNormal = np.array((0,-1,0))
+startNormalNormal = np.dot(rotFromRPY(0,0,pi/2),startNormal)
+goalNormalNormal = np.dot(rotFromRPY(0,0,pi/2),goalNormal)
 
 HeadName = "data/xspacemanifold-same-axes/headersamples.dat"
-[Npts, VSTACK_DELTA, heights] = pickle.load( open( HeadName, "rb" ) )
-
 Aname = "data/polytopes/A.dat"
 ARKname = "data/polytopes/Ark.dat"
 bname = "data/polytopes/b.dat"
 HName = "data/polytopes/H.dat"
 
+[Npts, VSTACK_DELTA, heights] = pickle.load( open( HeadName, "rb" ) )
 Harray = pickle.load( open( HName, "rb" ) )
 Aflat = pickle.load( open( Aname, "rb" ) )
 Aleftrightconv = pickle.load( open( ARKname, "rb" ) )
@@ -72,7 +71,7 @@ N_walkablesurfaces = len(path)
 print "choosing path",1,"over ",path,"walkable surfaces"
 
 ###############################################################################
-# optimize over the connection between surfaces
+# create connection between surfaces (intersection between boxes)
 ###############################################################################
 plot = Plotter()
 ## compute connectors
@@ -127,6 +126,16 @@ for i in range(0,N_walkablesurfaces-1):
         x_connection.append(Variable(3,1))
 
 ###############################################################################
+### we have to know the intersection normals, and the normal to those normals
+connectorNormalNormal = []
+connectorNormal= []
+for i in range(0,N_walkablesurfaces-1):
+        I = connector[i]
+        [n,nn]=computeNormalFromIntersection(I)
+        connectorNormalNormal.append(nn)
+        connectorNormal.append(n)
+
+###############################################################################
 ## compute number of points per walkable surface, depending on the distance to
 ## the next connector segment
 M_w = []
@@ -136,15 +145,17 @@ dI = distancePointWalkableSurface(start, connector[0])
 NdI = distanceInMetersToNumberOfPoints(dI)
 
 pathPlanes = []
-Xmiddle = getMiddlePathStart(start,connector[0],W,NdI)
+W=Wsurfaces_decomposed[path[0]]
+Xmiddle = getMiddlePathStart(start,connector[0],startNormal,connectorNormal[0],W,NdI)
 pathPlanesStart = middlePathToHyperplane(Xmiddle)
+xx = (start.T+np.array((0,0,0.1))).T
+plot.point(xx,color=(0,0,0,1))
 
-for i in range(0,len(pathPlanesStart)):
+for i in range(0,len(Xmiddle)):
         pathPlanes.append(pathPlanesStart[i])
 
 M_w.append(NdI)
-
-sys.exit(0)
+pathPlanesConnector = []
 
 for i in range(0,N_c-1):
         C = connector[i]
@@ -153,11 +164,26 @@ for i in range(0,N_c-1):
         Ndcc = distanceInMetersToNumberOfPoints(dcc)
         M_w.append(Ndcc)
         W=Wsurfaces_decomposed[path[i+1]]
-        Xmiddle = getMiddlePath(C,Cnext,W,Ndcc)
+        Xmiddle = getMiddlePath(C,Cnext,connectorNormal[i],connectorNormal[i+1],W,Ndcc)
+        pathPlanesConnector.append( middlePathToHyperplane(Xmiddle) )
+
+for i in range(0,len(pathPlanesConnector)):
+        for j in range(0,len(pathPlanesConnector[i])):
+                pathPlanes.append(pathPlanesConnector[i][j])
 
 dG = distancePointWalkableSurface(goal, connector[N_c-1])
-M_w.append(distanceInMetersToNumberOfPoints(dG))
+Ndg = distanceInMetersToNumberOfPoints(dG)
+M_w.append(Ndg)
 
+W=Wsurfaces_decomposed[path[len(path)-1]]
+Xmiddle = getMiddlePathStart(goal,connector[N_c-1],goalNormal,connectorNormal[N_c-1],W,Ndg)
+pathPlanesGoal = middlePathToHyperplane(Xmiddle)
+
+for i in range(0,len(pathPlanesGoal)):
+        pathPlanes.append(pathPlanesGoal[i])
+
+###############################################################################
+## DEBUG plot
 x_WS = []
 for i in range(0,N_walkablesurfaces):
         print "WS ",i,"has",M_w[i],"points to optimize"
@@ -166,20 +192,20 @@ for i in range(0,N_walkablesurfaces):
                 x_WS_tmp.append(Variable(3,1))
         x_WS.append(x_WS_tmp)
 
-
-### we have to know the intersection normals, and the normal to those normals
-connectorNormalNormal = []
-connectorNormal= []
-for i in range(0,N_walkablesurfaces-1):
-        ## TODO: use normal of intersection, and rotate it via
-        ## rotfromrpy(0,0,pi) to the right 
-        connectorNormalNormal.append(np.array((1,0,0)))
-        connectorNormal.append(np.array((0,1,0)))
+for i in range(0,len(pathPlanes)):
+        [a,b,ar,xcur]=pathPlanes[i]
+        l1 = xcur-0.5*ar
+        l2 = xcur+0.5*ar
+        l3 = xcur
+        L = np.array([l1,l2,l3])
+        plot.point(l1)
+        plot.point(l2)
+        plot.point(l3,color=(0,0,0,1))
+        plot.line(L,lw=0.3)
 
 ###############################################################################
 # building constraints
 ###############################################################################
-
 constraints = []
 
 ## start/goal regions constraints
@@ -219,11 +245,6 @@ for i in range(0,N_walkablesurfaces):
 for i in range(0,N_walkablesurfaces):
         ### constraints for points being on the hyperplanes of the middle path
         P = pathPlanes[i]
-        for j in range(1,len(P)-1):
-                constraints.append( np.matrix(W.A)*x_WS[i][j] <= W.b)
-                constraints.append( np.matrix(W.ap)*x_WS[i][j] == W.bp)
-        constraints.append( np.matrix(C.A)*y <= C.b )
-        constraints.append( np.matrix(C.ap)*y == C.bp)
 
 ###############################################################################
 ### constraint: x_WS should lie in the same functional space
@@ -269,13 +290,13 @@ for i in range(0,N_walkablesurfaces-1):
 
 ###############################################################################
 ### constraint: the first point after start should have same orientation as start
-v = startNormalNormal
+v = startNormal
 xnext = x_WS[0][1]
 gammaStart = Variable(1)
 constraints.append( gammaStart*v + x_WS[0][0] == xnext )
 
 ### constraint: the first point before goal should have same orientation as goal
-v = goalNormalNormal
+v = goalNormal
 N = len(x_WS)
 M = len(x_WS[N-1])
 xbefore = x_WS[N-1][M-2]
@@ -393,9 +414,11 @@ for i in range(startMinima,XspaceMinima):
         if i%100==0:
                 end = timer()
                 ts= np.around(end - start,2)
+                validMinima = np.sum(np.array(allValuesFirst) < inf)
                 print "================================================================"
                 print "Time elapsed after checking",i,"minima:"
                 print ts,"s"
+                print "(",validMinima,"valid minima found so far)"
                 print "================================================================"
 
 

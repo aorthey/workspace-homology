@@ -22,7 +22,6 @@ def memory_usage_psutil():
     mem = process.get_memory_info()[0] / float(2 ** 20)
     return mem
 
-VIDEO_DEBUG = 0
 
 dankle=ROBOT_DIST_FOOT_SOLE
 d0=ROBOT_DIST_KNEE_FOOT
@@ -60,9 +59,10 @@ h3high = 1.7
 #h2step = 0.005
 #h3step = 0.005
 
-h1step = 0.05
-h2step = 0.05
-h3step = 0.05
+h1step = 0.001
+h2step = 0.001
+h3step = 0.01
+VIDEO_DEBUG = 0
 
 h3=h3low
 NCtr = 0
@@ -138,13 +138,13 @@ while h3 <= h3high:
 
 NfeasibleCtrReduced = len(XLarray)
 
-XLname = "../data/xspacemanifold-same-axes/xsamplesL.dat"
-XMname = "../data/xspacemanifold-same-axes/xsamplesM.dat"
-XRname = "../data/xspacemanifold-same-axes/xsamplesR.dat"
-THETAname = "../data/xspacemanifold-same-axes/xsamplesTheta.dat"
-Qname = "../data/xspacemanifold-same-axes/xsamplesQ.dat"
-Hname = "../data/xspacemanifold-same-axes/hsamples.dat"
-HeadName = "../data/xspacemanifold-same-axes/headersamples.dat"
+XLname = "../data/xspace/xsamplesL.dat"
+XMname = "../data/xspace/xsamplesM.dat"
+XRname = "../data/xspace/xsamplesR.dat"
+THETAname = "../data/xspace/xsamplesTheta.dat"
+Qname = "../data/xspace/xsamplesQ.dat"
+Hname = "../data/xspace/hsamples.dat"
+HeadName = "../data/xspace/headersamples.dat"
 
 pickle.dump( XLarray, open( XLname, "wb" ) )
 pickle.dump( XMarray, open( XMname, "wb" ) )
