@@ -5,7 +5,7 @@ from math import cos,sin,tan,pi,asin,acos,atan2,atan,sqrt
 from plotter import rotFromRPY
 import math
 import numpy as np
-DEBUG=1
+
 def xtoq(X):
 
         dk=ROBOT_DIST_FOOT_SOLE
@@ -26,9 +26,15 @@ def xtoq(X):
                 print "wrong input",x0
                 sys.exit(0)
 
+        delta = VSTACK_DELTA
+
+        zz = np.array((0,0,1))
+        zzf = zz+x0
+        vk = dk*zz
+        while i*delta < dk:
+                if d(x[i],zzf) > 0.001:
+                        ##change to ankle knee segment
+                        xp = x[i-1]
+
+
         return [q,theta]
-
-
-
-
-

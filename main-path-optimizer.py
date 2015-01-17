@@ -23,8 +23,7 @@ Wsurfaces_decomposed = pickle.load( open( "data/environment/wsurfaces.dat", "rb"
 Wsurface_box_vstack = pickle.load( open( "data/environment/wsurfaces_vstack.dat", "rb" ) )
 
 DEBUG=1
-if DEBUG:
-        goal[0]=0.4
+goal[0]=0.4
 
 v2 = np.array((0,0,1))
 v1 = np.array((1,0,0))
@@ -43,7 +42,7 @@ goalNormal = np.array((0,-1,0))
 startNormalNormal = np.dot(rotFromRPY(0,0,pi/2),startNormal)
 goalNormalNormal = np.dot(rotFromRPY(0,0,pi/2),goalNormal)
 
-HeadName = "data/xspacemanifold-same-axes/headersamples.dat"
+HeadName = "data/polytopes/headersamples.dat"
 Aname = "data/polytopes/A.dat"
 ARKname = "data/polytopes/Ark.dat"
 bname = "data/polytopes/b.dat"

@@ -22,11 +22,12 @@ def memory_usage_psutil():
     mem = process.get_memory_info()[0] / float(2 ** 20)
     return mem
 
-XLname = "../data/xspacemanifold-same-axes/xsamplesL.dat"
-XRname = "../data/xspacemanifold-same-axes/xsamplesR.dat"
-XMname = "../data/xspacemanifold-same-axes/xsamplesM.dat"
-Hname = "../data/xspacemanifold-same-axes/hsamples.dat"
-HeadName = "../data/xspacemanifold-same-axes/headersamples.dat"
+folder="../data/xspace"
+XLname =   folder+"/xsamplesL.dat"
+XRname =   folder+"/xsamplesR.dat"
+XMname =   folder+"/xsamplesM.dat"
+Hname =    folder+"/hsamples.dat"
+HeadName = folder+"/headersamples.dat"
 
 start = timer()
 XLarray = pickle.load( open( XLname, "rb" ) )

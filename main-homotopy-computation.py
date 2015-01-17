@@ -2,7 +2,6 @@ import numpy as np
 import networkx as nx
 from networkx import graphviz_layout
 import pickle
-#import time
 
 from timeit import default_timer as timer
 
@@ -315,6 +314,8 @@ for i in range(0,N_w):
 
                 Wi_box_vstack.append(hstack)
                 bottomHeight+=VSTACK_DELTA
+
+        print "WS got Vstack of size",len(Wi_box_vstack)
 
         Wsurface_box_vstack.append(Wi_box_vstack)
 ###############################################################################
